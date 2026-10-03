@@ -27,3 +27,9 @@ build-backend = "uv_build"
 dev = [
     "pytest>=9.1.1",
 ]
+
+[tool.pytest.ini_options]
+# The suite is tests/ only. Without testpaths, a bare `pytest` walks into data/raw, where the
+# cloned upstream repositories carry their own test files, and collection dies on their imports.
+testpaths = ["tests"]
+norecursedirs = ["data", ".venv", ".superpowers", "results", "docs"]
