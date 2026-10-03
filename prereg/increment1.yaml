@@ -186,10 +186,17 @@ analysis:
 
 hodge:
   census_exact: [n_nodes, n_edges, n_components, n_triangles, dim_gradient, dim_cycle_space]
-  census_estimated:
+  census_split:
     quantity: the split of the cycle space into curl and harmonic
-    exact_when: n_edges <= 5000, by dense SVD
-    otherwise: randomised range finder, tolerance logged
+    exact_when: n_edges <= 5000 AND the dense |E| x |T| array fits in 400 MB, by dense SVD
+    otherwise: reported as unavailable, not estimated
+    why_not_estimated: >
+      Amended 2026-10-03, before any Hodge result was recorded. A randomised range finder cannot
+      return a rank above its probe width, so on CHEMBL1862_Ki it returned dim_curl = 2048 exactly,
+      the probe width, and inflated the harmonic part to 2866. On CHEMBL1871_Ki, where an exact rank
+      was affordable, harmonic was 124 against a gradient of 657 -- small, not dominant. The estimate
+      therefore pointed the same way as the finding this project is looking for, which is the worst
+      property an estimator can have. The energy fractions need no rank and carry the claim instead.
   energy: >
     Orthogonal projections by lsmr. Gradient and curl subspaces are orthogonal because
     B1 @ B2 = 0, which is asserted as a test.

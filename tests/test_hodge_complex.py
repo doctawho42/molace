@@ -74,8 +74,17 @@ def test_census_finds_a_harmonic_component_on_a_hollow_square():
     assert d["dim_harmonic"] == 1
 
 
-def test_census_marks_the_rank_as_estimated_above_the_exact_threshold():
+def test_census_refuses_to_guess_the_rank_above_the_exact_threshold():
+    """No estimate is offered above the threshold, and the exact quantities still are.
+
+    A randomised range finder cannot return a rank above its probe width, and on a real target that
+    ceiling inflated the harmonic part from 124 to 2866 -- in the direction of the finding the project
+    is looking for. So the split is unavailable rather than estimated.
+    """
     g = nx.gnp_random_graph(90, 0.4, seed=2)
     d = cx.census(g, exact_rank_max_edges=10)
-    assert d["rank_method"] == "estimated"
-    assert "rank_tolerance" in d
+    assert d["rank_method"] == "unavailable"
+    assert d["dim_curl"] is None and d["dim_harmonic"] is None
+    assert d["dim_gradient"] == 90 - 1
+    assert d["dim_cycle_space"] == d["n_edges"] - 90 + 1
+    assert d["n_triangles"] > 0
