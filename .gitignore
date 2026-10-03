@@ -1,8 +1,10 @@
 .remember/
+.superpowers/
 __pycache__/
 *.pyc
 .venv/
 data/raw/
 data/cache/
-results/
+results/tasks/
+.pytest_cache/
 .DS_Store
