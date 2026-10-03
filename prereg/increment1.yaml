@@ -84,8 +84,15 @@ forbidden:
   - Selecting the best seed, the best k, or the best graph kind by outcome.
 
 arms:
+  learner_note: >
+    The boosted-tree arm is scikit-learn's HistGradientBoostingRegressor, named `hgb`, not LightGBM
+    as the design document had it. LightGBM's wheel requires a system OpenMP runtime that is absent
+    on this machine; installing it is a change outside the repository and would make a repository
+    meant to be publicly reproducible depend on a system package manager. Same algorithm family, no
+    external runtime. Amended 2026-10-03, before any measurement ran, which is what this file's own
+    rule permits: changes after the sweep require a new file, not an edit of this one.
   pointwise:
-    learners: [svm, lightgbm, mlp]
+    learners: [svm, hgb, mlp]
     features: ecfp4
     test_time_label_access: none
   knn_floor:
@@ -94,7 +101,7 @@ arms:
     weights: uniform
     deterministic: true
   pairwise:
-    learners: [svm, lightgbm, mlp]
+    learners: [svm, hgb, mlp]
     feature_maps: [difference, concat_difference]
     inference: mean over the same m anchors of (y_i + f(x_i, x_new))
     m: 10
