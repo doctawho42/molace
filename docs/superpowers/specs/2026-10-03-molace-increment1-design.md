@@ -425,9 +425,13 @@ number. Budget switches are logged.
 These are open by design rather than by omission, and each has an owner task and an
 acceptance test. None blocks writing code; each blocks writing a sentence that depends on it.
 
-1. **Unbiased homophily formula** read from arXiv 2412.09663, `alpha` set as GraphLand sets
-   it. Acceptance: the implementation reproduces the paper's stated properties on the
-   paper's own counterexamples. Writing this formula from memory is forbidden.
+1. ~~**Unbiased homophily formula** read from arXiv 2412.09663, `alpha` set as GraphLand sets
+   it.~~ **CLOSED 2026-10-03.** Equation (3) transcribed from the paper into
+   `src/molace/measures/unbiased.py`, recommended form `alpha = 0`, so no free parameter in our
+   hands. All four defining properties pass as tests, including minimal agreement. The paper's
+   prose leaves the normalisation of `C` implicit; it is both orientations of every edge divided
+   by `2|E|`, which is the convention under which the paper's own stated values (0 for a balanced
+   random labelling, +1 for perfect separation, -1 for a fully heterophilous one) come out right.
 2. **MoleculeACE cliff definition** (substructure / scaffold / SMILES similarity at 0.9
    with a 10-fold activity difference) confirmed against van Tilborg et al. 2022 directly.
    Acceptance: the quoted thresholds appear in the paper. The circularity paragraph of §7
