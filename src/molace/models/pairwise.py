@@ -21,10 +21,43 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from sklearn.ensemble import HistGradientBoostingRegressor
+from sklearn.neural_network import MLPRegressor
+from sklearn.svm import LinearSVR
+
 from molace.models.anchors import M
-from molace.models.pointwise import make_learner
 
 FEATURE_MAPS: tuple[str, ...] = ("difference", "concat_difference")
+
+#: Families whose pointwise and pairwise learners are the same model class, so their gap is a
+#: matched comparison. The kernel family is deliberately absent: see make_pair_learner.
+MATCHED_FAMILIES: tuple[str, ...] = ("hgb", "mlp")
+
+
+def make_pair_learner(name: str, seed: int):
+    """A learner sized for the pair training set, which is 20 to 60 times the molecule count.
+
+    The kernel slot is a LINEAR support vector regressor, not the RBF one the pointwise arm uses.
+    RBF is quadratic in samples and the largest target has 58,480 pairs; measured, the pointwise RBF
+    fit costs 9.9s on 2,924 molecules while a linear pairwise fit costs 42.9s on their 58,480 pairs
+    and an RBF one does not finish. Two consequences, both stated rather than hidden: the kernel
+    family's pointwise-against-pairwise gap is NOT a matched comparison and is therefore excluded
+    from the primary, and a bias-free linear readout on a difference of a fixed encoder is exactly
+    the gradient-flow case of the design's second half, so this arm doubles as its empirical check.
+    """
+    if name == "svm":
+        return LinearSVR(C=1.0, max_iter=5000, random_state=seed)
+    if name == "hgb":
+        return HistGradientBoostingRegressor(
+            max_iter=100, learning_rate=0.1, max_features=0.05,
+            min_samples_leaf=10, random_state=seed,
+        )
+    if name == "mlp":
+        return MLPRegressor(
+            hidden_layer_sizes=(64,), max_iter=120, early_stopping=True,
+            n_iter_no_change=8, random_state=seed,
+        )
+    raise KeyError(f"unknown learner {name!r}")
 
 
 def pair_features(Xa: np.ndarray, Xb: np.ndarray, kind: str) -> np.ndarray:
@@ -82,6 +115,6 @@ class PairwiseModel:
 def fit(learner: str, kind: str, X_train, y_train, sim_train_train, m: int = M,
         seed: int = 0) -> PairwiseModel:
     feats, targets = training_pairs(X_train, y_train, sim_train_train, m, kind)
-    model = make_learner(learner, seed)
+    model = make_pair_learner(learner, seed)
     model.fit(feats, targets)
     return PairwiseModel(learner_name=learner, kind=kind, model=model)

@@ -13,6 +13,12 @@ reproducible depend on a system package manager. Histogram gradient boosting is 
 family, ships inside scikit-learn, and needs no external runtime. `min_samples_leaf` is lowered from
 the default 20 because a fingerprint bit is set in a small minority of molecules and the default
 forbids the splits that carry the signal.
+
+Hyperparameters are sized for a 2048-dimensional input, which is what the plan's values were not.
+Measured on one real target (489 training molecules): the plan's boosting settings cost 70.7s for a
+single fit and its network 12.7s, against 19.5s and 0.7s after resizing. Boosting stays the most
+expensive arm in both directions because scikit-learn bins all 2048 features at every fit regardless
+of `max_features`, and that cost is irreducible here.
 """
 from __future__ import annotations
 
@@ -30,13 +36,13 @@ def make_learner(name: str, seed: int):
         return SVR(kernel="rbf", C=10.0, gamma="scale", epsilon=0.1)
     if name == "hgb":
         return HistGradientBoostingRegressor(
-            max_iter=400, learning_rate=0.05, max_leaf_nodes=31,
-            min_samples_leaf=5, random_state=seed,
+            max_iter=100, learning_rate=0.1, max_leaf_nodes=31, max_features=0.05,
+            min_samples_leaf=10, random_state=seed,
         )
     if name == "mlp":
         return MLPRegressor(
-            hidden_layer_sizes=(256, 128), max_iter=600, early_stopping=True,
-            n_iter_no_change=20, random_state=seed,
+            hidden_layer_sizes=(64,), max_iter=120, early_stopping=True,
+            n_iter_no_change=8, random_state=seed,
         )
     raise KeyError(f"unknown learner {name!r}; expected one of {LEARNERS}")
 

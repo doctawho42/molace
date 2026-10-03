@@ -102,12 +102,35 @@ arms:
     deterministic: true
   pairwise:
     learners: [svm, hgb, mlp]
-    feature_maps: [difference, concat_difference]
+    feature_maps: [difference]
+    feature_maps_deferred: [concat_difference]
+    kernel_slot: >
+      LinearSVR, not the RBF SVR the pointwise arm uses. RBF is quadratic in samples and the largest
+      target has 58,480 training pairs; measured, a linear pairwise fit there costs 42.9s and an RBF
+      one does not finish. The kernel family's gap is therefore NOT a matched comparison and is
+      excluded from the primary. A bias-free linear readout on a difference of a fixed encoder is
+      also exactly the gradient-flow case of the Hodge half, so this arm doubles as its check.
+    hyperparameters: >
+      Sized for the pair training set, which is 20 to 60 times the molecule count, and separately
+      from the pointwise arm's. Measured single-fit costs after resizing, smallest and largest target:
+      pointwise svm 0.3s/9.9s, hgb 19.5s/59.8s, mlp 0.7s/2.3s; pairwise svm 5.0s/42.9s,
+      hgb 31.9s/48.0s, mlp 18.3s/74.6s.
     inference: mean over the same m anchors of (y_i + f(x_i, x_new))
     m: 10
 
 dependent_variables:
-  selection: 5-fold CV on the training split only, by mean CV RMSE, then refit on full train
+  selection: >
+    NONE. Amended 2026-10-03, before any measurement ran. The design had each arm pick its best of
+    three learners by 5-fold CV on the training split. Measured, a single fit costs 0.3s to 75s
+    depending on learner and arm, so CV over three learners and two feature maps in both arms is
+    about 36 fits per target and seed, a 20-hour sweep. One fit per learner per arm instead.
+  aggregation: >
+    The primary averages RMSE over the MATCHED families, those whose pointwise and pairwise learners
+    are the same model class, currently hgb and mlp. Averaging rather than selecting keeps the two
+    arms symmetric: letting one arm choose its best while the other is fixed would bias the gap
+    toward the chooser. This is also how SQRL reports, per base model, standard against paired.
+  matched_families: [hgb, mlp]
+  reported_but_not_matched: [svm]
   evaluation: the shipped test split, once
   primary_gap: RMSE_pointwise_selected - RMSE_pairwise_selected
   access: RMSE_pointwise_selected - RMSE_knn_floor
