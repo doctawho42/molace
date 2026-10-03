@@ -50,7 +50,9 @@ def test_sweep_averages_over_seeds_and_returns_one_row_per_target(tmp_path, monk
     df = sweep.run_sweep(["CHEMBL2835_Ki", "CHEMBL4203_Ki"], seeds=(0, 1))
     assert len(df) == 2
     assert set(df["dataset"]) == {"CHEMBL2835_Ki", "CHEMBL4203_Ki"}
-    assert df["seed"].isna().all() or "seed" not in df.columns
+    # Operand order matters: run_sweep drops the seed column, so touching df["seed"] first raises
+    # KeyError before the short circuit can save it.
+    assert "seed" not in df.columns or df["seed"].isna().all()
 
 
 def test_a_failing_target_does_not_lose_the_others(tmp_path, monkeypatch):

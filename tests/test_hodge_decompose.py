@@ -73,11 +73,23 @@ def test_a_difference_of_node_labels_is_curl_free_under_true_and_shuffled_labels
 
 
 def test_harmonic_is_nonzero_on_a_graph_with_an_empty_cycle():
-    g = nx.cycle_graph(5)
-    c = cx.build(g, require_triangles=False)
-    f = np.ones(len(c.edges))            # circulating once around the hole
+    """A cycle with no triangles has a purely harmonic circulation.
+
+    The vector has to be built with the traversal signs. Edges are stored as sorted pairs oriented
+    low to high, so walking the cycle traverses one of them against its orientation and an all-ones
+    vector is not divergence-free: measured on a 4-cycle it is 75 percent gradient.
+    """
+    c = cx.build(nx.cycle_graph(5), require_triangles=False)
+    eidx = {e: i for i, e in enumerate(c.edges)}
+    f = np.zeros(len(c.edges))
+    walk = [(i, (i + 1) % 5) for i in range(5)]
+    for a, b in walk:
+        key = (a, b) if (a, b) in eidx else (b, a)
+        f[eidx[key]] = 1.0 if key == (a, b) else -1.0
+    assert np.allclose(np.asarray(c.B1 @ f).ravel(), 0.0)   # divergence-free, as a circulation is
     fr = energy.fractions(decompose(c, f))
-    assert fr["harmonic"] > 0.9
+    assert fr["harmonic"] == pytest.approx(1.0, abs=1e-9)
+    assert fr["curl"] < 1e-12                               # no triangles, so no curl subspace
 
 
 def test_per_edge_curl_is_zero_for_a_gradient_flow():
