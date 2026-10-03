@@ -8,6 +8,7 @@ authors = [
 ]
 requires-python = ">=3.11"
 dependencies = [
+    "matplotlib>=3.11.2",
     "networkx>=3.6.1",
     "numpy>=2.4.6",
     "pandas>=3.0.6",
@@ -34,3 +35,10 @@ dev = [
 # cloned upstream repositories carry their own test files, and collection dies on their imports.
 testpaths = ["tests"]
 norecursedirs = ["data", ".venv", ".superpowers", "results", "docs"]
+
+[tool.uv]
+# PyTDC depends on `rdkit-pypi`, the deprecated wheel that superseded-by `rdkit` replaced. Both
+# install into the same `rdkit/` package directory, and rdkit-pypi's extension modules are compiled
+# against NumPy 1.x, so once it lands every `import rdkit` segfaults under NumPy 2. The override
+# keeps it out; `rdkit` proper provides the same import.
+override-dependencies = ["rdkit-pypi; sys_platform == 'nonexistent'"]

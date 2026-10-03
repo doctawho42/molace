@@ -59,8 +59,12 @@ independent_variables:
     measures: [unbiased_homophily, label_informativeness, adjusted_homophily]
     free_parameters: 0
     circularity_note: >
-      cliff_mol is defined from substructure/scaffold/SMILES similarity; the graph is ECFP4
-      kNN. Different relations. Stated in the text, not hidden.
+      Corrected 2026-10-03 from the code that generated the shipped flags. A cliff needs >= 0.9
+      similarity in at least one of Morgan r=2/1024 Tanimoto, generic-Murcko-scaffold Morgan
+      Tanimoto, or SMILES Levenshtein, plus a > 10-fold potency difference. The first channel is the
+      SAME relation our graph uses, so these are not different relations and the circularity is real.
+      What limits it is the threshold: our kNN edges have median Tanimoto 0.30-0.79 and only 0.02% to
+      2.75% of them reach 0.9. Real in kind, small in extent, measured not asserted.
   baseline:
     name: rogi
     flavour: rogi

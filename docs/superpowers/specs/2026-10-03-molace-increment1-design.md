@@ -180,12 +180,18 @@ switching quantile to equal-width bins moves adjusted homophily from +0.050 to +
 (7.5x) and LI from 0.0021 to 0.2122 (100x), flipping the target from "no label structure"
 to "strongly informative".
 
-Circularity of `cliff_mol`, handled constructively rather than hidden: MoleculeACE defines
-cliffs via substructure / scaffold / SMILES similarity at a 0.9 threshold with a 10-fold
-activity difference (this wording is **UNVERIFIED** — confirm against the paper before it
-is written down), while our graph is ECFP4-kNN. These are different relations. The
-difference is stated in the text; an identical-relation version would be partly
-tautological.
+Circularity of `cliff_mol`, **corrected 2026-10-03 against the code that generated the
+shipped flags** (`MoleculeACE/benchmark/cliffs.py`), which found this paragraph wrong. A
+molecule is flagged a cliff when it has a partner at >= 0.9 similarity in at least one of
+three channels -- Morgan r=2/1024 Tanimoto, generic-Murcko-scaffold Morgan Tanimoto, SMILES
+Levenshtein -- and a > 10-fold potency difference. The thresholds are as the proposal said.
+But the first channel is **the same relation our graph uses**, Morgan r=2 Tanimoto, differing
+only in bit width, so "these are different relations" was false and the circularity is real.
+
+What limits it is the threshold, and the limit is measured: cliff edges need Tanimoto >= 0.9
+while our kNN graph's median edge similarity is 0.30 to 0.79, and the share of our edges
+reaching 0.9 runs from 0.02% to 2.75% across five targets. The overlap is real in kind and
+small in extent, and that is what the text says. See `docs/preconditions.md`.
 
 ## 8. The dependent variable
 
