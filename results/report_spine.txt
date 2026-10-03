@@ -1,0 +1,13 @@
+prereg: 864ec5131b281d6cf3d48c481c897acd803d2e93
+n = 30 | n_eff = 10.0 | clusters = 6 | assumed intra-class rho = 0.3
+
+positive_control         rho=+0.015  95% CI [-0.491, +0.489]  excludes 0: False  n=30
+primary                  rho=-0.222  95% CI [-0.597, +0.006]  excludes 0: False  n=30
+incremental_over_rogi    rho=-0.202  95% CI [-0.366, +0.064]  excludes 0: False  n=30
+decisive_secondary       rho=-0.137  95% CI [-0.598, +0.502]  excludes 0: False  n=30
+
+mean correction: -0.0925
+PRIMARY CLAIM SUPPORTED: False
+
+Read the positive control first. If it does not exclude zero, the pipeline is suspect and
+nothing below it is interpreted.

@@ -1,0 +1,40 @@
+  CHEMBL1862_Ki    curl=0.0200 harm=0.0043 rho_diff=-0.020
+  CHEMBL1871_Ki    curl=0.0247 harm=0.0025 rho_diff=-0.001
+  CHEMBL2034_Ki    curl=0.0186 harm=0.0019 rho_diff=-0.134
+  CHEMBL2047_EC50  curl=0.0327 harm=0.0060 rho_diff=+0.094
+  CHEMBL204_Ki     curl=0.0349 harm=0.0114 rho_diff=-0.146
+  CHEMBL2147_Ki    curl=0.0203 harm=0.0101 rho_diff=-0.037
+  CHEMBL214_Ki     curl=0.0252 harm=0.0164 rho_diff=-0.149
+  CHEMBL218_EC50   curl=0.0226 harm=0.0071 rho_diff=-0.087
+  CHEMBL219_Ki     curl=0.0312 harm=0.0093 rho_diff=-0.145
+  CHEMBL228_Ki     curl=0.0234 harm=0.0101 rho_diff=-0.008
+  CHEMBL231_Ki     curl=0.0278 harm=0.0087 rho_diff=-0.153
+  CHEMBL233_Ki     curl=0.0276 harm=0.0097 rho_diff=-0.153
+  CHEMBL234_Ki     curl=0.0235 harm=0.0105 rho_diff=-0.178
+  CHEMBL235_EC50   curl=0.0339 harm=0.0131 rho_diff=-0.037
+  CHEMBL236_Ki     curl=0.0297 harm=0.0041 rho_diff=-0.153
+  CHEMBL237_EC50   curl=0.0260 harm=0.0056 rho_diff=+0.021
+  CHEMBL237_Ki     curl=0.0202 harm=0.0081 rho_diff=-0.129
+  CHEMBL238_Ki     curl=0.0246 harm=0.0058 rho_diff=-0.098
+  CHEMBL239_EC50   curl=0.0273 harm=0.0103 rho_diff=-0.054
+  CHEMBL244_Ki     curl=0.0293 harm=0.0080 rho_diff=-0.095
+  CHEMBL262_Ki     curl=0.0219 harm=0.0064 rho_diff=-0.110
+  CHEMBL264_Ki     curl=0.0277 harm=0.0126 rho_diff=-0.108
+  CHEMBL2835_Ki    curl=0.0205 harm=0.0009 rho_diff=-0.060
+  CHEMBL287_Ki     curl=0.0233 harm=0.0071 rho_diff=-0.055
+  CHEMBL2971_Ki    curl=0.0274 harm=0.0074 rho_diff=-0.210
+  CHEMBL3979_EC50  curl=0.0295 harm=0.0068 rho_diff=-0.043
+  CHEMBL4005_Ki    curl=0.0193 harm=0.0088 rho_diff=+0.111
+  CHEMBL4203_Ki    curl=0.0341 harm=0.0047 rho_diff=-0.097
+  CHEMBL4616_EC50  curl=0.0276 harm=0.0029 rho_diff=-0.055
+  CHEMBL4792_Ki    curl=0.0226 harm=0.0097 rho_diff=-0.020
+
+prereg: 864ec5131b281d6cf3d48c481c897acd803d2e93
+VALIDITY CHECK, read first -- max curl fraction of the pointwise floor (must be ~0): 2.0002327577028285e-33
+median curl fraction, trained: 0.0256
+median harmonic fraction, trained: 0.0077
+median curl fraction, shuffled labels: 0.0288
+
+mean rho difference (curl minus dispersion): -0.0769
+95% bootstrap CI on the mean difference: [-0.1030, -0.0492]
+CRITERION PASSED (curl beats anchor dispersion): False
