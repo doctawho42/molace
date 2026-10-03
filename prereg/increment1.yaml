@@ -1,0 +1,178 @@
+# Frozen analysis plan for molace increment 1.
+# Committed before any measurement runs on real data. Referenced by blob hash from every
+# result file and figure. Changes after the sweep must be a new file with a new name, never an
+# edit of this one.
+version: 1
+date: 2026-10-03
+spec: docs/superpowers/specs/2026-10-03-molace-increment1-design.md
+
+representation:
+  fingerprint: morgan
+  radius: 2
+  n_bits: 2048
+  binary: true
+  rationale: >
+    The single fixed methodological parameter. Cliff sets and graph statistics both move with
+    the representation, so it is fixed once and everything else is free.
+
+graphs:
+  primary:
+    kind: knn
+    k: 10
+    symmetrisation: union
+    note: >
+      Union symmetrisation gives degree >= k, not exactly k. Mean degree therefore remains a
+      covariate in the incremental regression; it is not assumed constant.
+  robustness:
+    - {kind: knn, k: 5, symmetrisation: union}
+    - {kind: knn, k: 20, symmetrisation: union}
+    - {kind: threshold, tau: 0.5}
+    - {kind: knn, k: 10, symmetrisation: directed}
+
+task_sets:
+  spine:
+    source: MoleculeACE
+    n_tasks: 30
+    label_column: "y [pEC50/pKi]"
+    split: shipped `split` column, 80/20, stratified
+  holdout:
+    source: TDC admet_benchmark, regression subset
+    n_tasks: 9
+    datasets: [caco2_wang, lipophilicity_astrazeneca, solubility_aqsoldb, ppbr_az,
+               vdss_lombardo, half_life_obach, clearance_hepatocyte_az,
+               clearance_microsome_az, ld50_zhu]
+    opened: exactly once, after the spine primary is computed and recorded
+  external_anchor:
+    source: DeepDelta Results/ shipped per-fold predictions
+    n_tasks: 10
+    families: [RandomForest, ChemProp50, DeepDelta5]
+    note: all three are scored on the same delta task, verified from the file layout
+
+independent_variables:
+  primary:
+    name: target_assortativity
+    definition: Newman 2003 scalar assortativity, Pearson r of y over the symmetrised edge list
+    computed_on: raw potency
+    free_parameters: 0
+  categorical_arm:
+    computed_on: cliff_mol
+    measures: [unbiased_homophily, label_informativeness, adjusted_homophily]
+    free_parameters: 0
+    circularity_note: >
+      cliff_mol is defined from substructure/scaffold/SMILES similarity; the graph is ECFP4
+      kNN. Different relations. Stated in the text, not hidden.
+  baseline:
+    name: rogi
+    flavour: rogi
+    role: the primary must show incremental contribution over this
+    flavour_note: >
+      Plain ROGI, not ROGI-XD as the design document named. ROGI-XD's only implementation needs a
+      separate conda environment on Python 3.9 with torch 1.13 and CUDA 11.6, git submodules and
+      pretrained encoders, so it cannot enter this project's environment; and its axis is the
+      roughness of learned representations while this project fixes one representation by design.
+      Recorded here, in the module and in the README rather than substituted silently.
+  secondary:
+    name: dirichlet_energy
+    normalisation: divided by the label variance times the edge count
+    presented_as: an import, not a measure of this group
+
+forbidden:
+  - Binning a continuous target into classes for any categorical measure. Measured on
+    CHEMBL2835_Ki at one graph and one bin count, swapping quantile for equal-width bins moved
+    adjusted homophily 7.5x and label informativeness 100x. Enforced by a TypeError.
+  - Inventing a continuous label informativeness. No published definition exists.
+  - Selecting the best seed, the best k, or the best graph kind by outcome.
+
+arms:
+  pointwise:
+    learners: [svm, lightgbm, mlp]
+    features: ecfp4
+    test_time_label_access: none
+  knn_floor:
+    rule: mean of y over the m nearest training molecules by Tanimoto on the one fingerprint
+    m: 10
+    weights: uniform
+    deterministic: true
+  pairwise:
+    learners: [svm, lightgbm, mlp]
+    feature_maps: [difference, concat_difference]
+    inference: mean over the same m anchors of (y_i + f(x_i, x_new))
+    m: 10
+
+dependent_variables:
+  selection: 5-fold CV on the training split only, by mean CV RMSE, then refit on full train
+  evaluation: the shipped test split, once
+  primary_gap: RMSE_pointwise_selected - RMSE_pairwise_selected
+  access: RMSE_pointwise_selected - RMSE_knn_floor
+  correction: RMSE_knn_floor - RMSE_pairwise_selected
+  identity: >
+    With uniform weights over the same m anchors the pairwise prediction equals the kNN
+    prediction plus the mean learned correction, as algebra. The telescoping of the three error
+    numbers is separately trivial and carries no content; the identity is what licenses
+    attributing `correction` to the learned function alone.
+  forbidden_reporting: >
+    RMSE is nonlinear, so `correction` is not a share of `gap` and must never be reported as a
+    percentage of it.
+  secondary: [per-learner gaps, the same three quantities under RMSE on cliff compounds]
+  seeds: 3, averaged, learned arms only
+
+analysis:
+  positive_control:
+    statistic: spearman(target_assortativity, access)
+    expectation: must be positive with a 95 percent interval excluding zero
+    on_failure: >
+      indicts the measurement pipeline, not the hypothesis. Nothing downstream is interpreted
+      until it is resolved.
+  primary:
+    statistic: spearman(target_assortativity, primary_gap)
+  incremental:
+    model: primary_gap ~ target_assortativity + rogi + mean_degree + log(n_molecules)
+    reported: the contribution of target_assortativity with its interval
+  decisive_secondary:
+    statistics: [spearman(target_assortativity, correction), mean(correction)]
+    interpretation: >
+      correction indistinguishable from zero is the half-1 statement of hypothesis 2, that a
+      pairwise model is a pointwise model plus anchor averaging, reached through held-out error
+      and without Hodge machinery. Section 10 of the spec tests the same claim through flow
+      energy. Disagreement between them is reported, not reconciled by choosing a number.
+  uncertainty:
+    method: cluster bootstrap over the Receptor Class column
+    clusters: {GPCR: 12, Kinase: 6, NR: 6, Other: 3, Protease: 2, Transferase: 1}
+    resamples: 10000
+    interval: percentile, 95 percent
+  decision_rule: >
+    The primary claim is supported iff the cluster-bootstrap interval for the primary Spearman
+    excludes zero AND the incremental contribution over rogi has an interval excluding zero.
+  no_sign_test: >
+    At n=5 the exact permutation critical value is |rho| = 1.0 and a sign-level null discards a
+    true rho of 0.5 to 0.7 in 9 to 20 percent of samples. There is no sign-level kill rule.
+  effective_n:
+    value: about 10
+    assumption: intra-receptor-class correlation 0.3
+    evidence: >
+      CHEMBL237_Ki and CHEMBL237_EC50 are the same protein; 26.7 percent of molecules appear in
+      more than one task; JAK1 and JAK2 overlap 88.5 percent.
+    requirement: n_eff is printed wherever n is printed
+
+hodge:
+  census_exact: [n_nodes, n_edges, n_components, n_triangles, dim_gradient, dim_cycle_space]
+  census_estimated:
+    quantity: the split of the cycle space into curl and harmonic
+    exact_when: n_edges <= 5000, by dense SVD
+    otherwise: randomised range finder, tolerance logged
+  energy: >
+    Orthogonal projections by lsmr. Gradient and curl subspaces are orthogonal because
+    B1 @ B2 = 0, which is asserted as a test.
+  controls:
+    - the trained model
+    - the same architecture on shuffled labels, with total flow norm matched
+    - an exactly curl-free floor from differencing a trained pointwise model on the same edges
+  void_null: >
+    The original null is void: the target flow dy_ij = y_j - y_i is the gradient of a node
+    labelling and is curl-free identically under true AND permuted labels, measured 0.00e+00 on
+    five real graphs. Raw-norm comparison is additionally scale-confounded, since shuffling
+    inflates the mean-square edge target 2.1x to 11.7x.
+  kill_criterion: >
+    The per-edge curl fraction must predict that edge's held-out error better than plain anchor
+    dispersion, which is published three times. Comparator: DeepDelta's additivity MAE
+    0.127 +/- 0.043. Failing to beat it is reported as a measured null.
