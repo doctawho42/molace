@@ -1,7 +1,7 @@
 [project]
 name = "molace"
 version = "0.1.0"
-description = "Add your description here"
+description = "Molecule-similarity graphs as comparison graphs: do graph statistics predict when pairwise models beat pointwise ones?"
 readme = "README.md"
 authors = [
     { name = "doctawho42", email = "plomoshnovnikita00@gmail.com" }

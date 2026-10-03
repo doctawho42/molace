@@ -5,6 +5,9 @@ __pycache__/
 .venv/
 data/raw/
 data/cache/
+data/*.tab
+data/*.csv
+data/oracle/
 results/tasks/
 .pytest_cache/
 .DS_Store

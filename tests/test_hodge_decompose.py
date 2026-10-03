@@ -103,3 +103,47 @@ def test_flow_length_mismatch_raises():
     c = _c()
     with pytest.raises(ValueError, match="edges"):
         decompose(c, np.ones(3))
+
+
+def test_a_complex_whose_boundary_composition_is_nonzero_cannot_be_built():
+    """The real defence against wrong orientation signs, and the reason it belongs in build().
+
+    The pointwise-floor control cannot detect wrong signs: a pure gradient flow leaves a zero
+    residual, and lsmr(B2, 0) is zero whatever B2 contains. Nor does breaking the triangle signs
+    destroy orthogonality -- measured, with all three triangle edges made positive so that
+    max|B1 @ B2| = 2.0, gradient . curl stayed at -2.1e-15 and the squared norms still summed to
+    ||f||^2 within 1.3e-15. So no downstream statistic catches it.
+
+    What catches it is the identity itself, which is why build() now asserts it on every complex it
+    returns rather than leaving it to one test on one graph.
+    """
+    import scipy.sparse as sp
+
+    c = cx.build(nx.complete_graph(8))
+    eidx = {e: i for i, e in enumerate(c.edges)}
+    rows, cols, vals = [], [], []
+    for t, (i, j, k) in enumerate(c.triangles):
+        for e in ((i, j), (j, k), (i, k)):
+            rows.append(eidx[e]); cols.append(t); vals.append(1.0)
+    bad = sp.csr_matrix((vals, (rows, cols)), shape=c.B2.shape)
+
+    with pytest.raises(ValueError, match="boundary"):
+        cx.check_boundary_identity(c.B1, bad)
+    cx.check_boundary_identity(c.B1, c.B2)          # the sound one passes
+
+
+def test_fractions_are_shares_of_the_flows_own_energy():
+    """Dividing by the sum of the component norms would make this sum to 1 by construction.
+
+    Dividing by ||f||^2 makes it the Pythagorean identity instead, so the assertion has content: it
+    fails if the three components stop being mutually orthogonal or stop reconstructing the flow.
+    """
+    c = cx.build(nx.gnp_random_graph(25, 0.35, seed=0))
+    rng = np.random.default_rng(7)
+    f = rng.normal(size=len(c.edges))
+    d = decompose(c, f)
+    fr = energy.fractions(d)
+    total = float(f @ f)
+    assert fr["gradient"] == pytest.approx(float(d.gradient @ d.gradient) / total, abs=1e-12)
+    assert sum(fr.values()) == pytest.approx(1.0, abs=1e-8)
+    assert fr["residual_check"] == pytest.approx(0.0, abs=1e-8)

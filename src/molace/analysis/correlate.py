@@ -32,6 +32,7 @@ class BootResult:
     excludes_zero: bool
     n: int
     n_clusters: int
+    n_draws: int
 
 
 def _spearman(x: np.ndarray, y: np.ndarray) -> float:
@@ -63,6 +64,45 @@ def cluster_bootstrap_spearman(x, y, clusters, n_resamples: int = 10000,
         excludes_zero=bool(np.isfinite(lo) and np.isfinite(hi) and (lo > 0.0 or hi < 0.0)),
         n=int((np.isfinite(x) & np.isfinite(y)).sum()),
         n_clusters=len(uniq),
+        n_draws=int(d.size),
+    )
+
+
+@dataclass(frozen=True)
+class MeanResult:
+    mean: float
+    lo: float
+    hi: float
+    excludes_zero: bool
+    n: int
+    n_clusters: int
+    n_draws: int
+
+
+def cluster_bootstrap_mean(x, clusters, n_resamples: int = 10000, seed: int = 0) -> MeanResult:
+    """A cluster bootstrap of a mean, for quantities summarised per target rather than correlated.
+
+    The Hodge criterion needs this: its statistic is the mean per-target difference between two rank
+    correlations, and bootstrapping the thirty values as if independent contradicts the same
+    non-independence that makes n_eff about ten everywhere else.
+    """
+    v = np.asarray(x, dtype=float)
+    cl = np.asarray(clusters)
+    groups = [np.flatnonzero(cl == c) for c in np.unique(cl)]
+    rng = np.random.default_rng(seed)
+    draws = []
+    for _ in range(n_resamples):
+        pick = rng.integers(0, len(groups), size=len(groups))
+        idx = np.concatenate([groups[p] for p in pick])
+        m = float(np.nanmean(v[idx]))
+        if np.isfinite(m):
+            draws.append(m)
+    d = np.asarray(draws)
+    lo, hi = (float(np.percentile(d, 2.5)), float(np.percentile(d, 97.5))) if d.size else (np.nan, np.nan)
+    return MeanResult(
+        mean=float(np.nanmean(v)), lo=lo, hi=hi,
+        excludes_zero=bool(np.isfinite(lo) and np.isfinite(hi) and (lo > 0.0 or hi < 0.0)),
+        n=int(np.isfinite(v).sum()), n_clusters=len(groups), n_draws=int(d.size),
     )
 
 

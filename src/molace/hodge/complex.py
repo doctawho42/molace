@@ -48,6 +48,27 @@ def _triangles(g: nx.Graph) -> list[tuple[int, int, int]]:
     return out
 
 
+def check_boundary_identity(B1: sp.csr_matrix, B2: sp.csr_matrix, tol: float = 1e-12) -> None:
+    """Assert B1 @ B2 == 0, the identity every projection downstream rests on.
+
+    This is where wrong orientation signs must be caught, because nothing downstream catches them.
+    The pointwise-floor control cannot: a pure gradient flow leaves a zero residual, so the curl
+    solve returns zero whatever B2 holds. Nor does breaking the triangle signs disturb the
+    decomposition's arithmetic -- measured, with all three triangle edges made positive so that
+    max|B1 @ B2| = 2.0, the gradient and curl components stayed orthogonal to 2e-15 and the squared
+    norms still summed to the flow's energy within 1.3e-15. So the identity is checked on every
+    complex that gets built, not left to one test on one graph.
+    """
+    if B2.shape[1] == 0:
+        return
+    worst = float(abs(B1 @ B2).max())
+    if worst > tol:
+        raise ValueError(
+            f"boundary composition is not zero: max|B1 @ B2| = {worst:g}. The orientation signs are "
+            "wrong, and no statistic computed from this complex would reveal it."
+        )
+
+
 def build(g: nx.Graph, triangle_budget: int | None = None,
           require_triangles: bool = True, seed: int = 0) -> Complex:
     nodes = sorted(g.nodes())
@@ -84,6 +105,7 @@ def build(g: nx.Graph, triangle_budget: int | None = None,
             vals.append(s)
     B2 = sp.csr_matrix((vals, (rows, cols)), shape=(len(edges), len(tris)))
 
+    check_boundary_identity(B1, B2)
     return Complex(B1=B1, B2=B2, nodes=nodes, edges=edges, triangles=tris,
                    triangles_total=total, triangles_sampled=sampled)
 

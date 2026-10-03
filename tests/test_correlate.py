@@ -96,3 +96,32 @@ def test_report_puts_the_positive_control_first():
     keys = list(co.report(frame))
     assert keys[0] == "positive_control"
     assert "n" in co.report(frame)["meta"] and "n_eff" in co.report(frame)["meta"]
+
+
+def test_cluster_bootstrap_mean_is_wider_than_a_row_bootstrap_of_the_same_values():
+    """The Hodge criterion's interval must resample classes, like every other interval here.
+
+    The runner first bootstrapped the thirty per-target differences as if they were independent,
+    which contradicts the pre-registration's own uncertainty rule and the n_eff of about ten that the
+    rest of the analysis treats as load-bearing.
+    """
+    rng = np.random.default_rng(0)
+    clusters = np.repeat(np.arange(6), 5)
+    offsets = np.array([-0.4, -0.3, -0.1, 0.0, 0.1, 0.2])        # between-class spread
+    x = offsets[clusters] + rng.normal(scale=0.01, size=30)      # tight within class
+
+    cl = co.cluster_bootstrap_mean(x, clusters, n_resamples=4000, seed=0)
+    row = [float(np.mean(np.random.default_rng(i).choice(x, len(x)))) for i in range(4000)]
+    row_width = float(np.percentile(row, 97.5) - np.percentile(row, 2.5))
+
+    assert cl.mean == pytest.approx(float(np.mean(x)), abs=1e-12)
+    assert (cl.hi - cl.lo) > row_width
+    assert cl.n_clusters == 6
+
+
+def test_cluster_bootstrap_mean_reports_whether_it_excludes_zero():
+    clusters = np.repeat(np.arange(6), 5)
+    neg = co.cluster_bootstrap_mean(np.full(30, -0.5), clusters, n_resamples=1000, seed=0)
+    assert neg.excludes_zero and neg.hi < 0
+    mixed = co.cluster_bootstrap_mean(np.tile([-1.0, 1.0], 15), clusters, n_resamples=1000, seed=0)
+    assert not mixed.excludes_zero

@@ -22,12 +22,27 @@ TDC_REGRESSION: tuple[str, ...] = (
 )
 
 
+#: The line the spine report only reaches if the analysis ran to completion.
+SPINE_SENTINEL = "PRIMARY CLAIM SUPPORTED:"
+
+
 def assert_spine_recorded() -> None:
-    """The holdout may only be opened after the spine result exists."""
+    """The holdout may only be opened after a spine result that actually succeeded.
+
+    Existence of the file is not enough. The runner pipes the report through `tee`, which creates it
+    whether python exited cleanly or left a traceback in it, so the gate requires the sentinel line
+    that only a completed analysis writes. The gate's whole job is to stop the holdout becoming a
+    second training set, and a gate that a crash can satisfy does not do it.
+    """
     if not SPINE_REPORT.is_file():
         raise RuntimeError(
             "the holdout may not be opened before the spine result is recorded at "
             f"{SPINE_REPORT}; opening it first turns the holdout into a second training set"
+        )
+    if SPINE_SENTINEL not in SPINE_REPORT.read_text():
+        raise RuntimeError(
+            f"{SPINE_REPORT} exists but does not contain {SPINE_SENTINEL!r}, so the spine analysis "
+            "did not complete; the holdout stays shut rather than becoming a second training set"
         )
 
 

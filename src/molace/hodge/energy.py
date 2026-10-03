@@ -22,14 +22,25 @@ from molace.hodge.decompose import Decomposition, decompose
 
 
 def fractions(d: Decomposition) -> dict:
-    total = float(d.gradient @ d.gradient + d.curl @ d.curl + d.harmonic @ d.harmonic)
+    """Shares of the flow's OWN energy, plus the residual of the Pythagorean identity.
+
+    Normalising by the sum of the three component norms would make the shares sum to 1 by
+    construction, which is how an assertion that they do becomes untestable. Normalising by ||f||^2
+    makes that sum the Pythagorean identity instead: it holds only while the three components are
+    mutually orthogonal and reconstruct the flow, so a projection that stopped doing either shows up
+    as `residual_check` moving off zero.
+    """
+    f = d.gradient + d.curl + d.harmonic
+    total = float(f @ f)
     if total == 0.0:
         raise ValueError("the flow is identically zero, so its energy budget is undefined")
-    return {
+    parts = {
         "gradient": float(d.gradient @ d.gradient) / total,
         "curl": float(d.curl @ d.curl) / total,
         "harmonic": float(d.harmonic @ d.harmonic) / total,
     }
+    parts["residual_check"] = sum(parts.values()) - 1.0
+    return parts
 
 
 def per_edge_curl(c: Complex, d: Decomposition) -> np.ndarray:

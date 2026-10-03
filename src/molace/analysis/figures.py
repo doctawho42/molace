@@ -15,7 +15,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from molace.analysis.correlate import cluster_bootstrap_spearman, effective_n
+from molace.analysis.correlate import (cluster_bootstrap_spearman, effective_n,
+                                        incremental_contribution)
 from molace.analysis.prereg import prereg_fingerprint
 
 RESULTS = Path(__file__).resolve().parents[3] / "results"
@@ -25,6 +26,10 @@ ABLATION = RESULTS / "readout_ablation.csv"
 
 PALETTE = {"GPCR": "#4C72B0", "Kinase": "#DD8452", "NR": "#55A868",
            "Other": "#C44E52", "Protease": "#8172B3", "Transferase": "#937860"}
+
+#: Set by _fig1 / _fig3 so tests can assert what was actually drawn rather than re-deriving it.
+LAST_FIG1_YLIM: tuple[float, float] = (0.0, 0.0)
+LAST_FIG3_UNAVAILABLE: int = -1
 
 
 def _read(path: Path) -> pd.DataFrame:
@@ -38,19 +43,24 @@ def _fig1(spine: pd.DataFrame, out: Path) -> Path:
     for cls, grp in spine.groupby("receptor_class"):
         ax.scatter(grp["assortativity"], grp["gap"], s=44, alpha=0.85,
                    color=PALETTE.get(cls, "#666666"), label=cls, edgecolor="white", linewidth=0.6)
-    ok = spine[["rogi", "gap"]].notna().all(axis=1)
-    if ok.sum() > 2:
-        z = np.polyfit(spine.loc[ok, "rogi"].rank(), spine.loc[ok, "gap"].rank(), 1)
-        xs = np.linspace(spine["assortativity"].min(), spine["assortativity"].max(), 10)
-        ax.plot(xs, np.full_like(xs, np.polyval(z, spine.loc[ok, "rogi"].rank().mean())),
-                "--", color="#999999", linewidth=1.2, label="roughness-only level")
+    # The plan drew a "roughness-only level" line here by evaluating a rank-space fit and plotting it
+    # on an axis in RMSE units, which put the y-limit at 16 while the data span about 0.3. The
+    # incremental quantity belongs in the title, where it is a number, not on the axis as a line.
     b = cluster_bootstrap_spearman(spine["assortativity"], spine["gap"],
                                    spine["receptor_class"], 10000, 0)
+    inc = incremental_contribution(spine, "gap", ["rogi", "mean_degree", "n_molecules"])
     ax.axhline(0.0, color="#CCCCCC", linewidth=0.8, zorder=0)
     ax.set_xlabel("target assortativity")
     ax.set_ylabel("gap  (RMSE pointwise - RMSE pairwise)")
-    ax.set_title(f"rho = {b.rho:+.3f}   95% CI [{b.lo:+.3f}, {b.hi:+.3f}]", fontsize=10)
+    ax.set_title(
+        f"rho = {b.rho:+.3f}  95% CI [{b.lo:+.3f}, {b.hi:+.3f}]\n"
+        f"incremental over roughness, degree and size: "
+        f"rho = {inc.rho:+.3f}  95% CI [{inc.lo:+.3f}, {inc.hi:+.3f}]",
+        fontsize=9,
+    )
     ax.legend(fontsize=7, frameon=False, ncol=2)
+    global LAST_FIG1_YLIM
+    LAST_FIG1_YLIM = tuple(float(v) for v in ax.get_ylim())
     fig.tight_layout()
     path = out / "fig1_assortativity_vs_gap.png"
     fig.savefig(path, dpi=200)
@@ -79,22 +89,40 @@ def _fig2(spine: pd.DataFrame, out: Path) -> Path:
 
 
 def _fig3(census: pd.DataFrame, out: Path) -> Path:
-    d = census.sort_values("dim_harmonic", ascending=False).reset_index(drop=True)
+    """Exact dimensions as bars; the unavailable split marked, never drawn as zero.
+
+    27 of 30 targets have no computable curl/harmonic split, and absent bars read as a measured zero
+    pointing the way the project's hypothesis points. Those targets get their cycle space drawn as a
+    hatched grey block instead: we know its size, we do not know how it divides.
+    """
+    d = census.sort_values("dim_cycle_space", ascending=False).reset_index(drop=True)
+    unavailable = d["rank_method"] == "unavailable"
     x = np.arange(len(d))
     w = 0.27
-    fig, ax = plt.subplots(figsize=(8.0, 4.4))
-    for off, col, colour, name in ((-w, "dim_gradient", "#4C72B0", "gradient"),
-                                   (0.0, "dim_curl", "#DD8452", "curl"),
-                                   (w, "dim_harmonic", "#55A868", "harmonic")):
-        hatch = ["//" if m == "estimated" else "" for m in d["rank_method"]]
-        bars = ax.bar(x + off, d[col], width=w, color=colour, label=name)
-        for bar, h in zip(bars, hatch):
-            bar.set_hatch(h)
+    fig, ax = plt.subplots(figsize=(8.6, 4.8))
+
+    ax.bar(x - w, d["dim_gradient"], width=w, color="#4C72B0", label="gradient (exact)")
+    ex = d.loc[~unavailable]
+    ax.bar(np.flatnonzero(~unavailable), ex["dim_curl"], width=w, color="#DD8452",
+           label="curl (exact rank)")
+    ax.bar(np.flatnonzero(~unavailable) + w, ex["dim_harmonic"], width=w, color="#55A868",
+           label="harmonic (exact rank)")
+    if unavailable.any():
+        un = d.loc[unavailable]
+        ax.bar(np.flatnonzero(unavailable) + w / 2, un["dim_cycle_space"], width=2 * w,
+               color="#DDDDDD", edgecolor="#777777", hatch="//",
+               label="cycle space, split UNAVAILABLE")
     ax.set_xticks(x)
     ax.set_xticklabels(d["dataset"], rotation=90, fontsize=5.5)
     ax.set_ylabel("subspace dimension")
-    ax.set_title("hatched bars: rank estimated, not computed exactly", fontsize=9)
-    ax.legend(fontsize=8, frameon=False)
+    ax.set_title(
+        f"curl/harmonic split is exact on {int((~unavailable).sum())} of {len(d)} targets; "
+        f"the other {int(unavailable.sum())} show their cycle space hatched, not a zero",
+        fontsize=9,
+    )
+    ax.legend(fontsize=7, frameon=False)
+    global LAST_FIG3_UNAVAILABLE
+    LAST_FIG3_UNAVAILABLE = int(unavailable.sum())
     fig.tight_layout()
     path = out / "fig3_hodge_census.png"
     fig.savefig(path, dpi=200)
@@ -149,10 +177,13 @@ def make_figures(out_dir="results/figures") -> list[Path]:
         "function buys, per target. Heights are error differences in the label's units. They are "
         "**not** shares of the gap: RMSE is nonlinear, so a percentage would be meaningless.",
         "",
-        "**fig3** Hodge subspace dimensions per target on the pre-registered kNN graph. Hatched "
-        "bars mark targets whose curl rank was estimated by a randomised range finder rather than "
-        "computed exactly, which happens above the stated edge count. An estimated bar does not "
-        "license the precision an exact one does.",
+        "**fig3** Hodge subspace dimensions per target on the pre-registered kNN graph. The gradient "
+        "and cycle-space dimensions are exact everywhere. The curl/harmonic split needs the rank of "
+        "the triangle boundary operator and is computed exactly only where a dense decomposition is "
+        "affordable; the remaining targets show their cycle space as a hatched grey block, because "
+        "its division is UNAVAILABLE rather than zero. No estimate is offered: a randomised range "
+        "finder cannot return a rank above its probe width, and when one was tried it inflated the "
+        "harmonic part twentyfold in the direction of this project's own hypothesis.",
         "",
         "**fig4** Curl fraction of the trained edge flow under a bias-free linear readout and under "
         "an MLP readout, both on the frozen fingerprint encoder, log scale with the machine-zero "

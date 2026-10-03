@@ -32,3 +32,22 @@ def test_the_holdout_refuses_to_run_before_the_spine_is_recorded(tmp_path, monke
     monkeypatch.setattr(t, "SPINE_REPORT", tmp_path / "absent.txt")
     with pytest.raises(RuntimeError, match="holdout"):
         t.assert_spine_recorded()
+
+
+def test_the_gate_rejects_a_spine_report_that_records_a_failure(tmp_path, monkeypatch):
+    """The gate's job is to stop the holdout becoming a second training set.
+
+    The runner writes the report through `tee`, which creates the file whether python succeeded or
+    crashed, so mere existence is not evidence that a spine result exists. The gate requires the line
+    the report only reaches on success.
+    """
+    bad = tmp_path / "report_spine.txt"
+    bad.write_text("Traceback (most recent call last):\n  ValueError: boom\n")
+    monkeypatch.setattr(t, "SPINE_REPORT", bad)
+    with pytest.raises(RuntimeError, match="holdout"):
+        t.assert_spine_recorded()
+
+    good = tmp_path / "ok.txt"
+    good.write_text("n = 30 | n_eff = 10.0\nPRIMARY CLAIM SUPPORTED: False\n")
+    monkeypatch.setattr(t, "SPINE_REPORT", good)
+    t.assert_spine_recorded()
