@@ -1,13 +1,18 @@
 prereg: 864ec5131b281d6cf3d48c481c897acd803d2e93
-n = 30 | n_eff = 10.0 | clusters = 6 | assumed intra-class rho = 0.3
+n = 30 | n_eff = 10.0 | clusters = 6 | assumed intra-class rho = 0.3 | seeds averaged per target: [3]
 
-positive_control         rho=+0.015  95% CI [-0.491, +0.489]  excludes 0: False  n=30
-primary                  rho=-0.222  95% CI [-0.597, +0.006]  excludes 0: False  n=30
-incremental_over_rogi    rho=-0.202  95% CI [-0.366, +0.064]  excludes 0: False  n=30
-decisive_secondary       rho=-0.137  95% CI [-0.598, +0.502]  excludes 0: False  n=30
+positive_control         rho=+0.043  95% CI [-0.456, +0.530]  excludes 0: False  n=30  draws kept=10000
+primary                  rho=-0.187  95% CI [-0.579, +0.063]  excludes 0: False  n=30  draws kept=10000
+incremental_over_rogi    rho=-0.187  95% CI [-0.410, +0.080]  excludes 0: False  n=30  draws kept=10000
+decisive_secondary       rho=-0.153  95% CI [-0.571, +0.416]  excludes 0: False  n=30  draws kept=10000
 
-mean correction: -0.0925
+mean correction: -0.0897
 PRIMARY CLAIM SUPPORTED: False
 
 Read the positive control first. If it does not exclude zero, the pipeline is suspect and
 nothing below it is interpreted.
+
+UNITS CAVEAT. The gap is expressed in the label's own units. Across these targets the label
+standard deviation varies about twofold and correlates with the statistic, so the magnitudes
+are partly a property of scale. A post-hoc standardised version of the primary is reported in
+results/results_increment1.md; it is also a null, so the conclusion is unchanged.

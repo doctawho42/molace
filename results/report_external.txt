@@ -1,0 +1,17 @@
+   dataset    n  assortativity  gap_vs_rf  gap_vs_chemprop
+     Caco2  910       0.521279   0.041750         0.002456
+   FUBrain  253       0.154753   0.098220         0.134375
+  FreeSolv  642       0.480104   1.623654         0.081672
+  HalfLife 1321       0.219805  -0.015651         0.005743
+   HemoTox  828       0.626624   0.028028         0.093764
+  HepClear  881       0.172024  -0.058189        -0.051354
+MicroClear  731       0.171575  -0.012461        -0.011261
+  RenClear  636       0.202145  -0.012782        -0.011230
+       Sol 1128       0.521393   0.764221         0.056422
+      VDss 1130       0.399539   0.013944         0.052076
+
+gap_vs_rf        rho=+0.430  95% CI [-0.296, +0.887]  n=10
+gap_vs_chemprop  rho=+0.345  95% CI [-0.459, +0.988]  n=10
+
+n = 10, so this is a replication with wide intervals, not a second primary result. These gaps
+are also in label units and these datasets mix scales, so the same units caveat applies.

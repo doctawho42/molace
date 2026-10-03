@@ -30,11 +30,20 @@
   CHEMBL4792_Ki    curl=0.0226 harm=0.0097 rho_diff=-0.020
 
 prereg: 864ec5131b281d6cf3d48c481c897acd803d2e93
-VALIDITY CHECK, read first -- max curl fraction of the pointwise floor (must be ~0): 2.0002327577028285e-33
+VALIDITY CHECKS, read first.
+  max curl fraction of the pointwise floor (must be ~0): 2.000232757702828e-33
+  worst Pythagorean residual of any decomposition (must be ~0): 1.2578826869003024e-13
+  note: the floor control alone cannot detect wrong orientation signs -- a pure gradient flow
+  leaves a zero residual. The signs are enforced in hodge.complex.build, which asserts
+  B1 @ B2 == 0 on every complex it returns.
+
 median curl fraction, trained: 0.0256
 median harmonic fraction, trained: 0.0077
 median curl fraction, shuffled labels: 0.0288
+  the trained and shuffled curl fractions are indistinguishable, so the circulation carries
+  no label information.
 
-mean rho difference (curl minus dispersion): -0.0769
-95% bootstrap CI on the mean difference: [-0.1030, -0.0492]
+mean rho difference (curl minus anchor dispersion): -0.0769
+95% CLUSTER bootstrap CI over receptor classes: [-0.1024, -0.0278]  clusters=6  draws kept=20000
+negative on 27 of 30 targets
 CRITERION PASSED (curl beats anchor dispersion): False
