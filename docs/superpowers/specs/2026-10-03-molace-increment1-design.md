@@ -199,28 +199,78 @@ arms). Metrics: RMSE and RMSE on cliff compounds, as MoleculeACE reports them.
   against 3.00 for ECFP-GBM, so naming GBM as the baseline inflates every reported gap.
   MLP because SQRL Table 1 shows tree models gain nothing from pairing (XGBoost 0.79 to
   0.76, RF 0.80 to 0.77), and a tree-only comparison would yield a degenerate gap.
+- **kNN floor arm** (label-access floor): `y_hat = (1/m) sum_i y_i` over the same `m`
+  nearest training molecules by Tanimoto **on the single fingerprint of §6**, uniform weights,
+  no learned function at all.
+  Deterministic, no hyperparameter to select, no seed. This arm exists because the pairwise
+  arm reads `m` measured labels at test time while the pointwise arm reads none, so a raw
+  pointwise-against-pairwise gap partly measures **test-time label access rather than
+  architecture**. Uniform weights and the identical anchor set are required, not
+  conveniences — see the identity below.
 - Pairwise arm: the same three base learners on pair features, in two variants —
   difference only (`xi − xj`, SQRL-like) and concatenation with difference
-  (`[xi, xj, xi − xj]`, PADRE-like). Inference by averaging over the k nearest training
-  molecules using their measured labels.
+  (`[xi, xj, xi − xj]`, PADRE-like). Inference by averaging over the same `m` anchors using
+  their measured labels.
 - Sign convention is fixed explicitly and stated. SQRL's published equations are
   inconsistent: eq. 3 under eq. 2's convention estimates `2 y_i − y_new`. We do not
   reproduce SQRL and we say so.
 
 **Primary gap**, pre-registered: within each arm the model is selected by **5-fold
 cross-validation on the training split only**, by mean CV RMSE, then refit on the full
-training split and evaluated once on the shipped test split. Anchor count for pairwise
-inference is **m = 10** nearest training molecules — a separate constant from the similarity
-graph's `k`, and not to be tied to it. The three seeds vary model initialisation and the CV
-fold assignment, and nothing else.
+training split and evaluated once on the shipped test split. Anchor count is **m = 10**
+nearest training molecules — a separate constant from the similarity graph's `k`, and not to
+be tied to it. The three seeds vary model initialisation and the CV fold assignment, and
+nothing else.
+
 `gap_t = RMSE_pointwise_selected(t) − RMSE_pairwise_selected(t)`, so a positive gap means
 pairwise wins. Secondary, also pre-registered: per-base-learner gaps, and the same
 quantities under RMSE on cliff compounds.
 
+**The decomposition, which is exact.** With uniform weights over the same `m` anchors,
+
+```
+y_hat_pairwise = (1/m) sum_i [ y_i + f(x_i, x_new) ]
+               = (1/m) sum_i y_i  +  (1/m) sum_i f(x_i, x_new)
+               = y_hat_kNN        +  mean learned correction
+```
+
+so the pairwise prediction is the kNN prediction plus the mean learned correction, as an
+algebraic identity rather than an interpretation.
+
+Separately, and trivially, the gap telescopes:
+
+```
+gap_t = [ RMSE_pointwise − RMSE_kNN ]  +  [ RMSE_kNN − RMSE_pairwise ]
+      =        access_t               +         correction_t
+```
+
+These are two different facts and must not be fused. The telescoping is exact for any three
+numbers and carries no content by itself. What the prediction identity adds is the
+**attribution**: because the pairwise arm differs from the kNN arm by exactly the mean of `f`,
+`correction_t` is the error change caused by the learned pairwise function and by nothing else
+— same anchors, same weights, same split. RMSE is nonlinear, so `correction_t` is **not** a
+variance-like share of anything and must never be reported as a percentage of `gap_t`; it is
+an error difference attributable to one named component. `access_t` is what test-time label
+access buys; `correction_t` is what the learned pairwise function buys on top of it. Both are pre-registered outcomes. This also makes the identity
+and the uniform weighting load-bearing: distance weighting or a different anchor set in
+either arm destroys the decomposition and the third arm stops being a floor.
+
 ## 9. Analysis plan (frozen before any measurement)
 
+- **Positive control, reported before anything else**: Spearman rho between target
+  assortativity and `access_t`. kNN regression works precisely when the label is smooth on
+  the kNN graph, so assortativity must predict this component; a 95% interval covering zero
+  here indicts the measurement pipeline, not the hypothesis, and nothing downstream is
+  interpreted until it is resolved.
 - Primary: Spearman rho between target assortativity and the primary gap across the 30
   MoleculeACE targets.
+- **Decisive secondary**: Spearman rho between target assortativity and `correction_t`, plus
+  the distribution of `correction_t` itself with a cluster-bootstrap interval for its mean.
+  `correction_t` indistinguishable from zero is the half-1 statement of hypothesis 2 — that a
+  pairwise model is a pointwise model plus anchor averaging — reached through held-out error
+  and without any Hodge machinery. §10 tests the same statement through the energy of the
+  flow. Agreement is a strong result; disagreement localises which of the two instruments is
+  wrong, and either outcome is reported.
 - Incremental: gap regressed on {target assortativity, ROGI-XD, mean degree, log n};
   report the incremental contribution of assortativity with its interval. Mean degree is
   included because union-symmetrised kNN bounds degree below by `k` without fixing it
@@ -236,7 +286,8 @@ quantities under RMSE on cliff compounds.
   CHEMBL237_Ki and CHEMBL237_EC50 are the same protein, 26.7% of molecules appear in more
   than one task, JAK1/JAK2 overlap 88.5%. Block-exchangeable `n_eff` is about 10 at an
   intra-class correlation of 0.3, and the assumed correlation is stated with the number.
-- Seeds: 3, averaged. No best-seed selection.
+- Seeds: 3, averaged, for the learned arms only. The kNN floor is deterministic and is
+  computed once. No best-seed selection anywhere.
 - Holdout: once the primary is computed and recorded, the 9 TDC tasks are run exactly
   once. Sign agreement and rho are reported. No re-tuning afterwards.
 - External replication: the same correlation against DeepDelta's published 10-task gap,
@@ -296,6 +347,12 @@ trained model; the same architecture on shuffled labels **with total flow norm m
 and an exactly curl-free floor built by differencing a trained pointwise model on the same
 edges.
 
+**Cross-check against half 1.** `correction_t` of §8 and the curl-plus-harmonic energy
+fraction here are two independent measurements of the same claim: that a trained pairwise
+flow carries nothing beyond a node potential. A near-zero `correction_t` with a large
+non-gradient energy fraction, or the reverse, is informative about the instruments and is
+reported as such rather than reconciled by choosing the friendlier number.
+
 **The question half 2 must answer, or it has no contribution.** Does the per-edge curl
 fraction predict that edge's held-out error **better than plain anchor dispersion**?
 Anchor dispersion is published three times (PADRE 2021, TNNR, Zhang et al. 2023) and the
@@ -314,6 +371,7 @@ edges are detectable given the comparison structure.
 | Harmonic dominance makes HodgeRank meaningless on these graphs | This is a finding, not a failure. Reported as the census result. |
 | Triangle explosion on the energy budget | Hard budget plus sampled cycle basis with reported variance. The energy budget across all 30 targets is the one piece genuinely at risk before 2026-10-05. |
 | n_eff about 10 | Cluster bootstrap, and `n_eff` printed beside `n`. The conclusion is phrased as variance explained with an interval, never as "we showed". |
+| A raw pointwise-against-pairwise gap measures test-time label access, not architecture | Removed by the kNN floor arm of §8: the gap decomposes exactly into `access_t` and `correction_t`, and both are pre-registered outcomes. |
 | `cliff_mol` circularity | Graph built on a different relation than the cliff definition uses; stated in the text. |
 | Unverified bibliography entries | Five entries listed in §2 to be opened by eye before any text is written. |
 
@@ -327,7 +385,7 @@ molace/
     data/       moleculeace.py  tdc_admet.py  deepdelta.py
     graphs/     fingerprints.py  knn.py  threshold.py  comparison.py  diagnostics.py
     measures/   assortativity.py  homophily.py  informativeness.py  dirichlet.py  rogi.py
-    models/     pointwise.py  pairwise.py  gap.py
+    models/     pointwise.py  anchors.py  knn_floor.py  pairwise.py  gap.py
     hodge/      complex.py  decompose.py  energy.py
     analysis/   correlate.py  figures.py
   tests/
@@ -336,7 +394,9 @@ molace/
 Boundaries: `data/` yields tidy per-task frames and knows nothing about graphs;
 `graphs/` knows nothing about labels beyond carrying them; `measures/` takes a graph plus
 a label vector and returns one number plus its coverage; `models/` never touches the
-similarity graph except to draw anchors; `hodge/` takes a comparison complex plus an edge
+similarity graph except to draw anchors, and anchor selection lives in exactly one module
+(`anchors.py`) because the kNN floor and the pairwise arm must draw the identical set or the
+§8 decomposition is not exact; `hodge/` takes a comparison complex plus an edge
 flow; `analysis/` takes a table of per-task numbers. Each unit is testable without the
 others.
 
@@ -350,6 +410,10 @@ number. Budget switches are logged.
   adjusted homophily and LI against hand-computed two-class examples; unbiased homophily
   against the source paper's stated properties; `B1 @ B2 == 0`; gradient orthogonal to
   curl; the linear-readout curl values of §10 as regression tests.
+- Identity: `y_hat_pairwise == y_hat_kNN + mean_i f(x_i, x_new)` to floating-point
+  tolerance on a fitted model, and the three RMSE differences telescope to `gap_t` exactly.
+  This is the test that keeps the §8 decomposition honest if anyone later changes the anchor
+  weighting.
 - Property: label shuffling leaves graph diagnostics unchanged; a permutation null for LI
   as a one-line sanity check (the measured observed-to-null ratio ran 33x to 15,510x, so
   no MI-estimator correction work is budgeted).
@@ -376,7 +440,8 @@ acceptance test. None blocks writing code; each blocks writing a sentence that d
 ## 14. Deliverables before 2026-10-05
 
 1. `prereg/increment1.yaml` committed before any measurement.
-2. Half 1 end to end on 30 targets: measures, self-computed gap, primary correlation with
+2. Half 1 end to end on 30 targets: measures, self-computed gap across **three arms**
+   (pointwise, kNN floor, pairwise) with its exact `access` / `correction` decomposition, primary correlation with
    cluster-bootstrap interval, incremental contribution over ROGI-XD, DeepDelta external
    replication, TDC holdout opened once.
 3. Hodge dimension census on 30 targets.
