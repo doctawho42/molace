@@ -1,0 +1,65 @@
+pre-registration blob: c2dcd4ef750f579a89bdfeb5e043b381307abdfe
+k in (3, 5, 10, 20, 40), 40 ChEMBL targets, nothing trained at any k
+
+  CHEMBL217_Ki           n= 8205  k= 3 err=+0.0119  k= 5 err=+0.0127  k=10 err=+0.0107  k=20 err=+0.0100  k=40 err=-0.0086  [27s]
+  CHEMBL205_Ki           n= 7636  k= 3 err=+0.0215  k= 5 err=-0.0016  k=10 err=-0.0229  k=20 err=-0.0366  k=40 err=-0.0289  [24s]
+  CHEMBL261_Ki           n= 7082  k= 3 err=-0.0326  k= 5 err=-0.0295  k=10 err=-0.0255  k=20 err=-0.0226  k=40 err=+0.0000  [19s]
+  CHEMBL3594_Ki          n= 5779  k= 3 err=+0.0273  k= 5 err=-0.0025  k=10 err=-0.0123  k=20 err=-0.0330  k=40 err=-0.0272  [13s]
+  CHEMBL251_Ki           n= 5286  k= 3 err=+0.0154  k= 5 err=+0.0115  k=10 err=-0.0008  k=20 err=+0.0022  k=40 err=+0.0069  [12s]
+  CHEMBL224_Ki           n= 4653  k= 3 err=-0.0400  k= 5 err=-0.0441  k=10 err=-0.0359  k=20 err=-0.0441  k=40 err=-0.0358  [9s]
+  CHEMBL1628481_EC50     n= 3215  k= 3 err=-0.0268  k= 5 err=-0.0028  k=10 err=-0.0380  k=20 err=-0.0383  k=40 err=-0.0198  [5s]
+  CHEMBL256_Ki           n= 4276  k= 3 err=+0.0032  k= 5 err=-0.0179  k=10 err=-0.0146  k=20 err=-0.0378  k=40 err=-0.0521  [8s]
+  CHEMBL3242_Ki          n= 4624  k= 3 err=-0.0158  k= 5 err=+0.0016  k=10 err=-0.0260  k=20 err=-0.0364  k=40 err=-0.0254  [9s]
+  CHEMBL226_Ki           n= 4386  k= 3 err=+0.0122  k= 5 err=+0.0235  k=10 err=+0.0033  k=20 err=-0.0207  k=40 err=-0.0124  [8s]
+  CHEMBL253_Ki           n= 4063  k= 3 err=-0.0384  k= 5 err=-0.0471  k=10 err=-0.0698  k=20 err=-0.0692  k=40 err=-0.0627  [7s]
+  CHEMBL3371_Ki          n= 3904  k= 3 err=-0.0119  k= 5 err=-0.0120  k=10 err=-0.0170  k=20 err=-0.0030  k=40 err=-0.0050  [7s]
+  CHEMBL5113_Ki          n= 2272  k= 3 err=+0.0123  k= 5 err=-0.0032  k=10 err=-0.0074  k=20 err=-0.0439  k=40 err=-0.0472  [3s]
+  CHEMBL2292_EC50        n= 1857  k= 3 err=-0.0204  k= 5 err=-0.0716  k=10 err=-0.0387  k=20 err=-0.0599  k=40 err=-0.0659  [2s]
+  CHEMBL1163125_Ki       n= 1296  k= 3 err=-0.0364  k= 5 err=-0.0414  k=10 err=-0.0416  k=20 err=-0.0355  k=40 err=-0.0583  [1s]
+  CHEMBL3155_Ki          n= 2657  k= 3 err=+0.0569  k= 5 err=+0.0461  k=10 err=+0.0470  k=20 err=+0.0457  k=40 err=+0.0102  [4s]
+  CHEMBL225_Ki           n= 2584  k= 3 err=+0.0130  k= 5 err=+0.0131  k=10 err=+0.0179  k=20 err=+0.0193  k=40 err=+0.0367  [3s]
+  CHEMBL4422_EC50        n= 2272  k= 3 err=-0.0628  k= 5 err=-0.0503  k=10 err=-0.0477  k=20 err=-0.0299  k=40 err=-0.0265  [3s]
+  CHEMBL614358_EC50      n= 1243  k= 3 err=-0.0130  k= 5 err=-0.0431  k=10 err=-0.0597  k=20 err=-0.0026  k=40 err=-0.0069  [1s]
+  CHEMBL4860_Ki          n= 1243  k= 3 err=-0.0081  k= 5 err=-0.0139  k=10 err=-0.0101  k=20 err=-0.0241  k=40 err=-0.0414  [1s]
+  CHEMBL5024_Ki          n= 1011  k= 3 err=-0.0113  k= 5 err=-0.0426  k=10 err=-0.0603  k=20 err=-0.0529  k=40 err=-0.1022  [1s]
+  CHEMBL2000_Ki          n= 1080  k= 3 err=+0.0221  k= 5 err=+0.0245  k=10 err=+0.0110  k=20 err=-0.0088  k=40 err=-0.0381  [1s]
+  CHEMBL4333_EC50        n= 2464  k= 3 err=+0.0039  k= 5 err=+0.0029  k=10 err=-0.0172  k=20 err=-0.0455  k=40 err=-0.0439  [3s]
+  CHEMBL4550_Ki          n= 1513  k= 3 err=-0.0529  k= 5 err=+0.0011  k=10 err=+0.0561  k=20 err=+0.0600  k=40 err=+0.0327  [2s]
+  CHEMBL259_Ki           n= 1982  k= 3 err=-0.0029  k= 5 err=-0.0017  k=10 err=-0.0239  k=20 err=-0.0138  k=40 err=-0.0020  [2s]
+  CHEMBL4822_Ki          n= 2217  k= 3 err=+0.0027  k= 5 err=-0.0092  k=10 err=+0.0086  k=20 err=-0.0114  k=40 err=-0.0303  [3s]
+  CHEMBL222_Ki           n= 1987  k= 3 err=-0.0152  k= 5 err=-0.0063  k=10 err=-0.0368  k=20 err=-0.0458  k=40 err=-0.0289  [2s]
+  CHEMBL245_Ki           n= 1777  k= 3 err=-0.0318  k= 5 err=-0.0181  k=10 err=-0.0078  k=20 err=-0.0026  k=40 err=-0.0422  [2s]
+  CHEMBL2014_Ki          n= 2108  k= 3 err=+0.0429  k= 5 err=+0.0256  k=10 err=+0.0134  k=20 err=-0.0118  k=40 err=-0.0279  [3s]
+  CHEMBL255_Ki           n= 1843  k= 3 err=+0.0342  k= 5 err=-0.0052  k=10 err=-0.0226  k=20 err=-0.0288  k=40 err=-0.0341  [2s]
+  CHEMBL4361_Ki          n= 1617  k= 3 err=+0.0048  k= 5 err=+0.0070  k=10 err=+0.0130  k=20 err=+0.0106  k=40 err=+0.0048  [2s]
+  CHEMBL4805_Ki          n=  583  k= 3 err=-0.1166  k= 5 err=-0.0931  k=10 err=-0.0211  k=20 err=-0.0890  k=40 err=-0.1161  [0s]
+  CHEMBL1784_EC50        n= 1464  k= 3 err=-0.0032  k= 5 err=-0.0101  k=10 err=+0.0129  k=20 err=-0.0148  k=40 err=-0.0271  [2s]
+  CHEMBL1833_Ki          n= 1655  k= 3 err=-0.1073  k= 5 err=-0.0983  k=10 err=-0.0837  k=20 err=-0.0301  k=40 err=-0.0081  [2s]
+  CHEMBL4227_EC50        n= 1332  k= 3 err=+0.0137  k= 5 err=-0.0079  k=10 err=-0.0009  k=20 err=-0.0280  k=40 err=-0.0184  [1s]
+  CHEMBL211_Ki           n= 1564  k= 3 err=+0.0590  k= 5 err=+0.0484  k=10 err=+0.0343  k=20 err=+0.0369  k=40 err=+0.0369  [2s]
+  CHEMBL344_Ki           n= 1593  k= 3 err=-0.0166  k= 5 err=-0.0230  k=10 err=-0.0016  k=20 err=-0.0062  k=40 err=-0.0423  [2s]
+  CHEMBL240_Ki           n= 1485  k= 3 err=+0.0074  k= 5 err=+0.0541  k=10 err=+0.0278  k=20 err=+0.0172  k=40 err=-0.0071  [2s]
+  CHEMBL3759_Ki          n= 1342  k= 3 err=+0.0273  k= 5 err=+0.0049  k=10 err=+0.0015  k=20 err=+0.0031  k=40 err=+0.0021  [1s]
+  CHEMBL2056_Ki          n= 1265  k= 3 err=-0.0218  k= 5 err=-0.0360  k=10 err=-0.0214  k=20 err=-0.0103  k=40 err=+0.0001  [1s]
+
+====================================================================================================
+the identity's accuracy at each k
+====================================================================================================
+    k  mean |err|   mean err  max |err|   Pearson  Spearman  mean deg   rho_nn        r
+    3      0.0269    -0.0074     0.1166     0.983     0.956       4.2    0.576    0.646
+    5      0.0252    -0.0114     0.0983     0.983     0.925       6.8    0.545    0.615
+   10      0.0256    -0.0127     0.0837     0.983     0.949      13.5    0.487    0.556
+   20      0.0286    -0.0183     0.0890     0.981     0.942      26.7    0.409    0.481
+   40      0.0306    -0.0241     0.1161     0.978     0.964      53.7    0.318    0.392
+
+====================================================================================================
+VERDICT against the frozen rule
+====================================================================================================
+  functional form, mean |error| < 0.05 at every k:   True   (worst 0.0306 at k = 40)
+  bias is negative at every k:                      True
+  |error| grows with k: rho=+0.083 [-0.064, +0.228]   False
+
+  THE IDENTITY HOLDS ACROSS k. My explanation of its residual does NOT, and those
+  are separate claims: the derivation stands, the story about the train-only
+  neighbour mismatch is not supported as stated.
+exit 0
