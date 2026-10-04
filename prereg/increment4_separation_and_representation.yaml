@@ -1,0 +1,68 @@
+# Increment 4, two experiments frozen before either is run.
+#
+# A. Finish the separation claim. The project says the statistic predicts the LEVEL of attainable
+#    accuracy and not WHICH model class wins. The first half is confirmed three times over. The
+#    second half is a non-rejection at n = 10 with no power, which increment2_separation downgraded
+#    from "supported" after review. The 40 independent ChEMBL targets of increment 3 can test it at
+#    four times the n, with the pipeline that is already frozen.
+#
+# B. Break the representation boundary. Every measure and every model in this project reads the same
+#    ECFP4 fingerprint, so "assortativity predicts attainable accuracy" may be a statement about
+#    ECFP4 rather than about graphs. The test separates them.
+
+shared:
+  targets: the 40 ChEMBL targets of prereg/increment3_chembl.yaml, blob 7519ef31c4374637483bae167221f9b7567ece7f
+  split: random 80/20, numpy default_rng(0), identical to scripts/rogi_chembl.py so skills are comparable
+  graph: kNN, k = 10, Tanimoto on ECFP4 Morgan r=2 2048 bits, union-symmetrised
+  statistic: rank assortativity, primary; Newman target assortativity also reported
+  correlation: Spearman, cluster bootstrap, 10000 draws, seed 0, each target its own cluster
+
+experiment_A:
+  question: does the statistic predict WHICH model class wins?
+  arms: the pre-registered pointwise arm, the kNN floor, the pairwise arm, all as in increment 1
+  skill: 1 - RMSE_arm / RMSE_baseline, baseline = predicting the training mean on the test split
+  tested_quantities:
+    - assortativity against each arm's skill (expected positive, this is the confirmed half)
+    - assortativity against pointwise skill MINUS pairwise skill
+    - assortativity against floor skill MINUS pointwise skill
+  decision_rule:
+    separation_established_iff: >
+      every arm's own skill correlates positively with the statistic and excludes zero, AND every
+      pairwise DIFFERENCE of skills has an interval that covers zero AND is narrow enough to bound
+      the effect, which is fixed here as a half-width below 0.50.
+    if_a_difference_excludes_zero: >
+      the separation claim is WRONG as stated and the project says so. The statistic would then
+      carry something about model choice after all.
+    if_intervals_cover_zero_but_stay_wide: >
+      still not established, and the project keeps saying not established rather than claiming a
+      null from a failure to reject. This is the mistake increment2_separation made and corrected.
+
+experiment_B:
+  question: >
+    is the link a property of the GRAPH, or of the ECFP4 representation that the graph, the measures
+    and the models all share?
+  design: >
+    the graph and the statistic stay on ECFP4 Tanimoto exactly as before. The MODEL is refitted on a
+    different representation and its skill is correlated with the unchanged statistic.
+  representations:
+    - rdkit_descriptors: the RDKit physicochemical descriptor block, median-imputed and standardised
+    - maccs: MACCS keys, 166 structural keys
+    - atompair: atom-pair fingerprint, 2048 bits
+  why_descriptors_matter_most: >
+    MACCS and atom-pair are still substructure fingerprints and share a lot with ECFP4. The
+    physicochemical descriptors are a different kind of object, so they are the real test.
+  decision_rule:
+    representation_free_iff: >
+      assortativity computed on the ECFP4 graph correlates positively with the skill of the
+      descriptor-based model and excludes zero.
+    if_it_collapses_for_descriptors: >
+      the claim is bounded to within-representation prediction and the results documents say so in
+      the headline rather than in a caveat.
+  note: >
+    A positive result here does NOT make the claim representation-free in general. It makes it
+    survive one genuinely different representation, which is one more than zero.
+
+forbidden:
+  - Choosing which representation to report after seeing its result; all three are reported.
+  - Dropping a target after seeing its number.
+  - Reading a difference interval that covers zero as evidence of no effect without its width.

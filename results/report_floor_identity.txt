@@ -1,0 +1,58 @@
+  CHEMBL217_Ki           r=+0.592 rho_nn=+0.522 deg= 13.5 pred=+0.386 meas=+0.375 [10s]
+  CHEMBL205_Ki           r=+0.521 rho_nn=+0.415 deg= 13.0 pred=+0.431 meas=+0.454 [9s]
+  CHEMBL261_Ki           r=+0.526 rho_nn=+0.429 deg= 13.0 pred=+0.434 meas=+0.460 [8s]
+  CHEMBL3594_Ki          r=+0.504 rho_nn=+0.404 deg= 12.9 pred=+0.456 meas=+0.468 [6s]
+  CHEMBL251_Ki           r=+0.644 rho_nn=+0.585 deg= 13.3 pred=+0.338 meas=+0.339 [4s]
+  CHEMBL224_Ki           r=+0.612 rho_nn=+0.559 deg= 13.5 pred=+0.379 meas=+0.415 [3s]
+  CHEMBL1628481_EC50     r=+0.456 rho_nn=+0.373 deg= 13.8 pred=+0.524 meas=+0.562 [3s]
+  CHEMBL256_Ki           r=+0.607 rho_nn=+0.539 deg= 13.2 pred=+0.371 meas=+0.386 [3s]
+  CHEMBL3242_Ki          r=+0.524 rho_nn=+0.429 deg= 12.8 pred=+0.439 meas=+0.465 [3s]
+  CHEMBL226_Ki           r=+0.500 rho_nn=+0.416 deg= 13.2 pred=+0.474 meas=+0.471 [3s]
+  CHEMBL253_Ki           r=+0.560 rho_nn=+0.492 deg= 13.4 pred=+0.424 meas=+0.493 [3s]
+  CHEMBL3371_Ki          r=+0.598 rho_nn=+0.520 deg= 13.4 pred=+0.373 meas=+0.391 [3s]
+  CHEMBL5113_Ki          r=+0.653 rho_nn=+0.602 deg= 13.5 pred=+0.335 meas=+0.342 [1s]
+  CHEMBL2292_EC50        r=+0.435 rho_nn=+0.339 deg= 13.5 pred=+0.536 meas=+0.575 [1s]
+  CHEMBL1163125_Ki       r=+0.677 rho_nn=+0.589 deg= 13.5 pred=+0.277 meas=+0.318 [1s]
+  CHEMBL3155_Ki          r=+0.536 rho_nn=+0.450 deg= 13.3 pred=+0.433 meas=+0.387 [1s]
+  CHEMBL225_Ki           r=+0.510 rho_nn=+0.444 deg= 13.5 pred=+0.480 meas=+0.462 [1s]
+  CHEMBL4422_EC50        r=+0.545 rho_nn=+0.483 deg= 13.6 pred=+0.444 meas=+0.493 [1s]
+  CHEMBL614358_EC50      r=+0.113 rho_nn=+0.076 deg= 14.2 pred=+0.942 meas=+1.002 [0s]
+  CHEMBL4860_Ki          r=+0.873 rho_nn=+0.848 deg= 13.5 pred=+0.118 meas=+0.129 [1s]
+  CHEMBL5024_Ki          r=+0.439 rho_nn=+0.344 deg= 13.9 pred=+0.532 meas=+0.591 [0s]
+  CHEMBL2000_Ki          r=+0.546 rho_nn=+0.458 deg= 14.1 pred=+0.420 meas=+0.410 [1s]
+  CHEMBL4333_EC50        r=+0.619 rho_nn=+0.574 deg= 13.2 pred=+0.377 meas=+0.394 [1s]
+  CHEMBL4550_Ki          r=+0.415 rho_nn=+0.327 deg= 13.9 pred=+0.564 meas=+0.508 [1s]
+  CHEMBL259_Ki           r=+0.697 rho_nn=+0.624 deg= 13.4 pred=+0.267 meas=+0.291 [1s]
+  CHEMBL4822_Ki          r=+0.536 rho_nn=+0.455 deg= 13.2 pred=+0.438 meas=+0.429 [1s]
+  CHEMBL222_Ki           r=+0.554 rho_nn=+0.479 deg= 13.7 pred=+0.424 meas=+0.461 [1s]
+  CHEMBL245_Ki           r=+0.717 rho_nn=+0.658 deg= 13.6 pred=+0.259 meas=+0.266 [1s]
+  CHEMBL2014_Ki          r=+0.556 rho_nn=+0.491 deg= 13.5 pred=+0.430 meas=+0.417 [1s]
+  CHEMBL255_Ki           r=+0.669 rho_nn=+0.620 deg= 13.3 pred=+0.320 meas=+0.342 [1s]
+  CHEMBL4361_Ki          r=+0.871 rho_nn=+0.848 deg= 13.7 pred=+0.121 meas=+0.108 [1s]
+  CHEMBL4805_Ki          r=+0.250 rho_nn=+0.221 deg= 13.4 pred=+0.798 meas=+0.819 [0s]
+  CHEMBL1784_EC50        r=+0.748 rho_nn=+0.711 deg= 13.7 pred=+0.243 meas=+0.231 [2s]
+  CHEMBL1833_Ki          r=+0.400 rho_nn=+0.307 deg= 13.7 pred=+0.576 meas=+0.660 [1s]
+  CHEMBL4227_EC50        r=+0.520 rho_nn=+0.464 deg= 13.7 pred=+0.477 meas=+0.478 [1s]
+  CHEMBL211_Ki           r=+0.626 rho_nn=+0.558 deg= 13.6 pred=+0.350 meas=+0.315 [1s]
+  CHEMBL344_Ki           r=+0.421 rho_nn=+0.377 deg= 13.1 pred=+0.596 meas=+0.598 [1s]
+  CHEMBL240_Ki           r=+0.572 rho_nn=+0.518 deg= 13.1 pred=+0.422 meas=+0.394 [1s]
+  CHEMBL3759_Ki          r=+0.532 rho_nn=+0.448 deg= 13.4 pred=+0.439 meas=+0.438 [0s]
+  CHEMBL2056_Ki          r=+0.551 rho_nn=+0.467 deg= 13.7 pred=+0.418 meas=+0.440 [1s]
+
+============================================================================================
+the identity as a POINT prediction of the floor's relative error, n = 40
+============================================================================================
+  k = 10, the floor's own averaging width
+    mean signed error -0.0127   mean |error| 0.0256   max |error| 0.0837
+    Spearman(predicted, measured) = +0.950   Pearson = +0.983
+  k = the graph's mean degree
+    mean signed error -0.0259   mean |error| 0.0322   max |error| 0.1023
+    Spearman(predicted, measured) = +0.947   Pearson = +0.983
+
+  for reference, the statistic alone: Spearman(1 - r, measured) = +0.934
+  rho_shared_neighbour against assortativity: +0.988 (range +0.076 to +0.848)
+
+  implied crossover r* = 1/k + (k-1)/k * rho_nn, where the floor's excess over Bayes
+  equals a fitted model's, compared with the descriptive split measured at 0.546:
+    median r* = 0.526, range [0.168, 0.863]
+exit 0

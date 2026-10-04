@@ -1,0 +1,74 @@
+pre-registration blob: c8ebac86ffd1f0813144121c84927632fef1ab1e
+40 ChEMBL targets, none sharing an id with the discovery set
+
+  CHEMBL217_Ki           n= 8205 pt=+0.312 floor=+0.388 pair=+0.345 [634s]
+  CHEMBL205_Ki           n= 7636 pt=+0.319 floor=+0.326 pair=+0.286 [435s]
+  CHEMBL261_Ki           n= 7082 pt=+0.250 floor=+0.322 pair=+0.256 [426s]
+  CHEMBL3594_Ki          n= 5779 pt=+0.264 floor=+0.316 pair=+0.200 [396s]
+  CHEMBL251_Ki           n= 5286 pt=+0.368 floor=+0.418 pair=+0.316 [325s]
+  CHEMBL224_Ki           n= 4653 pt=+0.373 floor=+0.356 pair=+0.320 [346s]
+  CHEMBL1628481_EC50     n= 3215 pt=+0.277 floor=+0.250 pair=+0.242 [209s]
+  CHEMBL256_Ki           n= 4276 pt=+0.382 floor=+0.379 pair=+0.292 [136s]
+  CHEMBL3242_Ki          n= 4624 pt=+0.243 floor=+0.318 pair=+0.195 [133s]
+  CHEMBL226_Ki           n= 4386 pt=+0.280 floor=+0.314 pair=+0.188 [117s]
+  CHEMBL253_Ki           n= 4063 pt=+0.276 floor=+0.298 pair=+0.163 [108s]
+  CHEMBL3371_Ki          n= 3904 pt=+0.376 floor=+0.375 pair=+0.274 [127s]
+  CHEMBL5113_Ki          n= 2272 pt=+0.446 floor=+0.415 pair=+0.414 [63s]
+  CHEMBL2292_EC50        n= 1857 pt=+0.241 floor=+0.242 pair=+0.183 [185s]
+  CHEMBL1163125_Ki       n= 1296 pt=+0.446 floor=+0.436 pair=+0.431 [219s]
+  CHEMBL3155_Ki          n= 2657 pt=+0.336 floor=+0.378 pair=+0.284 [310s]
+  CHEMBL225_Ki           n= 2584 pt=+0.248 floor=+0.320 pair=+0.129 [313s]
+  CHEMBL4422_EC50        n= 2272 pt=+0.299 floor=+0.298 pair=+0.170 [264s]
+  CHEMBL614358_EC50      n= 1243 pt=-0.269 floor=-0.001 pair=-0.289 [247s]
+  CHEMBL4860_Ki          n= 1243 pt=+0.663 floor=+0.641 pair=+0.627 [234s]
+  CHEMBL5024_Ki          n= 1011 pt=+0.139 floor=+0.231 pair=-0.013 [181s]
+  CHEMBL2000_Ki          n= 1080 pt=+0.401 floor=+0.360 pair=+0.329 [160s]
+  CHEMBL4333_EC50        n= 2464 pt=+0.389 floor=+0.372 pair=+0.292 [296s]
+  CHEMBL4550_Ki          n= 1513 pt=+0.284 floor=+0.287 pair=+0.276 [235s]
+  CHEMBL259_Ki           n= 1982 pt=+0.443 floor=+0.461 pair=+0.353 [266s]
+  CHEMBL4822_Ki          n= 2217 pt=+0.386 floor=+0.345 pair=+0.304 [226s]
+  CHEMBL222_Ki           n= 1987 pt=+0.264 floor=+0.321 pair=+0.224 [203s]
+  CHEMBL245_Ki           n= 1777 pt=+0.457 floor=+0.484 pair=+0.410 [219s]
+
+=== resumed run, 20:47 ===
+pre-registration blob: c8ebac86ffd1f0813144121c84927632fef1ab1e
+40 ChEMBL targets, none sharing an id with the discovery set
+
+resuming from results/separation_chembl_partial.csv: 28 targets already done
+
+  CHEMBL2014_Ki          n= 2108 pt=+0.324 floor=+0.355 pair=+0.294 [319s]
+  CHEMBL255_Ki           n= 1843 pt=+0.402 floor=+0.415 pair=+0.358 [237s]
+  CHEMBL4361_Ki          n= 1617 pt=+0.658 floor=+0.671 pair=+0.621 [177s]
+  CHEMBL4805_Ki          n=  583 pt=-0.042 floor=+0.095 pair=+0.011 [88s]
+  CHEMBL1784_EC50        n= 1464 pt=+0.495 floor=+0.520 pair=+0.461 [133s]
+  CHEMBL1833_Ki          n= 1655 pt=+0.131 floor=+0.188 pair=+0.093 [169s]
+  CHEMBL4227_EC50        n= 1332 pt=+0.267 floor=+0.308 pair=+0.125 [77s]
+  CHEMBL211_Ki           n= 1564 pt=+0.437 floor=+0.438 pair=+0.419 [241s]
+  CHEMBL344_Ki           n= 1593 pt=+0.235 floor=+0.227 pair=+0.199 [233s]
+  CHEMBL240_Ki           n= 1485 pt=+0.333 floor=+0.372 pair=+0.281 [224s]
+  CHEMBL3759_Ki          n= 1342 pt=+0.350 floor=+0.339 pair=+0.298 [308s]
+  CHEMBL2056_Ki          n= 1265 pt=+0.347 floor=+0.337 pair=+0.353 [373s]
+
+================================================================================================
+THE CONFIRMED HALF: each arm's own skill, n = 40
+================================================================================================
+  skill of the pointwise arm                   rho=+0.875  [+0.717, +0.955]  EXCLUDES 0  half-width 0.119
+  skill of the knn_floor arm                   rho=+0.909  [+0.780, +0.968]  EXCLUDES 0  half-width 0.094
+  skill of the pairwise arm                    rho=+0.810  [+0.624, +0.913]  EXCLUDES 0  half-width 0.144
+
+================================================================================================
+THE HALF THAT WAS NEVER ESTABLISHED: differences between arms
+================================================================================================
+  pointwise minus pairwise                     rho=-0.010  [-0.322, +0.294]  covers 0   half-width 0.308
+  floor minus pointwise                        rho=-0.343  [-0.619, -0.008]  EXCLUDES 0  half-width 0.305
+  floor minus pairwise                         rho=-0.253  [-0.537, +0.080]  covers 0   half-width 0.309
+
+================================================================================================
+VERDICT against the frozen rule
+================================================================================================
+  every arm's own skill tracks the statistic:        True
+  no difference excludes zero:                       False
+  every difference interval is narrower than 0.5:   True
+
+  THE SEPARATION IS WRONG AS STATED. A difference excludes zero, so the statistic
+  does carry something about model choice. The project says so.

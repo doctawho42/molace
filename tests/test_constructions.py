@@ -68,3 +68,44 @@ def test_unknown_names_are_refused_rather_than_silently_defaulted():
 def test_an_unparseable_smiles_names_itself():
     with pytest.raises(ValueError, match="index 1"):
         fingerprint(["CCO", "this-is-not-a-molecule"], "ecfp4")
+
+
+def test_descriptors_are_a_different_kind_of_object_from_a_fingerprint():
+    """The cross-representation test needs a representation that is not substructure presence.
+
+    MACCS and atom-pair are still bit vectors over substructures, so they share most of their
+    information with ECFP4. The physicochemical descriptor block is continuous and derived from
+    molecular properties, which is what makes it the real test of whether the project's claim is
+    about graphs or about one fingerprint.
+    """
+    from molace.graphs.constructions import descriptors
+
+    d = descriptors(SMILES)
+    assert d.shape[0] == len(SMILES)
+    assert d.shape[1] > 50, f"expected the full descriptor block, got {d.shape[1]} columns"
+    assert d.dtype.kind == "f"
+    assert not set(np.unique(d)).issubset({0.0, 1.0}), "a binary matrix is not a descriptor block"
+
+
+def test_descriptors_are_finite_after_imputation():
+    """Several RDKit descriptors return inf or nan on ordinary molecules; models cannot take those."""
+    from molace.graphs.constructions import descriptors
+
+    d = descriptors(SMILES + ["C", "O=C=O", "[Na+].[Cl-]"])
+    assert np.isfinite(d).all()
+
+
+def test_descriptors_are_standardised_so_one_column_cannot_dominate():
+    from molace.graphs.constructions import descriptors
+
+    d = descriptors(SMILES)
+    varying = d[:, d.std(axis=0) > 1e-9]
+    assert abs(varying.mean()) < 0.2
+    assert 0.5 < varying.std() < 2.0
+
+
+def test_descriptors_refuse_an_unparseable_smiles_by_index():
+    from molace.graphs.constructions import descriptors
+
+    with pytest.raises(ValueError, match="index 1"):
+        descriptors(["CCO", "not-a-molecule"])

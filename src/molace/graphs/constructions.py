@@ -90,3 +90,41 @@ def threshold_graph(sim: np.ndarray, threshold: float) -> nx.Graph:
     hit = sim[iu] >= threshold
     g.add_edges_from(zip(iu[0][hit].tolist(), iu[1][hit].tolist()))
     return g
+
+
+def descriptors(smiles: Sequence[str]) -> np.ndarray:
+    """The RDKit physicochemical descriptor block, imputed and standardised.
+
+    Every other representation in this project is a bit vector over substructures, so a model built
+    on one of them shares most of its information with the ECFP4 graph the measures are computed on.
+    These descriptors are a different kind of object: continuous molecular properties rather than
+    substructure presence. They are therefore the representation that actually tests whether this
+    project's claim is about the graph or about ECFP4.
+
+    Several descriptors return inf or nan on perfectly ordinary molecules (Ipc overflows, charge
+    descriptors divide by zero on salts), so non-finite entries are replaced by the column median
+    and columns that are entirely non-finite are dropped. The block is then standardised, because
+    its columns span many orders of magnitude and an unstandardised MolWt would dominate any
+    distance-based learner.
+    """
+    from rdkit.Chem import Descriptors
+
+    mols = _mols(smiles)
+    names = [n for n, _ in Descriptors._descList]
+    out = np.full((len(mols), len(names)), np.nan, dtype=float)
+    for j, (_, fn) in enumerate(Descriptors._descList):
+        for i, m in enumerate(mols):
+            try:
+                out[i, j] = float(fn(m))
+            except Exception:
+                pass
+    out[~np.isfinite(out)] = np.nan
+    keep = ~np.all(np.isnan(out), axis=0)
+    out = out[:, keep]
+    med = np.nanmedian(out, axis=0)
+    med[~np.isfinite(med)] = 0.0
+    idx = np.where(np.isnan(out))
+    out[idx] = np.take(med, idx[1])
+    sd = out.std(axis=0)
+    sd[sd < 1e-12] = 1.0
+    return (out - out.mean(axis=0)) / sd

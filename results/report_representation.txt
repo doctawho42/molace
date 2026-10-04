@@ -1,0 +1,71 @@
+pre-registration blob: c8ebac86ffd1f0813144121c84927632fef1ab1e
+graph and statistic stay on ECFP4 Tanimoto throughout; only the MODEL's features change
+
+  CHEMBL217_Ki           ecfp4=+0.359 rdkit=+0.183 maccs=+0.293 atomp=+0.378  [605s]
+  CHEMBL205_Ki           ecfp4=+0.351 rdkit=+0.252 maccs=+0.326 atomp=+0.326  [445s]
+  CHEMBL261_Ki           ecfp4=+0.291 rdkit=+0.280 maccs=+0.297 atomp=+0.256  [462s]
+  CHEMBL3594_Ki          ecfp4=+0.314 rdkit=+0.292 maccs=+0.297 atomp=+0.301  [316s]
+  CHEMBL251_Ki           ecfp4=+0.407 rdkit=+0.349 maccs=+0.358 atomp=+0.426  [329s]
+  CHEMBL224_Ki           ecfp4=+0.410 rdkit=+0.270 maccs=+0.366 atomp=+0.418  [352s]
+  CHEMBL1628481_EC50     ecfp4=+0.314 rdkit=+0.158 maccs=+0.227 atomp=+0.297  [179s]
+  CHEMBL256_Ki           ecfp4=+0.422 rdkit=+0.263 maccs=+0.348 atomp=+0.403  [118s]
+  CHEMBL3242_Ki          ecfp4=+0.276 rdkit=+0.256 maccs=+0.300 atomp=+0.271  [99s]
+  CHEMBL226_Ki           ecfp4=+0.322 rdkit=+0.018 maccs=+0.288 atomp=+0.328  [87s]
+  CHEMBL253_Ki           ecfp4=+0.316 rdkit=+0.234 maccs=+0.253 atomp=+0.319  [88s]
+  CHEMBL3371_Ki          ecfp4=+0.412 rdkit=+0.324 maccs=+0.375 atomp=+0.429  [89s]
+  CHEMBL5113_Ki          ecfp4=+0.467 rdkit=+0.388 maccs=+0.371 atomp=+0.452  [51s]
+  CHEMBL2292_EC50        ecfp4=+0.279 rdkit=-0.266 maccs=+0.185 atomp=+0.257  [65s]
+  CHEMBL1163125_Ki       ecfp4=+0.475 rdkit=+0.136 maccs=+0.429 atomp=+0.470  [31s]
+  CHEMBL3155_Ki          ecfp4=+0.377 rdkit=+0.246 maccs=+0.314 atomp=+0.364  [69s]
+  CHEMBL225_Ki           ecfp4=+0.291 rdkit=+0.206 maccs=+0.298 atomp=+0.314  [212s]
+  CHEMBL4422_EC50        ecfp4=+0.313 rdkit=+0.236 maccs=+0.270 atomp=+0.327  [276s]
+  CHEMBL614358_EC50      ecfp4=-0.180 rdkit=-0.207 maccs=+0.022 atomp=-0.015  [250s]
+  CHEMBL4860_Ki          ecfp4=+0.678 rdkit=+0.494 maccs=+0.636 atomp=+0.670  [285s]
+  CHEMBL5024_Ki          ecfp4=+0.172 rdkit=-0.289 maccs=+0.118 atomp=+0.165  [231s]
+  CHEMBL2000_Ki          ecfp4=+0.406 rdkit=+0.326 maccs=+0.316 atomp=+0.393  [252s]
+  CHEMBL4333_EC50        ecfp4=+0.417 rdkit=+0.353 maccs=+0.354 atomp=+0.417  [283s]
+  CHEMBL4550_Ki          ecfp4=+0.319 rdkit=+0.149 maccs=+0.220 atomp=+0.328  [220s]
+  CHEMBL259_Ki           ecfp4=+0.463 rdkit=+0.310 maccs=+0.365 atomp=+0.453  [366s]
+  CHEMBL4822_Ki          ecfp4=+0.384 rdkit=+0.131 maccs=+0.312 atomp=+0.395  [299s]
+  CHEMBL222_Ki           ecfp4=+0.302 rdkit=+0.153 maccs=+0.319 atomp=+0.348  [289s]
+  CHEMBL245_Ki           ecfp4=+0.493 rdkit=+0.458 maccs=+0.471 atomp=+0.506  [238s]
+  CHEMBL2014_Ki          ecfp4=+0.365 rdkit=+0.247 maccs=+0.322 atomp=+0.400  [265s]
+  CHEMBL255_Ki           ecfp4=+0.427 rdkit=+0.387 maccs=+0.394 atomp=+0.425  [250s]
+
+=== resumed run, 20:48 ===
+pre-registration blob: c8ebac86ffd1f0813144121c84927632fef1ab1e
+graph and statistic stay on ECFP4 Tanimoto throughout; only the MODEL's features change
+
+resuming from results/representation_partial.csv: 30 targets already done
+
+  CHEMBL4361_Ki          ecfp4=+0.673 rdkit=+0.557 maccs=+0.642 atomp=+0.656  [377s]
+  CHEMBL4805_Ki          ecfp4=+0.001 rdkit=-0.211 maccs=-0.045 atomp=-0.054  [165s]
+  CHEMBL1784_EC50        ecfp4=+0.514 rdkit=+0.496 maccs=+0.433 atomp=+0.513  [583s]
+  CHEMBL1833_Ki          ecfp4=+0.176 rdkit=+0.077 maccs=+0.219 atomp=+0.212  [201s]
+  CHEMBL4227_EC50        ecfp4=+0.282 rdkit=+0.188 maccs=+0.233 atomp=+0.302  [248s]
+  CHEMBL211_Ki           ecfp4=+0.474 rdkit=+0.444 maccs=+0.411 atomp=+0.493  [251s]
+  CHEMBL344_Ki           ecfp4=+0.275 rdkit=+0.185 maccs=+0.184 atomp=+0.295  [374s]
+  CHEMBL240_Ki           ecfp4=+0.374 rdkit=+0.345 maccs=+0.348 atomp=+0.415  [497s]
+  CHEMBL3759_Ki          ecfp4=+0.388 rdkit=+0.368 maccs=+0.340 atomp=+0.391  [320s]
+  CHEMBL2056_Ki          ecfp4=+0.379 rdkit=+0.340 maccs=+0.360 atomp=+0.376  [353s]
+
+================================================================================================
+assortativity on the ECFP4 GRAPH against the skill of a model on each representation, n = 40
+================================================================================================
+  ecfp4                rho=+0.889  [+0.750, +0.956]  EXCLUDES 0  (same representation as the graph)
+  rdkit_descriptors    rho=+0.726  [+0.481, +0.877]  EXCLUDES 0  <- the real test
+  maccs                rho=+0.893  [+0.757, +0.956]  EXCLUDES 0
+  atompair             rho=+0.915  [+0.805, +0.964]  EXCLUDES 0
+
+  how similar the representations actually are, by the skills they produce:
+    skill on rdkit_descriptors    vs skill on ecfp4   rho=+0.767
+    skill on maccs                vs skill on ecfp4   rho=+0.928
+    skill on atompair             vs skill on ecfp4   rho=+0.970
+
+================================================================================================
+VERDICT against the frozen rule
+================================================================================================
+  SURVIVES A DIFFERENT REPRESENTATION. A statistic computed on the ECFP4 graph
+  predicts the skill of a model that never sees ECFP4, so the link is not an
+  artefact of sharing one fingerprint. It survives ONE different representation,
+  which is one more than zero, and does not make the claim representation-free.
