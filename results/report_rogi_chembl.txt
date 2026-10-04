@@ -1,0 +1,58 @@
+pre-registration blob: 7519ef31c4374637483bae167221f9b7567ece7f
+40 ChEMBL targets, none sharing an id with MoleculeACE
+
+  CHEMBL217_Ki           n= 8205 skill=+0.359 a=+0.585 rogi=0.0614 [44s]
+  CHEMBL205_Ki           n= 7636 skill=+0.351 a=+0.520 rogi=0.0409 [39s]
+  CHEMBL261_Ki           n= 7082 skill=+0.291 a=+0.527 rogi=0.0441 [35s]
+  CHEMBL3594_Ki          n= 5779 skill=+0.314 a=+0.477 rogi=0.0649 [26s]
+  CHEMBL251_Ki           n= 5286 skill=+0.407 a=+0.643 rogi=0.0570 [22s]
+  CHEMBL224_Ki           n= 4653 skill=+0.410 a=+0.629 rogi=0.0521 [18s]
+  CHEMBL1628481_EC50     n= 3215 skill=+0.314 a=+0.436 rogi=0.1017 [12s]
+  CHEMBL256_Ki           n= 4276 skill=+0.422 a=+0.607 rogi=0.0694 [17s]
+  CHEMBL3242_Ki          n= 4624 skill=+0.276 a=+0.485 rogi=0.0605 [19s]
+  CHEMBL226_Ki           n= 4386 skill=+0.322 a=+0.501 rogi=0.0737 [18s]
+  CHEMBL253_Ki           n= 4063 skill=+0.316 a=+0.564 rogi=0.0711 [15s]
+  CHEMBL3371_Ki          n= 3904 skill=+0.412 a=+0.590 rogi=0.0574 [14s]
+  CHEMBL5113_Ki          n= 2272 skill=+0.467 a=+0.660 rogi=0.0713 [9s]
+  CHEMBL2292_EC50        n= 1857 skill=+0.279 a=+0.472 rogi=0.1067 [7s]
+  CHEMBL1163125_Ki       n= 1296 skill=+0.475 a=+0.658 rogi=0.0597 [6s]
+  CHEMBL3155_Ki          n= 2657 skill=+0.377 a=+0.534 rogi=0.0657 [10s]
+  CHEMBL225_Ki           n= 2584 skill=+0.291 a=+0.502 rogi=0.0519 [9s]
+  CHEMBL4422_EC50        n= 2272 skill=+0.313 a=+0.557 rogi=0.0765 [8s]
+  CHEMBL614358_EC50      n= 1243 skill=-0.180 a=+0.135 rogi=0.0496 [6s]
+  CHEMBL4860_Ki          n= 1243 skill=+0.678 a=+0.841 rogi=0.0548 [6s]
+  CHEMBL5024_Ki          n= 1011 skill=+0.172 a=+0.361 rogi=0.0887 [5s]
+  CHEMBL2000_Ki          n= 1080 skill=+0.406 a=+0.494 rogi=0.0832 [5s]
+  CHEMBL4333_EC50        n= 2464 skill=+0.417 a=+0.607 rogi=0.0763 [9s]
+  CHEMBL4550_Ki          n= 1513 skill=+0.319 a=+0.424 rogi=0.1749 [6s]
+  CHEMBL259_Ki           n= 1982 skill=+0.463 a=+0.680 rogi=0.0863 [9s]
+  CHEMBL4822_Ki          n= 2217 skill=+0.384 a=+0.546 rogi=0.0905 [8s]
+  CHEMBL222_Ki           n= 1987 skill=+0.302 a=+0.554 rogi=0.0584 [7s]
+  CHEMBL245_Ki           n= 1777 skill=+0.493 a=+0.712 rogi=0.0528 [7s]
+  CHEMBL2014_Ki          n= 2108 skill=+0.365 a=+0.543 rogi=0.0862 [8s]
+  CHEMBL255_Ki           n= 1843 skill=+0.427 a=+0.654 rogi=0.0590 [8s]
+  CHEMBL4361_Ki          n= 1617 skill=+0.673 a=+0.850 rogi=0.0346 [7s]
+  CHEMBL4805_Ki          n=  583 skill=+0.001 a=+0.311 rogi=0.1189 [4s]
+  CHEMBL1784_EC50        n= 1464 skill=+0.514 a=+0.746 rogi=0.0888 [7s]
+  CHEMBL1833_Ki          n= 1655 skill=+0.176 a=+0.375 rogi=0.0640 [7s]
+  CHEMBL4227_EC50        n= 1332 skill=+0.282 a=+0.528 rogi=0.0988 [6s]
+  CHEMBL211_Ki           n= 1564 skill=+0.474 a=+0.615 rogi=0.0604 [7s]
+  CHEMBL344_Ki           n= 1593 skill=+0.275 a=+0.413 rogi=0.0822 [7s]
+  CHEMBL240_Ki           n= 1485 skill=+0.374 a=+0.576 rogi=0.0539 [7s]
+  CHEMBL3759_Ki          n= 1342 skill=+0.388 a=+0.519 rogi=0.0658 [7s]
+  CHEMBL2056_Ki          n= 1265 skill=+0.379 a=+0.554 rogi=0.0644 [6s]
+
+============================================================================================
+INDEPENDENT TARGETS, n = 40
+============================================================================================
+  rank_assortativity   incremental  rho=+0.846  [+0.678, +0.928]  EXCLUDES 0
+  rogi                 incremental  rho=+0.098  [-0.230, +0.417]  covers 0 
+  rank_assortativity   alone        rho=+0.889  [+0.750, +0.955]  EXCLUDES 0
+  assortativity        alone        rho=+0.908  [+0.793, +0.959]  EXCLUDES 0
+  rogi                 alone        rho=-0.228  [-0.540, +0.114]  covers 0 
+
+============================================================================================
+VERDICT against the frozen rule
+============================================================================================
+  SETTLED: exactly one direction excludes zero -- assortativity carries what the other
+  does not, on targets independent of the discovery set.

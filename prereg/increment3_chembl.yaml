@@ -1,0 +1,57 @@
+# Increment 3: settle the ROGI question on genuinely independent targets.
+#
+# WHY. increment2_rogi tried to resolve, on 40 datasets, whether target assortativity adds anything
+# over the roughness index, and could not: 30 of the 40 were the set the claim was found on, and the
+# 10 that were not had no power. Both pre-registered explanations for the earlier disagreement were
+# refuted. The only remaining move is more INDEPENDENT datasets, curated here from ChEMBL.
+#
+# This file is frozen before any activity data is downloaded. The selection rule below takes no
+# decision that could be steered by an outcome: it is a count-ranked cut with fixed thresholds.
+
+selection:
+  source: ChEMBL REST API, www.ebi.ac.uk/chembl/api/data
+  target_filter:
+    target_type: SINGLE PROTEIN
+    organism: Homo sapiens
+  activity_filter:
+    pchembl_value: must be present
+    standard_type: Ki or EC50, whichever is the dominant type for that target
+    standard_relation: "=" only, so censored measurements are excluded
+  rank_by: number of pchembl-valued activities of the dominant type, descending
+  exclude: >
+    every ChEMBL target id that appears in MoleculeACE's 30 datasets (29 distinct ids), so that no
+    target is shared with the discovery set.
+  take: the top 40 remaining targets that satisfy the size rule
+  size_rule: at least 200 unique compounds after deduplication
+
+curation:
+  deduplication: by RDKit canonical SMILES; the label is the MEDIAN pchembl_value of the duplicates
+  label: pchembl_value, i.e. -log10 of the molar activity, the same quantity as MoleculeACE's
+  dropped: molecules RDKit cannot parse, recorded with a count
+  split: random 80/20, seed 0, fixed before any model is fitted
+
+analysis:
+  skill: 1 - RMSE_pointwise / RMSE_baseline, baseline = predicting the TRAINING mean on the test split
+  statistic: rank assortativity, primary; Newman target assortativity also reported
+  graph: kNN, k = 10, Tanimoto on ECFP4 Morgan r=2 2048 bits, union-symmetrised
+  covariates_residualised: [rogi, mean_degree, n_molecules]
+  correlation: Spearman
+  interval: cluster bootstrap, 10000 draws, seed 0, each target its own cluster
+  both_directions: >
+    assortativity incremental over ROGI AND ROGI incremental over assortativity, always both.
+
+decision_rule:
+  settled_iff: >
+    exactly one of the two incremental directions excludes zero on these targets alone.
+  if_both_exclude: >
+    report both with their magnitudes and call it an asymmetry, not a settlement -- the mistake made
+    in increment2_rogi was writing a rule that could not express this case.
+  if_neither: >
+    the increment over the roughness baseline is not established, and the project stops claiming it
+    in either direction.
+
+forbidden:
+  - Changing the count threshold, the size rule or the number of targets after seeing any skill.
+  - Dropping a target after seeing its number; a target that fails the size rule is dropped before
+    any model is fitted and its removal is recorded.
+  - Pooling these with MoleculeACE or TDC for the headline. They are reported alone first.

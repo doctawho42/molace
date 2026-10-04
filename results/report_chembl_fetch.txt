@@ -1,0 +1,73 @@
+pulling activities (cached after the first run)
+    Ki: 25,000 of 425,556 [112s]
+    Ki: 50,000 of 425,556 [340s]
+    Ki: 75,000 of 425,556 [449s]
+    Ki: 100,000 of 425,556 [551s]
+    Ki: 125,000 of 425,556 [662s]
+    Ki: 150,000 of 425,556 [760s]
+    Ki: 175,000 of 425,556 [863s]
+    Ki: 200,000 of 425,556 [967s]
+    Ki: 225,000 of 425,556 [1075s]
+    Ki: 250,000 of 425,556 [1189s]
+    Ki: 275,000 of 425,556 [1299s]
+    Ki: 300,000 of 425,556 [1404s]
+    Ki: 325,000 of 425,556 [1567s]
+    Ki: 350,000 of 425,556 [1787s]
+    Ki: 375,000 of 425,556 [2011s]
+    Ki: 400,000 of 425,556 [2211s]
+    Ki: 425,000 of 425,556 [2394s]
+  Ki: 425,556 rows in 2399s
+    EC50: 25,000 of 203,436 [152s]
+    EC50: 50,000 of 203,436 [290s]
+    EC50: 75,000 of 203,436 [431s]
+    EC50: 100,000 of 203,436 [598s]
+    EC50: 125,000 of 203,436 [746s]
+    EC50: 150,000 of 203,436 [901s]
+    EC50: 175,000 of 203,436 [1054s]
+    EC50: 200,000 of 203,436 [1208s]
+  EC50: 203,436 rows in 1229s
+total usable rows: 622,421
+excluding 29 ChEMBL ids that appear in MoleculeACE
+  CHEMBL217_Ki            11550 activities ->  8205 compounds
+  CHEMBL205_Ki            10910 activities ->  7636 compounds
+  CHEMBL261_Ki             9864 activities ->  7082 compounds
+  CHEMBL3594_Ki            6887 activities ->  5779 compounds
+  CHEMBL251_Ki             6500 activities ->  5286 compounds
+  CHEMBL224_Ki             6250 activities ->  4653 compounds
+  CHEMBL1628481_EC50       5810 activities ->  3215 compounds
+  CHEMBL256_Ki             5721 activities ->  4276 compounds
+  CHEMBL3242_Ki            5278 activities ->  4624 compounds
+  CHEMBL226_Ki             5168 activities ->  4386 compounds
+  CHEMBL253_Ki             5167 activities ->  4063 compounds
+  CHEMBL3371_Ki            4668 activities ->  3904 compounds
+  CHEMBL5113_Ki            4352 activities ->  2272 compounds
+  CHEMBL2292_EC50          3995 activities ->  1857 compounds
+  CHEMBL1163125_Ki         3303 activities ->  1296 compounds
+  CHEMBL3155_Ki            3251 activities ->  2657 compounds
+  CHEMBL225_Ki             3195 activities ->  2584 compounds
+  CHEMBL4422_EC50          3136 activities ->  2272 compounds
+  CHEMBL614358_EC50        3107 activities ->  1243 compounds
+  CHEMBL4860_Ki            2953 activities ->  1243 compounds
+  CHEMBL5024_Ki            2950 activities ->  1011 compounds
+  CHEMBL2000_Ki            2938 activities ->  1080 compounds
+  CHEMBL4333_EC50          2910 activities ->  2464 compounds
+  CHEMBL4550_Ki            2844 activities ->  1513 compounds
+  CHEMBL259_Ki             2713 activities ->  1982 compounds
+  CHEMBL4822_Ki            2534 activities ->  2217 compounds
+  CHEMBL222_Ki             2345 activities ->  1987 compounds
+  CHEMBL245_Ki             2328 activities ->  1777 compounds
+  CHEMBL2014_Ki            2314 activities ->  2108 compounds
+  CHEMBL255_Ki             2251 activities ->  1843 compounds
+  CHEMBL4361_Ki            2118 activities ->  1617 compounds
+  CHEMBL4805_Ki            2033 activities ->   583 compounds
+  CHEMBL1784_EC50          1959 activities ->  1464 compounds
+  CHEMBL1833_Ki            1941 activities ->  1655 compounds
+  CHEMBL4227_EC50          1924 activities ->  1332 compounds
+  CHEMBL211_Ki             1877 activities ->  1564 compounds
+  CHEMBL344_Ki             1821 activities ->  1593 compounds
+  CHEMBL240_Ki             1812 activities ->  1485 compounds
+  CHEMBL3759_Ki            1793 activities ->  1342 compounds
+  CHEMBL2056_Ki            1745 activities ->  1265 compounds
+
+selected 40 targets; 0 dropped for fewer than 200 unique compounds, recorded in skipped.json
+compounds per target: min 583, median 1984, max 8205
