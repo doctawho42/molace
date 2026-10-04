@@ -1,0 +1,79 @@
+# Increment 2, claim 1: what target assortativity predicts, and what it does not.
+#
+# STATUS OF THE CLAIM. It was found POST HOC on the 30 MoleculeACE targets, while diagnosing why
+# increment 1's positive control failed. MoleculeACE therefore cannot confirm it and is reported as
+# the discovery set. This file freezes the confirmatory analysis BEFORE the replication sets are
+# looked at for this question.
+#
+# Freeze: this file's git blob hash is recorded in every result file produced under it. It is not
+# amended after the first number is computed.
+
+claim:
+  exploratory_origin: >
+    On 30 MoleculeACE targets, target assortativity against each arm's SKILL over the no-graph
+    baseline gave +0.866 [+0.694, +0.951] for the kNN floor and +0.813 [+0.550, +1.000] for the
+    pointwise arm, while the DIFFERENCE of the two skills gave +0.055 [-0.427, +0.541]. Measured
+    after increment 1's primary was known; see results/report_control_recheck.txt.
+  H1: >
+    Target assortativity predicts ATTAINABLE ACCURACY: the skill of a model over the no-graph
+    baseline rises with assortativity, for model families that are not nearest-neighbour averages.
+  H2: >
+    Target assortativity does NOT predict WHICH model family wins: the difference of two families'
+    skills is uncorrelated with it.
+  why_H1_is_not_a_tautology: >
+    For the kNN floor the link is near definitional -- the floor IS a neighbour average and
+    assortativity IS label smoothness over the neighbour graph -- which is why it serves as a
+    positive control rather than a finding. The claim under test is that it extends to families that
+    average no neighbours. The confirmatory set is chosen so that none of the three families is mine
+    and none is a neighbour average.
+
+definitions:
+  skill: 1 - RMSE_model / RMSE_baseline
+  baseline: predicting the mean of the evaluation set's true values, computed per split
+  assortativity: Newman scalar target assortativity on the pre-registered graph
+  graph: kNN, k = 10, Tanimoto on ECFP4 Morgan r=2 2048 bits, union-symmetrised
+  note_on_label_scale: >
+    Increment 1 learned that a Pearson statistic on a skewed label is not comparable across
+    datasets. Both the Pearson and the rank (Spearman across edge endpoints) version of
+    assortativity are computed and BOTH are reported. The rank version is primary; this is fixed
+    here, before any number is seen, precisely because the choice was contested last time.
+
+confirmatory_set:
+  source: DeepDelta published per-fold predictions, Results/
+  n_datasets: 10
+  families: [RandomForest, ChemProp50, DeepDelta5]
+  why_this_set: >
+    The models are not mine, the splits are not mine, no refitting happens, and no family is a
+    neighbour average. The task is pairwise delta prediction, so the baseline is predicting the
+    mean true delta on the fold.
+  opened: once, for this question, after this file is frozen
+
+secondary_set:
+  source: TDC admet_benchmark regression subset
+  n_tasks: 9
+  caveat: >
+    NOT a holdout for this question. These nine tasks were already opened in increment 1 for the
+    gap-versus-assortativity question and again for its post-hoc scale sensitivity. Reported as a
+    second set with that stated, never as confirmation.
+
+statistics:
+  correlation: Spearman
+  interval: cluster bootstrap, 10000 draws, seed 0
+  clusters: each dataset is its own cluster on the confirmatory set (no shared targets there)
+  incremental_over: [rogi]
+
+decision_rule:
+  H1_supported_iff: >
+    on the confirmatory set, the interval for assortativity against skill is positive and excludes
+    zero for ALL THREE families.
+  H2_supported_iff: >
+    on the confirmatory set, no pairwise difference of family skills has an interval excluding zero.
+  both_must_be_stated: >
+    H1 and H2 are reported together whatever happens. A supported H1 with a supported H2 is the
+    claim; anything else is reported as what it is, including H1 failing outright.
+
+forbidden:
+  - Choosing the label scale, the graph, or k after seeing a result.
+  - Reporting the discovery set as confirmation.
+  - Dropping a family or a dataset after seeing its number.
+  - Reading the kNN floor's own correlation as evidence for H1; it is the positive control.

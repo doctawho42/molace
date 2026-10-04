@@ -1,0 +1,85 @@
+  ACE:CHEMBL1862_Ki            10 constructions  [4s]
+  ACE:CHEMBL1871_Ki            10 constructions  [4s]
+  ACE:CHEMBL2034_Ki            10 constructions  [4s]
+  ACE:CHEMBL2047_EC50          10 constructions  [3s]
+  ACE:CHEMBL204_Ki             10 constructions  [16s]
+  ACE:CHEMBL2147_Ki            10 constructions  [8s]
+  ACE:CHEMBL214_Ki             10 constructions  [22s]
+  ACE:CHEMBL218_EC50           10 constructions  [5s]
+  ACE:CHEMBL219_Ki             10 constructions  [10s]
+  ACE:CHEMBL228_Ki             10 constructions  [9s]
+  ACE:CHEMBL231_Ki             10 constructions  [5s]
+  ACE:CHEMBL233_Ki             10 constructions  [31s]
+  ACE:CHEMBL234_Ki             10 constructions  [22s]
+  ACE:CHEMBL235_EC50           10 constructions  [11s]
+  ACE:CHEMBL236_Ki             10 constructions  [20s]
+  ACE:CHEMBL237_EC50           10 constructions  [7s]
+  ACE:CHEMBL237_Ki             10 constructions  [20s]
+  ACE:CHEMBL238_Ki             10 constructions  [4s]
+  ACE:CHEMBL239_EC50           10 constructions  [7s]
+  ACE:CHEMBL244_Ki             10 constructions  [18s]
+  ACE:CHEMBL262_Ki             10 constructions  [4s]
+  ACE:CHEMBL264_Ki             10 constructions  [15s]
+  ACE:CHEMBL2835_Ki            10 constructions  [3s]
+  ACE:CHEMBL287_Ki             10 constructions  [5s]
+  ACE:CHEMBL2971_Ki            10 constructions  [6s]
+  ACE:CHEMBL3979_EC50          10 constructions  [5s]
+  ACE:CHEMBL4005_Ki            10 constructions  [5s]
+  ACE:CHEMBL4203_Ki            10 constructions  [3s]
+  ACE:CHEMBL4616_EC50          10 constructions  [3s]
+  ACE:CHEMBL4792_Ki            10 constructions  [8s]
+  DD:Caco2                     10 constructions  [4s]
+  DD:FUBrain                   10 constructions  [1s]
+  DD:FreeSolv                  10 constructions  [1s]
+  DD:HalfLife                  10 constructions  [8s]
+  DD:HemoTox                   10 constructions  [7s]
+  DD:HepClear                  10 constructions  [4s]
+  DD:MicroClear                10 constructions  [3s]
+  DD:RenClear                  10 constructions  [3s]
+  DD:Sol                       10 constructions  [3s]
+  DD:VDss                      10 constructions  [7s]
+
+================================================================================================
+40 datasets x 10 constructions, no model fitted
+================================================================================================
+
+--- assortativity ---
+  spread BETWEEN datasets   (sd of each dataset's mean): 0.1608
+  spread WITHIN a dataset   (mean sd across constructions): 0.0633
+  share of variance that is the dataset rather than the construction: 0.866
+  per-dataset range across constructions: median 0.2087, max 0.4041 (DD:FreeSolv)
+  for comparison, the full range of dataset means: 0.6235
+  DOES THE ORDERING SURVIVE? Spearman of the dataset ranking, ecfp4/tanimoto/k10 against:
+    atompair/tanimoto/k10        rho=+0.942
+    ecfp4/cosine/k10             rho=+0.997
+    ecfp4/dice/k10               rho=+1.000
+    ecfp4/tanimoto/k20           rho=+0.992
+    ecfp4/tanimoto/k30           rho=+0.983
+    ecfp4/tanimoto/k5            rho=+0.987
+    ecfp6/tanimoto/k10           rho=+0.994
+    maccs/tanimoto/k10           rho=+0.864
+    rdkit/tanimoto/k10           rho=+0.896
+    worst +0.864, median +0.987
+
+--- rank_assortativity ---
+  spread BETWEEN datasets   (sd of each dataset's mean): 0.1539
+  spread WITHIN a dataset   (mean sd across constructions): 0.0624
+  share of variance that is the dataset rather than the construction: 0.859
+  per-dataset range across constructions: median 0.2047, max 0.4108 (DD:FreeSolv)
+  for comparison, the full range of dataset means: 0.6024
+  DOES THE ORDERING SURVIVE? Spearman of the dataset ranking, ecfp4/tanimoto/k10 against:
+    atompair/tanimoto/k10        rho=+0.951
+    ecfp4/cosine/k10             rho=+0.997
+    ecfp4/dice/k10               rho=+1.000
+    ecfp4/tanimoto/k20           rho=+0.988
+    ecfp4/tanimoto/k30           rho=+0.975
+    ecfp4/tanimoto/k5            rho=+0.989
+    ecfp6/tanimoto/k10           rho=+0.994
+    maccs/tanimoto/k10           rho=+0.869
+    rdkit/tanimoto/k10           rho=+0.889
+    worst +0.869, median +0.988
+
+Read the ordering block last and hardest. If a measure's value moves with the
+construction but its ordering of datasets does not, it is still doing the job it exists
+for. If the ordering moves too, a homophily number quoted without its construction is
+not a dataset property at all.

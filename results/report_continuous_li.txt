@@ -1,0 +1,67 @@
+================================================================================================
+A continuous label informativeness: the numerator survives, the denominator does not.
+================================================================================================
+Theory, both exact: I(cY, cY') = I(Y, Y')  and  h(cY) = h(Y) + log|c|.
+So LI = I/h is a function of the units, and crosses a pole wherever h = 0.
+
+MoleculeACE CHEMBL2047_EC50  (label in pEC50, i.e. -log10 M; 631 molecules, 4295 edges)
+    OBSTACLE 2, before any number: the edge-endpoint sample has 8590 points but only 411 distinct
+    values -- mean multiplicity 20.9. The marginal LI is defined over is degree-weighted,
+    so every molecule's label enters deg(v) times and the sample is tied BY CONSTRUCTION. A nearest-
+    neighbour differential entropy is undefined on it. h is therefore estimated on the 631 node
+    labels instead, which changes nothing about the scale argument below: any estimate of h shifts by log c.
+             scale                  units   I (nats)   h (nats)     LI = I/h
+                 1             as shipped     0.1239    -2.5143      -0.0493
+                 2                     x2     0.1239    -1.8212      -0.0681
+               0.5                   x1/2     0.1239    -3.2075      -0.0386
+                10                    x10     0.1245    -0.2117      -0.5881
+    h moves by exactly log(c) between any two rows -- that part is a theorem and is
+    reproduced here to machine precision. The I column is an ESTIMATE and is not
+    invariant to machine precision on a tied sample; the true I is.
+    a pole EXISTS: h is continuous in log c and unbounded below, so it crosses zero.
+    its LOCATION is not quotable: with this label 35% duplicated, h comes from a
+    nudged estimate and moves several nats with the nudge constant, so c* = exp(-h) ~ 12.4 is
+    an order of magnitude, not a number. What does not depend on the nudge is the
+    DIFFERENCE between two scales, which is why the table above is the evidence.
+
+TDC half_life_obach  (label in hours; 667 molecules, 4620 edges)
+    OBSTACLE 2, before any number: the edge-endpoint sample has 9240 points but only 193 distinct
+    values -- mean multiplicity 47.9. The marginal LI is defined over is degree-weighted,
+    so every molecule's label enters deg(v) times and the sample is tied BY CONSTRUCTION. A nearest-
+    neighbour differential entropy is undefined on it. h is therefore estimated on the 667 node
+    labels instead, which changes nothing about the scale argument below: any estimate of h shifts by log c.
+             scale                  units   I (nats)   h (nats)     LI = I/h
+                 1                  hours    -0.3547    -6.6622       0.0532  <- I<0: the estimator has failed, see below
+                60                minutes    -0.4929    -2.5679       0.1920  <- I<0: the estimator has failed, see below
+              3600                seconds    -0.4615     1.5265      -0.3024  <- I<0: the estimator has failed, see below
+         0.0416667                   days    -0.3165    -9.8403       0.0322  <- I<0: the estimator has failed, see below
+        0.00595238                  weeks    -0.3075   -11.7862       0.0261  <- I<0: the estimator has failed, see below
+    h moves by exactly log(c) between any two rows -- that part is a theorem and is
+    reproduced here to machine precision. The I column is an ESTIMATE and is not
+    invariant to machine precision on a tied sample; the true I is.
+    a pole EXISTS: h is continuous in log c and unbounded below, so it crosses zero.
+    its LOCATION is not quotable: with this label 71% duplicated, h comes from a
+    nudged estimate and moves several nats with the nudge constant, so c* = exp(-h) ~ 782 is
+    an order of magnitude, not a number. What does not depend on the nudge is the
+    DIFFERENCE between two scales, which is why the table above is the evidence.
+
+================================================================================================
+What this settles, and what it does not.
+================================================================================================
+Settles: a continuous LI cannot be built by substituting differential entropy into the
+  denominator. The same dataset in hours and in minutes gets different values, and there
+  is a unit in between where the measure is undefined. A measure whose point is
+  comparability ACROSS datasets cannot depend on each dataset's unit.
+A third thing the data says, which I did not expect. The labels are not continuous: 667
+  molecules carry 193 distinct half-life values and 631 carry 411 distinct pEC50 values,
+  because assays report to a fixed precision. So the categorical LI is applicable -- on the
+  grid the assay already imposes. But that grid differs per dataset, and LI on it would
+  depend on each assay's reporting precision, which is the binning dependence the
+  pre-registration forbade (adjusted homophily moved 7.5x and LI 100x across bin counts).
+  The continuous case and the binned case fail for the same reason from opposite ends.
+Does not settle: that no continuous analogue exists. A normaliser that is itself
+  scale-equivariant would fix the units -- I(y_xi; y_eta) / I(y_xi; y_xi) is not
+  available since the self-information of a continuous variable diverges, but a
+  normalisation by the entropy of a FIXED discretisation, or by I under a reference
+  coupling, is not ruled out by anything here. That is the open question, and it is the
+  one worth asking rather than asserting an impossibility.

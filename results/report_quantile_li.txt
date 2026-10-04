@@ -1,0 +1,95 @@
+  ACE:CHEMBL1862_Ki            distinct=  272  LI_q4=0.1772  LI_q16=0.1057
+  ACE:CHEMBL1871_Ki            distinct=  381  LI_q4=0.1354  LI_q16=0.0918
+  ACE:CHEMBL2034_Ki            distinct=  465  LI_q4=0.1216  LI_q16=0.0899
+  ACE:CHEMBL2047_EC50          distinct=  411  LI_q4=0.0987  LI_q16=0.0799
+  ACE:CHEMBL204_Ki             distinct=  946  LI_q4=0.1973  LI_q16=0.1242
+  ACE:CHEMBL2147_Ki            distinct=  649  LI_q4=0.2735  LI_q16=0.1739
+  ACE:CHEMBL214_Ki             distinct= 1722  LI_q4=0.1221  LI_q16=0.0837
+  ACE:CHEMBL218_EC50           distinct=  701  LI_q4=0.0799  LI_q16=0.0575
+  ACE:CHEMBL219_Ki             distinct=  916  LI_q4=0.0736  LI_q16=0.0492
+  ACE:CHEMBL228_Ki             distinct=  947  LI_q4=0.1069  LI_q16=0.0706
+  ACE:CHEMBL231_Ki             distinct=  556  LI_q4=0.1607  LI_q16=0.1097
+  ACE:CHEMBL233_Ki             distinct= 1836  LI_q4=0.1543  LI_q16=0.1026
+  ACE:CHEMBL234_Ki             distinct= 1782  LI_q4=0.1452  LI_q16=0.0893
+  ACE:CHEMBL235_EC50           distinct=  991  LI_q4=0.1349  LI_q16=0.0862
+  ACE:CHEMBL236_Ki             distinct= 1567  LI_q4=0.2030  LI_q16=0.1396
+  ACE:CHEMBL237_EC50           distinct=  665  LI_q4=0.0827  LI_q16=0.0675
+  ACE:CHEMBL237_Ki             distinct= 1557  LI_q4=0.1757  LI_q16=0.1039
+  ACE:CHEMBL238_Ki             distinct=  762  LI_q4=0.1209  LI_q16=0.0745
+  ACE:CHEMBL239_EC50           distinct=  839  LI_q4=0.1001  LI_q16=0.0677
+  ACE:CHEMBL244_Ki             distinct= 1079  LI_q4=0.2423  LI_q16=0.1591
+  ACE:CHEMBL262_Ki             distinct=  209  LI_q4=0.0514  LI_q16=0.0376
+  ACE:CHEMBL264_Ki             distinct= 1190  LI_q4=0.1193  LI_q16=0.0846
+  ACE:CHEMBL2835_Ki            distinct=  298  LI_q4=0.2086  LI_q16=0.1476
+  ACE:CHEMBL287_Ki             distinct=  885  LI_q4=0.0521  LI_q16=0.0375
+  ACE:CHEMBL2971_Ki            distinct=  436  LI_q4=0.2757  LI_q16=0.1810
+  ACE:CHEMBL3979_EC50          distinct=  551  LI_q4=0.1299  LI_q16=0.0898
+  ACE:CHEMBL4005_Ki            distinct=  594  LI_q4=0.1240  LI_q16=0.0919
+  ACE:CHEMBL4203_Ki            distinct=   54  LI_q4=0.0402  LI_q16=0.0358
+  ACE:CHEMBL4616_EC50          distinct=  355  LI_q4=0.0501  LI_q16=0.0664
+  ACE:CHEMBL4792_Ki            distinct=  696  LI_q4=0.1089  LI_q16=0.0734
+  DD:Caco2                     distinct=  593  LI_q4=0.0955  LI_q16=0.0743
+  DD:FUBrain                   distinct=  189  LI_q4=0.0139  LI_q16=0.0187
+  DD:FreeSolv                  distinct=  485  LI_q4=0.1089  LI_q16=0.0951
+  DD:HalfLife                  distinct=  500  LI_q4=0.0229  LI_q16=0.0189
+  DD:HemoTox                   distinct=  567  LI_q4=0.1088  LI_q16=0.0998
+  DD:HepClear                  distinct=  348  LI_q4=0.0135  LI_q16=0.0109
+  DD:MicroClear                distinct=  284  LI_q4=0.0111  LI_q16=0.0101
+  DD:RenClear                  distinct=  345  LI_q4=0.0227  LI_q16=0.0206
+  DD:Sol                       distinct=  734  LI_q4=0.0878  LI_q16=0.0623
+  DD:VDss                      distinct=  306  LI_q4=0.0767  LI_q16=0.0494
+
+================================================================================================
+1. THE VALUE MOVES, AS THE PRE-REGISTRATION SAID
+================================================================================================
+  per-dataset max/min across bin counts: median 1.9x, max 5.3x
+  the measure's mean value at each bin count:
+    b=  2  mean 0.1465   range 0.0114 to 0.4768
+    b=  3  mean 0.1234   range 0.0106 to 0.3140
+    b=  4  mean 0.1157   range 0.0111 to 0.2757
+    b=  6  mean 0.1019   range 0.0094 to 0.2462
+    b=  8  mean 0.0951   range 0.0092 to 0.2252
+    b= 12  mean 0.0856   range 0.0096 to 0.1939
+    b= 16  mean 0.0808   range 0.0101 to 0.1810
+    b= 24  mean 0.0776   range 0.0145 to 0.1674
+    b= 32  mean 0.0782   range 0.0189 to 0.1595
+
+================================================================================================
+2. DOES THE ORDERING MOVE?  Spearman of the dataset ranking, bin count against bin count
+================================================================================================
+             2       3       4       6       8      12      16      24      32
+    2    1.000   0.967   0.967   0.960   0.948   0.941   0.926   0.897   0.853
+    3    0.967   1.000   0.990   0.987   0.973   0.966   0.954   0.926   0.877
+    4    0.967   0.990   1.000   0.994   0.982   0.973   0.961   0.931   0.884
+    6    0.960   0.987   0.994   1.000   0.992   0.985   0.973   0.949   0.906
+    8    0.948   0.973   0.982   0.992   1.000   0.993   0.983   0.963   0.924
+   12    0.941   0.966   0.973   0.985   0.993   1.000   0.994   0.982   0.954
+   16    0.926   0.954   0.961   0.973   0.983   0.994   1.000   0.990   0.967
+   24    0.897   0.926   0.931   0.949   0.963   0.982   0.990   1.000   0.987
+   32    0.853   0.877   0.884   0.906   0.924   0.954   0.967   0.987   1.000
+  worst off-diagonal 0.853, median 0.967
+  adjacent bin counts: worst 0.967
+
+================================================================================================
+3. IS IT SAYING ANYTHING NEW, AND IS IT USEFUL?
+================================================================================================
+  against rank assortativity on the same graph:
+    LI_q2   vs rank assortativity   rho=+0.961
+    LI_q4   vs rank assortativity   rho=+0.986
+    LI_q8   vs rank assortativity   rho=+0.984
+    LI_q16  vs rank assortativity   rho=+0.951
+    LI_q32  vs rank assortativity   rho=+0.874
+
+  against attainable accuracy (pointwise skill, 30 MoleculeACE targets):
+    LI_q2   vs skill   rho=+0.759  [+0.382, +0.941]  EXCLUDES 0
+    LI_q4   vs skill   rho=+0.795  [+0.432, +0.976]  EXCLUDES 0
+    LI_q8   vs skill   rho=+0.790  [+0.502, +0.976]  EXCLUDES 0
+    LI_q16  vs skill   rho=+0.762  [+0.349, +0.985]  EXCLUDES 0
+  and incrementally over rank assortativity, ROGI, degree and size:
+    LI_q4   incremental rho=+0.137  [-0.207, +0.568]  covers 0 
+    LI_q8   incremental rho=+0.098  [-0.218, +0.584]  covers 0 
+    LI_q16  incremental rho=+0.065  [-0.352, +0.586]  covers 0 
+
+Read block 2 as the verdict. A measure whose value moves but whose ordering does not is
+usable for comparing datasets with a declared bin count. A measure whose ordering moves
+too is not a dataset property, and the pre-registration was right to forbid it outright.

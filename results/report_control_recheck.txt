@@ -1,0 +1,17 @@
+POST-HOC DIAGNOSTIC, not a pre-registered result. Computed after the primary was known,
+to explain a failed control rather than to support a claim.
+
+as pre-registered -- a difference of two arms:
+  assortativity vs access                          rho=+0.043  95% CI [-0.456, +0.530]  excludes 0: False
+  assortativity vs raw error, floor                rho=-0.236  95% CI [-0.599, +0.263]  excludes 0: False
+  assortativity vs raw error, pointwise            rho=-0.161  95% CI [-0.756, +0.459]  excludes 0: False
+
+as it should have been -- a level, skill over the training-mean baseline:
+  assortativity vs floor skill                     rho=+0.866  95% CI [+0.694, +0.951]  excludes 0: True
+  assortativity vs pointwise skill                 rho=+0.813  95% CI [+0.550, +1.000]  excludes 0: True
+  assortativity vs difference of the two skills    rho=+0.055  95% CI [-0.427, +0.541]  excludes 0: False
+
+floor skill across targets: 0.147 to 0.607, median 0.350
+
+Read it as: the statistic predicts how accurately a target can be predicted at all, and
+almost nothing about which arm wins, because both arms inherit the same smoothness.

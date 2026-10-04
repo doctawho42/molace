@@ -1,0 +1,72 @@
+# Increment 2, claim 2: does target assortativity add anything over the roughness index?
+#
+# WHY THIS EXISTS. increment2_separation left one thing unsettled and said so: on the confirmatory
+# set (DeepDelta, 10) assortativity's increment over ROGI covered zero while ROGI alone was strong;
+# on the discovery set (MoleculeACE, 30) the reverse held on every line. The two were not
+# reconciled, and "not established" was reported as the answer.
+#
+# This file freezes two attempts at reconciling them, before either is run.
+
+frozen_before: both analyses below
+prior_result_being_re-examined: results/results_increment2_separation.md
+
+hypotheses:
+  H_power: >
+    The disagreement is sample size. With n = 40 instead of n = 10 and three covariates
+    residualised, the increment over ROGI is resolvable in one direction or the other.
+  H_task: >
+    The disagreement is the TASK. The discovery set measures skill on an ABSOLUTE regression (predict
+    the property); the confirmatory set measures skill on a DELTA regression (predict the difference
+    for a pair). A graph statistic about label smoothness over neighbours has more to say about
+    absolute prediction than about differences, so the balance between assortativity and ROGI may
+    flip with the task rather than with n.
+  note: >
+    H_power and H_task are not exclusive. Both are reported whatever they say.
+
+sets:
+  pooled:
+    source: MoleculeACE 30 targets + TDC regression 10 tasks
+    n: 40
+    skill: 1 - RMSE_pointwise / RMSE_baseline, baseline = predicting the TRAINING mean on the test split
+    status: >
+      NOT confirmatory. It contains the 30 targets on which the separation claim was found, so a
+      positive result here is better powered but not independent. Reported as such.
+  fresh_slice:
+    source: the 10 TDC tasks alone
+    status: >
+      Never used for the assortativity-versus-ROGI question. Independent for THIS question, though
+      these tasks were opened twice before for the holdout question and its scale sensitivity.
+      n = 10, so it inherits the same power problem; reported for completeness, not as a settlement.
+  task_contrast:
+    source: the same 10 TDC tasks, two skills from one fit
+    absolute: 1 - RMSE_pointwise / RMSE_baseline
+    delta: 1 - RMSE_pairwise / RMSE_baseline
+    status: >
+      The two skills come from the same model fits on the same split, so the only thing that differs
+      is which arm is scored. That is the cleanest available test of H_task.
+
+statistics:
+  statistic: rank assortativity (Pearson of node-label ranks across edge endpoints), primary
+  also_reported: Newman target assortativity on the raw label
+  correlation: Spearman
+  interval: cluster bootstrap, 10000 draws, seed 0
+  clusters: MoleculeACE by receptor class; each TDC task its own cluster
+  covariates_residualised: [rogi, mean_degree, n_molecules]
+  both_directions: >
+    assortativity incremental over ROGI AND ROGI incremental over assortativity, always both, so
+    that "adds nothing" cannot be reported for one without the other.
+
+decision_rule:
+  H_power_resolved_iff: >
+    on the pooled set, exactly one of the two incremental directions excludes zero.
+  H_task_supported_iff: >
+    on the task contrast, the sign or significance of the assortativity increment differs between
+    the absolute and delta skills computed from the same fits.
+  if_neither: >
+    report that the disagreement is unexplained by either, and stop claiming the increment either
+    way. The previous document's "not established" stands.
+
+forbidden:
+  - Reporting the pooled set as confirmation of anything, since it contains the discovery set.
+  - Dropping a dataset after seeing its number.
+  - Choosing the covariate set after seeing a result; it is fixed above and matches increment 1.

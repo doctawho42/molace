@@ -1,0 +1,68 @@
+certified targets: 30 of 30
+  CHEMBL2835_Ki    clustering 0.568  mean degree 14.1
+  CHEMBL2047_EC50  clustering 0.635  mean degree 13.6
+  CHEMBL1871_Ki    clustering 0.632  mean degree 13.1
+  CHEMBL4616_EC50  clustering 0.607  mean degree 13.5
+  CHEMBL4203_Ki    clustering 0.353  mean degree 14.3
+  CHEMBL2034_Ki    clustering 0.686  mean degree 13.1
+  CHEMBL1862_Ki    clustering 0.446  mean degree 14.4
+  CHEMBL262_Ki     clustering 0.425  mean degree 14.1
+  CHEMBL237_EC50   clustering 0.600  mean degree 13.6
+  CHEMBL4005_Ki    clustering 0.585  mean degree 13.2
+  CHEMBL231_Ki     clustering 0.545  mean degree 13.8
+  CHEMBL2971_Ki    clustering 0.495  mean degree 14.2
+  CHEMBL218_EC50   clustering 0.583  mean degree 13.2
+  CHEMBL238_Ki     clustering 0.549  mean degree 13.5
+  CHEMBL3979_EC50  clustering 0.628  mean degree 13.2
+  CHEMBL287_Ki     clustering 0.526  mean degree 13.9
+  CHEMBL2147_Ki    clustering 0.464  mean degree 14.3
+  CHEMBL4792_Ki    clustering 0.522  mean degree 13.4
+  CHEMBL228_Ki     clustering 0.572  mean degree 13.3
+  CHEMBL239_EC50   clustering 0.637  mean degree 13.2
+  CHEMBL219_Ki     clustering 0.555  mean degree 13.5
+  CHEMBL235_EC50   clustering 0.652  mean degree 13.0
+  CHEMBL236_Ki     clustering 0.602  mean degree 13.5
+  CHEMBL237_Ki     clustering 0.592  mean degree 13.5
+  CHEMBL204_Ki     clustering 0.632  mean degree 13.1
+  CHEMBL264_Ki     clustering 0.583  mean degree 13.4
+  CHEMBL244_Ki     clustering 0.637  mean degree 13.4
+  CHEMBL233_Ki     clustering 0.592  mean degree 13.5
+  CHEMBL214_Ki     clustering 0.559  mean degree 13.2
+  CHEMBL234_Ki     clustering 0.540  mean degree 13.7
+
+============================================================================================
+WHAT THE HARMONIC SHARE LOOKS LIKE ACROSS 30 MOLECULAR SIMILARITY GRAPHS
+============================================================================================
+  harmonic / cycle space     min   0.0156   median   0.0488   max   0.1679
+  harmonic / gradient        min   0.0869   median   0.2795   max   1.0301
+  triangles per edge         min   1.6347   median   2.3838   max   2.7713
+  average clustering         min   0.3526   median   0.5829   max   0.6862
+
+  targets where harmonic >= 2x gradient (the design's expectation): 0 of 30
+  worst margin against that threshold: 1.94x, at CHEMBL4203_Ki
+
+============================================================================================
+WHAT IT TRACKS  (Spearman, cluster bootstrap over receptor classes)
+============================================================================================
+  The objection to answer first: does it just grow with graph size?
+    harmonic share vs graph size, |E|          rho=+0.103  [-0.660, +0.595]  covers 0 
+    harmonic share vs molecules, |V|           rho=+0.080  [-0.660, +0.596]  covers 0 
+  Against structure instead:
+    harmonic share vs triangles per edge       rho=-0.883  [-0.973, -0.593]  EXCLUDES 0
+    harmonic share vs average clustering       rho=-0.895  [-0.971, -0.606]  EXCLUDES 0
+    harmonic share vs mean degree              rho=+0.588  [+0.100, +0.764]  EXCLUDES 0
+    harmonic share vs degree dispersion        rho=+0.048  [-0.308, +0.214]  covers 0 
+  Against label statistics -- the graph is label-free, so this is chemistry, not circularity:
+    harmonic share vs target assortativity     rho=-0.196  [-0.554, +0.075]  covers 0 
+    harmonic share vs ROGI roughness           rho=-0.511  [-0.628, -0.026]  EXCLUDES 0
+    harmonic share vs unbiased homophily on the cliff flag rho=-0.249  [-0.736, +0.150]  covers 0 
+  AND THE OBVIOUS CONFOUND, because ROGI is not a pure label statistic:
+    ROGI vs average clustering                 rho=+0.541  [+0.015, +0.708]  EXCLUDES 0
+    ROGI vs triangles per edge                 rho=+0.490  [-0.154, +0.752]  covers 0 
+    ROGI incremental over structure            rho=-0.167  [-0.600, +0.503]  covers 0 
+    ROGI clusters molecules by structure before it touches the label, so its link to a
+    topological quantity is not evidence of a label-structure relationship. With the
+    structural covariates removed it goes away, so it was the structure.
+
+Read the size row first. If the harmonic share does not track graph size, the design's
+refutation does not depend on the three small graphs it was first reported from.

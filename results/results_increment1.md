@@ -24,14 +24,30 @@ The control asked assortativity to predict `access`, the error difference betwee
 and the kNN floor, on the reasoning that nearest-neighbour regression works precisely when the label
 is smooth on the nearest-neighbour graph. That reasoning is right about the floor and wrong about the
 difference: the pointwise models benefit from a smooth label too, and by almost the same amount.
-Measured, assortativity against each arm's own error gives −0.236 for the floor and −0.180 for the
-pointwise arm. A difference of two quantities that respond alike carries no signal, which is why the
-control reads +0.043.
+Measured, assortativity against each arm's own raw error gives −0.236 for the floor and −0.161 for
+the pointwise arm, both with intervals covering zero. A difference of two quantities that respond
+alike carries no signal, which is why the control reads +0.043.
 
-So the control was mis-specified, not the pipeline. Re-specified against the floor's own error it has
-the expected negative sign, though its interval covers zero at n_eff about 10. **A correct control for
-the next increment** is assortativity against the floor's accuracy relative to predicting the mean,
-which no competing arm shares.
+So the control was mis-specified, not the pipeline. **Post hoc, the control this should have been is
+measured and it works.** Expressing each arm's accuracy as skill over the no-graph baseline —
+predicting the training mean on the test split — rather than as a raw error, assortativity against
+the kNN floor's skill gives **+0.866, 95% CI [+0.694, +0.951]**, and against the pointwise arm's skill
+**+0.813 [+0.550, +1.000]**. Both exclude zero decisively; their difference is +0.055 [−0.427, +0.541] and does not.
+
+That is the whole mechanism in three numbers. The statistic is strongly informative about **how
+accurately a target can be predicted at all** — which is what a positive control needs to show, and
+it shows it at rho about +0.87. It carries almost nothing about **which arm wins**, because both arms
+inherit the same smoothness. The pre-registered control asked for the second thing while the
+reasoning that motivated it established only the first, so it could not have fired for the stated
+reason. A control specified as a **level** passes; the same control specified as a **difference of two
+arms** is empty by construction.
+
+This paragraph is a post-hoc diagnostic, not a pre-registered result: it was computed after the
+primary was known, and it is reported to explain a failed control rather than to support a claim.
+The numbers come from `results/spine.csv` plus the per-target training-mean baseline, which needs no
+refitting. Reproduce them with `uv run python scripts/control_recheck.py`; its output is kept at
+`results/report_control_recheck.txt`. It uses the frozen plan's 10,000 draws, so the pre-registered
+`access` row in its output reproduces `results/report_spine.txt` exactly.
 
 ### A units caveat that limits the magnitudes, not the conclusion
 
@@ -133,9 +149,52 @@ against label SD gives −0.883 — so the correlation is a property of units ra
 structure, and the low-assortativity targets are exactly the raw-scale ones where the pairwise arm
 blows up.
 
-The pre-registration failed to require a dimensionless gap. No transform is applied, because applying
-one after seeing the result would be tuning, and the holdout is spent either way. The amendment the
-next increment owes is in `docs/prereg-amendments.md`.
+The pre-registration failed to require a dimensionless gap. The amendment the next increment owes is
+in `docs/prereg-amendments.md`.
+
+### Post-hoc: the result does not survive the repair, and the diagnosis above was half wrong
+
+A spent holdout cannot be made confirmatory again, so what follows answers one diagnostic question
+only -- does +0.817 survive putting the label on a comparable scale? -- and is reported as a
+sensitivity analysis, not as a result. The transform rule carries no free parameter: log10 is
+admissible exactly where the label is strictly positive, which on these nine endpoints is exactly the
+five in raw units; the other four go negative because they already are logarithms. Run it with
+`uv run python scripts/holdout_sensitivity.py`; output in `results/report_holdout_sensitivity.txt`
+and `results/holdout_sensitivity.csv`.
+
+| scale of the label | assortativity vs standardised gap | 95% CI |
+|---|---|---|
+| raw, as pre-registered | +0.883 | [+0.474, +1.000] |
+| log10 where admissible (5 of 9 refitted) | **+0.017** | [−0.737, +0.722] |
+| rank-to-normal, one rule for all 9 | **+0.250** | [−0.541, +0.846] |
+
+The holdout's interval -- the only one the PRE-REGISTERED analysis produced that excluded zero --
+stops excluding it as soon as the label is put on a comparable scale. Nothing should be built on it.
+(Post-hoc analyses elsewhere in this file do exclude zero: the level-based control at +0.866 and
++0.813, and increment 2's H1. Those are different claims on different quantities.)
+
+**Two corrections to the paragraph above.** First, the stated mechanism was the smaller half.
+Standardising only the gap, which is what "the gap is in label units" implies, makes the correlation
+*stronger* (+0.817 to +0.883), because the confound lives in the statistic as much as in the gap:
+target assortativity is a Pearson correlation across edge endpoints, and on `vdss_lombardo` -- label
+0.01 to 700 L/kg, skewness 27 -- the raw value is 0.082 while the same graph with the label's ranks
+gives 0.426 (`rank_assortativity`). Two rank-based quantities appear in this project and they are
+not the same: `rank_assortativity` is Pearson of the plain ranks, while the `rank_normal` SCALE in
+`scripts/holdout_sensitivity.py` is a van der Waerden transform of the label before refitting, which
+gives 0.391 on the same graph. The sensitivity table reports the second; this sentence is about the
+first. Replacing Pearson with ranks alone, refitting nothing and leaving the gap in raw label units,
+already drops the headline from +0.817 to **+0.550 [-0.185, +0.948]**, an interval covering zero.
+Doing both -- ranks and a standardised gap -- gives +0.533 [-0.263, +1.000]. An earlier version of
+this paragraph quoted the second number for the first change. Note this is a statement about what was measured here, not a
+general law: outliers can inflate a Pearson correlation as readily as deflate it.
+
+Second, the repair is not clean and should not be sold as one. The confound check -- assortativity
+against label SD -- does not vanish under the transforms; it changes sign, from −0.700 raw to +0.883
+under log. And the log rule is not uniformly the right transform: on `ppbr_az`, a plasma protein
+binding *percentage* bounded above, log moves the statistic the wrong way (0.187 to 0.148) where the
+rank versions move it up (`rank_assortativity` 0.260, van der Waerden 0.243); a bounded proportion
+wants a logit. The defensible conclusion is
+the weak one and it is enough: the result is not stable under the choice of scale.
 
 ## The external replication disagrees in sign and settles nothing
 

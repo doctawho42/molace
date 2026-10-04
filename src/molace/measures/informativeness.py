@@ -15,7 +15,18 @@ from molace.measures.homophily import _check, _coverage
 
 
 def label_informativeness(g: nx.Graph, labels: np.ndarray) -> MeasureResult:
-    a = _check(g, labels)
+    """The categorical measure. The guard in `_check` refuses a binned continuous label."""
+    return li_from_classes(g, _check(g, labels))
+
+
+def li_from_classes(g: nx.Graph, a: np.ndarray) -> MeasureResult:
+    """LI of an ALREADY VALIDATED class vector, with no guard of its own.
+
+    Split out so that `measures.quantile_li` can declare its binning instead of sneaking past the
+    guard. The guard exists to stop a continuous label being binned by accident or convenience; a
+    caller whose entire subject is the binning states that in its own module and comes through here.
+    Nothing else should.
+    """
     nodes = sorted(g.nodes())
     pos = {v: i for i, v in enumerate(nodes)}
     classes = np.unique(a)

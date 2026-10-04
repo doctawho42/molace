@@ -11,10 +11,15 @@ which is computed exactly where a dense SVD is affordable and reported as unavai
 
 The first version offered a randomised range-finder estimate above that threshold. It was wrong in a
 dangerous direction: a range finder cannot return a rank above its probe width, so on CHEMBL1862_Ki
-it returned dim_curl = 2048 exactly, the probe width, and inflated the harmonic part to 2866. On
-CHEMBL1871_Ki, where |E| was small enough for an exact rank, harmonic was 124 against a gradient of
-657 -- small, not dominant. The estimate pointed the same way as the finding the project was looking
-for, which is the worst property an estimator can have, so it is gone.
+it returned dim_curl = 2048 exactly, the probe width, and inflated the harmonic part to 2866 against a
+true value of 491 -- a factor of 5.8. The estimate pointed the same way as the finding the project was
+looking for, which is the worst property an estimator can have, so it is gone.
+
+The census here still refuses to guess, and that refusal is now mostly moot: `molace.hodge.nullity`
+computes the same split exactly and with a certificate, by taking the nullity of the edge Laplacian
+instead of the rank of B2 -- the small number instead of the large one. Prefer it. What remains here
+is the cheap, exact part (gradient and cycle-space dimensions) plus a dense rank where it is
+affordable, which is what validated the nullity route in the first place.
 """
 from __future__ import annotations
 
