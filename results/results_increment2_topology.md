@@ -27,10 +27,10 @@ thirty, which invites the obvious reply: harmonic dimension grows with graph siz
 were unrepresentative.
 
 It does not grow with graph size. Across all 30 targets the harmonic share against |E| is
-**+0.103 [−0.660, +0.595]** and against |V| **+0.080 [−0.660, +0.596]**; both cover zero. And the
++0.103 [−0.660, +0.595] and against |V| +0.080 [−0.660, +0.596]; both cover zero. And the
 expectation is refuted on **every one of the 30**, not three: the largest harmonic-over-gradient
-ratio anywhere is 1.03, against a threshold of 2, so the worst margin is a factor of 1.94 — at
-CHEMBL4203_Ki, not at any of the three originally reported.
+ratio anywhere is 1.03, against a threshold of 2, so the worst margin is a factor of 1.94, and it
+occurs at CHEMBL4203_Ki, not at any of the three originally reported.
 
 ## What it does track
 
@@ -41,23 +41,23 @@ CHEMBL4203_Ki, not at any of the three originally reported.
 | mean degree | +0.588 | [+0.100, +0.764] | excludes 0 |
 | degree dispersion | +0.048 | [−0.308, +0.214] | covers 0 |
 
-Triangle coverage, not size. A molecular similarity graph is triangle-rich because real chemical
-series are dense clusters of analogues -- a neighbour's neighbour is a neighbour -- and the measured
-clustering coefficient runs 0.35 to 0.69. The synthetic probe that produced the design's
-expectation was built from random sparse bit vectors, where nearest neighbours are essentially
-arbitrary; reproducing it gives a clustering coefficient of 0.018 to 0.053, twelve to thirty-five
-times lower, and 64 triangles where the real graphs have thousands.
+The harmonic share tracks triangle coverage, not size. A molecular similarity graph is triangle-rich
+because real chemical series are dense clusters of analogues (a neighbour's neighbour is a
+neighbour), and the measured clustering coefficient runs 0.35 to 0.69. The synthetic probe that
+produced the design's expectation was built from random sparse bit vectors, where nearest
+neighbours are essentially arbitrary; reproducing it gives a clustering coefficient of 0.018 to
+0.053, twelve to thirty-five times lower, and 64 triangles where the real graphs have thousands.
 
 ## A correlation that looked like chemistry and is not
 
 The graph is built from structure alone, so a correlation between a topological quantity and a
 label statistic would be a fact about chemistry rather than a circularity. One appeared: harmonic
-share against ROGI, **−0.511 [−0.628, −0.026]**, excluding zero.
+share against ROGI, −0.511 [−0.628, −0.026], which excludes zero.
 
-It does not survive. ROGI is not a pure label statistic -- it hierarchically clusters molecules by
-structure before it ever looks at the property -- and ROGI against average clustering is
-**+0.541 [+0.015, +0.708]**, also excluding zero. With the structural covariates removed, ROGI's
-contribution to the harmonic share is **−0.167 [−0.600, +0.503]** and covers zero. It was reading
+It does not survive. ROGI is not a pure label statistic (it hierarchically clusters molecules by
+structure before it ever looks at the property), and ROGI against average clustering is
++0.541 [+0.015, +0.708], which also excludes zero. With the structural covariates removed, ROGI's
+contribution to the harmonic share is −0.167 [−0.600, +0.503] and covers zero. It was reading
 the structure.
 
 The two genuinely label-side statistics show nothing: target assortativity −0.196 [−0.554, +0.075]
@@ -76,7 +76,8 @@ true rank of 4,423. Nothing in the sketch's spectrum showed it.
 
 A shift-invert Lanczos solve returns the eigenvalues nearest zero, so one clearly positive
 eigenvalue among them proves every zero was found. When no such eigenvalue appears, or the solver
-fails, `HarmonicDim` reports `UNCERTIFIED` and **no count at all** -- the saturating number is the
-specific thing being avoided. See `src/molace/hodge/nullity.py` and `tests/test_hodge_nullity.py`,
-which pins the crash cases (a singular Laplacian is exactly the case the module is for), the
-uncertified path, dense-against-iterative agreement, and rank(B2) against an independent dense rank.
+fails, `HarmonicDim` reports `UNCERTIFIED` and no count at all, because the saturating number is
+the specific thing being avoided. See `src/molace/hodge/nullity.py` and
+`tests/test_hodge_nullity.py`, which pins the crash cases (a singular Laplacian is exactly the case
+the module is for), the uncertified path, dense-against-iterative agreement, and rank(B2) against an
+independent dense rank.

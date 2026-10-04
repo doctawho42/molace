@@ -14,8 +14,8 @@ statistic re-describes something chemistry already has.
 
 Two attempts failed. The confirmatory set (DeepDelta, n = 10) had no power. The pooled set (n = 40)
 was three quarters discovery set, so a positive result there is the claim reproducing on itself.
-Two pre-registered explanations for the disagreement between them -- sample size, and the
-absolute-versus-delta task -- were both refuted.
+Two pre-registered explanations for the disagreement between them (sample size, and the
+absolute-versus-delta task) were both refuted.
 
 ## What was done
 
@@ -27,7 +27,7 @@ target is shared with the set the claim was found on.
 The selection rule was frozen before any download and contains nothing an outcome could steer: rank
 by count, exclude the discovery ids, take the top 40 with at least 200 unique compounds. No target
 was dropped by the size rule, so the threshold did not shape the sample. Compounds per target run
-583 to 8,205, median 1,984 -- larger than MoleculeACE's 615 to 4,000.
+583 to 8,205, median 1,984, which is larger than MoleculeACE's 615 to 4,000.
 
 Everything downstream matches the earlier increments line for line: kNN at k = 10 on ECFP4
 Tanimoto, the pointwise arm averaged over its three matched families, skill against predicting the
@@ -58,14 +58,14 @@ target against 0.055 and 0.035 at the two best.
 **Does.** The project's headline is no longer a re-description. A reader can be told that the
 statistic predicts how accurately a molecular regression dataset can be predicted at all, that this
 was confirmed on third-party models, and that it is not something the cheminformatics roughness
-index already provides -- the last part on forty targets chosen before anything was measured and
-sharing nothing with the set where the claim was found.
+index already provides. That last part rests on forty targets chosen before anything was measured
+and sharing nothing with the set where the claim was found.
 
 **Does not.** Both measures are computed from the same ECFP4 fingerprint and the same label, and so
 are the models whose skill is being predicted. The claim is therefore about prediction *in that
 representation*: a label smooth over ECFP4 neighbourhoods is one that ECFP4-based models predict
-well. That is not vacuous -- ROGI sees the identical fingerprint and the identical label and does
-not capture it -- but it is not a representation-free statement, and a different fingerprint is an
+well. That is not vacuous (ROGI sees the identical fingerprint and the identical label and does
+not capture it), but it is not a representation-free statement, and a different fingerprint is an
 experiment this does not run.
 
 Nor is this a random sample of drug targets. Ranking by activity count selects the best-measured

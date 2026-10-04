@@ -13,7 +13,7 @@ under a smooth invertible change of either argument.
 
 **The denominator does not.** Differential entropy is not an entropy: h(cY) = h(Y) + log|c|. On
 `CHEMBL2047_EC50`, one graph, changing only the label's scale: LI reads −0.039 at x0.5, −0.049 as
-shipped, −0.068 at x2 and **−0.588** at x10. A pole where h = 0 always exists, because h is
+shipped, −0.068 at x2 and −0.588 at x10. A pole where h = 0 always exists, because h is
 continuous in log c and unbounded below.
 
 **Where the pole is cannot be quoted.** On a tied sample the entropy estimate needs a constant to
@@ -25,7 +25,7 @@ to six figures; those figures were the constant.
 **Two further obstacles, neither anticipated.** The marginal LI is defined over is degree-weighted,
 so each molecule's label enters deg(v) times: the sample is tied by construction, at multiplicity
 20 to 48 here, and a nearest-neighbour entropy is undefined on it. And the labels are not continuous
-to begin with -- 667 molecules carry 193 distinct half-life values, 631 carry 411 distinct pEC50
+to begin with: 667 molecules carry 193 distinct half-life values, 631 carry 411 distinct pEC50
 values, because assays report to a fixed precision.
 
 On `half_life_obach` the mutual-information estimate comes out **negative at every scale**, which no
@@ -35,7 +35,7 @@ reportable; an earlier version of this work reported four.
 ## The candidate
 
 Bin the label into **quantile** bins and apply the categorical measure. This does not fix the
-objection the pre-registration raised -- the value still moves with the bin count -- but it answers
+objection the pre-registration raised (the value still moves with the bin count), but it answers
 the two that make a binning arbitrary:
 
 * the cut POSITIONS are not chosen, so there is no boundary to tune after seeing a result;
@@ -51,8 +51,8 @@ measure for comparing datasets does not need a stable value.
 | ordering, Spearman between adjacent bin counts | worst **+0.967** |
 | ordering, worst pair anywhere (b = 2 against b = 32) | **+0.853** |
 
-**The value moves and the ordering does not.** By the standard this measure exists to meet --
-comparing datasets -- a quantile-binned LI with a declared bin count is usable.
+**The value moves and the ordering does not.** The standard this measure exists to meet is comparing
+datasets, and by that standard a quantile-binned LI with a declared bin count is usable.
 
 ## And it is redundant
 
@@ -69,7 +69,7 @@ pointwise skill on the 30 MoleculeACE targets, all excluding zero) and adds noth
 incrementally over rank assortativity, ROGI, mean degree and task size, +0.137, +0.098 and +0.065,
 all covering zero.
 
-The most telling line is the first. **LI_q2** -- above or below the median, a single binary split --
+The most telling line is the first. LI_q2 (above or below the median, a single binary split)
 already correlates +0.961 with rank assortativity. The dependence between a molecule's label and its
 neighbours' on these graphs is essentially monotone, and a monotone dependence is what the
 continuous measure already captures.

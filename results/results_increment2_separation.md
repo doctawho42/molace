@@ -7,11 +7,11 @@ question. Reproduce with `uv run python scripts/separation.py`; output in
 
 ## The claim
 
-**H1.** Target assortativity predicts **attainable accuracy** -- a model's skill over the no-graph
+**H1.** Target assortativity predicts **attainable accuracy**: a model's skill over the no-graph
 baseline, where skill = 1 - RMSE_model / RMSE_baseline and the baseline predicts the evaluation
 set's mean.
 
-**H2.** It does **not** predict **which model family wins** -- the difference of two families'
+**H2.** It does **not** predict **which model family wins**: the difference of two families'
 skills is uncorrelated with it.
 
 Found post hoc on the 30 MoleculeACE targets while diagnosing why increment 1's positive control
@@ -20,7 +20,7 @@ failed. That set is the discovery set and cannot confirm the claim.
 ## Confirmatory set: DeepDelta, 10 benchmarks, three published families, no refitting
 
 The models are not mine, the splits are not mine, and none of the three families averages
-neighbours -- which is what keeps H1 from restating the kNN floor's definition. Primary statistic is
+neighbours, which is what keeps H1 from restating the kNN floor's definition. Primary statistic is
 the rank (Spearman across edge endpoints) version, fixed in the plan before any number was seen.
 
 | | rho | 95% CI | |
@@ -36,19 +36,19 @@ the rank (Spearman across edge endpoints) version, fixed in the plan before any 
 choice of statistic.
 
 **H2 is NOT supported, and the pre-registered rule that says otherwise is a bad rule.** It declares
-H2 supported when no pairwise difference excludes zero -- which is accepting a null from a failure
+H2 supported when no pairwise difference excludes zero, which is accepting a null from a failure
 to reject, and at n = 10 the test has almost no power to reject anything. One of the three
-differences has a point estimate of **-0.503** inside an interval nearly a full unit wide. That is
+differences has a point estimate of -0.503 inside an interval nearly a full unit wide. That is
 not evidence that assortativity fails to predict which family wins; it is the absence of evidence
 either way. Writing an accept-the-null rule into a pre-registration does not convert a null into a
 result, and the same power objection this document raises against the ROGI increment applies here
 with more force.
 
 What does bound the effect is the discovery set, where n = 30 and the intervals are tight enough to
-say something: pointwise minus pairwise is **+0.073 [-0.150, +0.457]** and floor minus pointwise
-**+0.055 [-0.427, +0.541]**. The first of those rules out an effect above about 0.46. That is
+say something: pointwise minus pairwise is +0.073 [-0.150, +0.457] and floor minus pointwise
++0.055 [-0.427, +0.541]. The first of those rules out an effect above about 0.46. That is
 exploratory, on the set the claim was found on, and it is the honest basis for the separation
-language -- not the confirmatory H2 rows.
+language, not the confirmatory H2 rows.
 
 ## What this does to increment 1's null
 
@@ -57,7 +57,7 @@ nothing: −0.187, interval covering zero. That null now has a mechanism rather 
 absence. The statistic carries a great deal about **how accurately a target can be predicted at
 all** and almost nothing about **which model class wins**, because both classes inherit the same
 label smoothness. Increment 1 asked for the second thing. Its own positive control failed for
-exactly this reason -- it was defined as a difference of two arms that respond alike -- and that
+exactly this reason (it was defined as a difference of two arms that respond alike) and that
 failure is what led here.
 
 ## Where it fails: the increment over the roughness baseline
@@ -90,14 +90,14 @@ targets, exploratory:
 | ROGI incremental over assortativity, kNN floor | +0.212 | [−0.163, +0.412] | covers 0 |
 | ROGI alone vs skill, pointwise | −0.200 | [−0.363, +0.093] | covers 0 |
 
-There the graph statistic dominates and ROGI adds nothing over it -- the reverse of the confirmatory
+There the graph statistic dominates and ROGI adds nothing over it, the reverse of the confirmatory
 set on every line.
 
 **What is honest to say about the disagreement.** Three differences could produce it and this work
 separates none of them: n = 10 against n = 30 with three covariates residualised, which leaves the
 confirmatory increment with very little power; a skill defined on pairwise deltas against one
 defined on absolute values; and ROGI itself behaving differently on the two collections (−0.82
-against skill on the ten, −0.20 on the thirty). The pre-registered answer stands as the answer:
+against skill on the ten, −0.20 on the thirty). The pre-registered answer is the answer:
 **the increment over the roughness baseline is not established.** Claiming otherwise from the
 discovery set would be reporting the set the claim was found on.
 
@@ -107,7 +107,7 @@ Confirmed on independent data and third-party models: **target assortativity pre
 accurately a molecular regression dataset can be predicted at all**, by models that are not mine and
 that average no neighbours. That half is solid.
 
-The other half -- that it does *not* predict which model class wins -- is **not** confirmed. The
+The other half, that it does *not* predict which model class wins, is **not** confirmed. The
 confirmatory set cannot reject anything at n = 10, and what supports the separation language is the
 discovery set's tighter interval, which is exploratory. A reader should take the first sentence as
 established and the separation as a hypothesis with one supporting exploratory bound.

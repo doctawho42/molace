@@ -33,8 +33,8 @@ choice does, before picking any.
 | full range of dataset means, for comparison | 0.6235 | 0.6024 |
 
 Read the last three rows together. 87% of the variance being the dataset sounds reassuring, and
-then the median dataset still moves **0.21** across constructions against a total between-dataset
-spread of **0.62**. One dataset, holding its data fixed and changing only the fingerprint and k,
+then the median dataset still moves 0.21 across constructions against a total between-dataset
+spread of 0.62. One dataset, holding its data fixed and changing only the fingerprint and k,
 traverses a third of the whole scale. The worst case, DeepDelta's FreeSolv, moves 0.40.
 
 ## The ordering survives
@@ -72,6 +72,6 @@ construction with the number, and make comparative claims rather than absolute o
 
 Ten constructions around one centre, two collections of molecular data, one node-feature type. It
 says nothing about graphs that are observed rather than built, and nothing about classification
-measures -- unbiased homophily on the cliff flag was not swept here because the flag exists only on
+measures: unbiased homophily on the cliff flag was not swept here because the flag exists only on
 the MoleculeACE half. A wider sweep could find a construction that breaks the ordering; none of
 these did.
