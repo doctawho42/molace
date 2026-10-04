@@ -1,0 +1,55 @@
+pre-registration blob: be0e9415878b85f76994ea75fc0338488e284dcc
+30 MoleculeACE targets, arms taken from results/spine.csv, not refitted
+
+  CHEMBL1862_Ki          r=+0.600 rho_nn=+0.507 1-nu=0.710 ceiling=0.461 best=+0.427  [0s]
+  CHEMBL1871_Ki          r=+0.588 rho_nn=+0.542 1-nu=0.638 ceiling=0.399 best=+0.309  [0s]
+  CHEMBL2034_Ki          r=+0.565 rho_nn=+0.528 1-nu=0.604 ceiling=0.371 best=+0.243  [0s]
+  CHEMBL2047_EC50        r=+0.520 rho_nn=+0.410 1-nu=0.660 ceiling=0.417 best=+0.334  [0s]
+  CHEMBL204_Ki           r=+0.663 rho_nn=+0.610 1-nu=0.719 ceiling=0.470 best=+0.459  [1s]
+  CHEMBL2147_Ki          r=+0.805 rho_nn=+0.746 1-nu=0.869 ceiling=0.638 best=+0.626  [0s]
+  CHEMBL214_Ki           r=+0.579 rho_nn=+0.491 1-nu=0.683 ceiling=0.437 best=+0.340  [1s]
+  CHEMBL218_EC50         r=+0.463 rho_nn=+0.378 1-nu=0.568 ceiling=0.343 best=+0.259  [0s]
+  CHEMBL219_Ki           r=+0.442 rho_nn=+0.357 1-nu=0.547 ceiling=0.327 best=+0.242  [1s]
+  CHEMBL228_Ki           r=+0.526 rho_nn=+0.442 1-nu=0.626 ceiling=0.389 best=+0.333  [1s]
+  CHEMBL231_Ki           r=+0.621 rho_nn=+0.557 1-nu=0.692 ceiling=0.445 best=+0.395  [0s]
+  CHEMBL233_Ki           r=+0.612 rho_nn=+0.564 1-nu=0.664 ceiling=0.420 best=+0.346  [1s]
+  CHEMBL234_Ki           r=+0.591 rho_nn=+0.512 1-nu=0.683 ceiling=0.437 best=+0.357  [2s]
+  CHEMBL235_EC50         r=+0.583 rho_nn=+0.522 1-nu=0.651 ceiling=0.409 best=+0.361  [1s]
+  CHEMBL236_Ki           r=+0.680 rho_nn=+0.630 1-nu=0.734 ceiling=0.485 best=+0.410  [1s]
+  CHEMBL237_EC50         r=+0.521 rho_nn=+0.438 1-nu=0.619 ceiling=0.383 best=+0.431  <-- VIOLATED  [0s]
+  CHEMBL237_Ki           r=+0.645 rho_nn=+0.599 1-nu=0.695 ceiling=0.448 best=+0.417  [1s]
+  CHEMBL238_Ki           r=+0.533 rho_nn=+0.440 1-nu=0.645 ceiling=0.404 best=+0.368  [0s]
+  CHEMBL239_EC50         r=+0.514 rho_nn=+0.429 1-nu=0.615 ceiling=0.380 best=+0.309  [1s]
+  CHEMBL244_Ki           r=+0.755 rho_nn=+0.719 1-nu=0.793 ceiling=0.545 best=+0.495  [1s]
+  CHEMBL262_Ki           r=+0.385 rho_nn=+0.299 1-nu=0.495 ceiling=0.289 best=+0.242  [0s]
+  CHEMBL264_Ki           r=+0.562 rho_nn=+0.470 1-nu=0.671 ceiling=0.427 best=+0.342  [1s]
+  CHEMBL2835_Ki          r=+0.784 rho_nn=+0.750 1-nu=0.820 ceiling=0.576 best=+0.541  [0s]
+  CHEMBL287_Ki           r=+0.375 rho_nn=+0.264 1-nu=0.534 ceiling=0.317 best=+0.196  [0s]
+  CHEMBL2971_Ki          r=+0.735 rho_nn=+0.697 1-nu=0.775 ceiling=0.526 best=+0.519  [0s]
+  CHEMBL3979_EC50        r=+0.609 rho_nn=+0.529 1-nu=0.700 ceiling=0.453 best=+0.390  [0s]
+  CHEMBL4005_Ki          r=+0.591 rho_nn=+0.519 1-nu=0.674 ceiling=0.429 best=+0.394  [0s]
+  CHEMBL4203_Ki          r=+0.369 rho_nn=+0.279 1-nu=0.488 ceiling=0.285 best=+0.147  [0s]
+  CHEMBL4616_EC50        r=+0.399 rho_nn=+0.324 1-nu=0.491 ceiling=0.287 best=+0.234  [0s]
+  CHEMBL4792_Ki          r=+0.545 rho_nn=+0.471 1-nu=0.630 ceiling=0.392 best=+0.418  <-- VIOLATED  [0s]
+
+================================================================================================
+the ceiling on the held-out set, n = 30
+================================================================================================
+  inadmissible targets (r^2/rho_nn outside (0,1]):   0
+  two-statistic ceiling violated on:                 2 / 30
+  one-statistic ceiling violated on:                 19 / 30
+  mean slack, ceiling minus best attained skill:     +0.0567  [-0.0486, +0.1380]
+  targets within 0.02 of their ceiling:              5 / 30
+  Spearman(ceiling, best attained skill):            +0.866 [+0.613, +0.995]  EXCLUDES 0
+
+================================================================================================
+VERDICT against the frozen rule
+================================================================================================
+  valid, at most 1 violation:                          False
+  not vacuous, mean slack below 0.15:                 True
+  informative, ranks the attained skill:                True
+  the second statistic adds something:                  True
+
+  IT DOES NOT HOLD OUT OF SAMPLE. The formula was a within-set fit, and the talk
+  carries it as an idea with a measured failure rather than as a result.
+exit 0
