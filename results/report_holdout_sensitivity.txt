@@ -1,0 +1,93 @@
+Found local copy...
+Loading...
+Done!
+  0%|          | 0/910 [00:00<?, ?it/s] 35%|███▍      | 315/910 [00:00<00:00, 3143.00it/s] 69%|██████▉   | 630/910 [00:00<00:00, 2994.55it/s]100%|██████████| 910/910 [00:00<00:00, 2953.52it/s]
+  caco2_wang                 raw                applied=True  a=+0.520 gap_sd=+0.6640 (48s)
+  caco2_wang                 log_if_admissible  applied=False a=+0.520 gap_sd=+0.6640 (44s)
+  caco2_wang                 rank_normal        applied=True  a=+0.502 gap_sd=-0.0218 (45s)
+Found local copy...
+Loading...
+Done!
+  0%|          | 0/4200 [00:00<?, ?it/s]  8%|▊         | 323/4200 [00:00<00:01, 3226.64it/s] 15%|█▌        | 646/4200 [00:00<00:01, 3158.98it/s] 23%|██▎       | 962/4200 [00:00<00:01, 3000.98it/s] 30%|███       | 1271/4200 [00:00<00:00, 3031.79it/s] 38%|███▊      | 1575/4200 [00:00<00:00, 3000.92it/s] 45%|████▍     | 1887/4200 [00:00<00:00, 3039.03it/s] 52%|█████▏    | 2204/4200 [00:00<00:00, 3079.01it/s] 60%|██████    | 2525/4200 [00:00<00:00, 3119.05it/s] 68%|██████▊   | 2838/4200 [00:00<00:00, 3121.73it/s] 75%|███████▌  | 3158/4200 [00:01<00:00, 3144.47it/s] 83%|████████▎ | 3488/4200 [00:01<00:00, 3190.04it/s] 91%|█████████ | 3808/4200 [00:01<00:00, 3114.97it/s] 98%|█████████▊| 4120/4200 [00:01<00:00, 3090.49it/s]100%|██████████| 4200/4200 [00:01<00:00, 3100.12it/s]
+  lipophilicity_astrazeneca  raw                applied=True  a=+0.379 gap_sd=-0.1822 (185s)
+  lipophilicity_astrazeneca  log_if_admissible  applied=False a=+0.379 gap_sd=-0.1822 (182s)
+  lipophilicity_astrazeneca  rank_normal        applied=True  a=+0.360 gap_sd=-0.1814 (192s)
+Found local copy...
+Loading...
+Done!
+  0%|          | 0/9982 [00:00<?, ?it/s]  5%|▍         | 469/9982 [00:00<00:02, 4685.22it/s] 11%|█         | 1086/9982 [00:00<00:01, 5557.66it/s] 16%|█▋        | 1642/9982 [00:00<00:02, 3645.35it/s] 21%|██        | 2063/9982 [00:00<00:02, 3789.70it/s] 26%|██▌       | 2549/9982 [00:00<00:01, 4108.48it/s] 31%|███       | 3057/9982 [00:00<00:01, 4398.65it/s] 35%|███▌      | 3522/9982 [00:00<00:01, 3987.58it/s] 40%|███▉      | 3948/9982 [00:00<00:01, 4062.36it/s] 47%|████▋     | 4733/9982 [00:01<00:01, 5131.99it/s]CC1=CC=C[NH+2]([O-])[CH-]1 returns RDKit error and is thus omitted...
+O=C(O)C1=C[NH+2]([O-])[CH-]C=C1 returns RDKit error and is thus omitted...
+ 54%|█████▍    | 5380/9982 [00:01<00:00, 5514.16it/s] 60%|██████    | 6025/9982 [00:01<00:00, 5784.67it/s] 66%|██████▋   | 6618/9982 [00:01<00:00, 5555.62it/s] 74%|███████▎  | 7346/9982 [00:01<00:00, 6046.33it/s] 80%|███████▉  | 7962/9982 [00:01<00:00, 5636.93it/s] 86%|████████▌ | 8538/9982 [00:01<00:00, 4633.86it/s] 91%|█████████ | 9054/9982 [00:01<00:00, 4760.40it/s] 96%|█████████▌| 9558/9982 [00:02<00:00, 4543.92it/s]100%|██████████| 9982/9982 [00:02<00:00, 4719.80it/s]
+  solubility_aqsoldb         raw                applied=True  a=+0.577 gap_sd=-0.0947 (571s)
+  solubility_aqsoldb         log_if_admissible  applied=False a=+0.577 gap_sd=-0.0947 (931s)
+  solubility_aqsoldb         rank_normal        applied=True  a=+0.569 gap_sd=-0.1135 (919s)
+Found local copy...
+Loading...
+Done!
+  0%|          | 0/1614 [00:00<?, ?it/s] 18%|█▊        | 289/1614 [00:00<00:00, 2880.81it/s] 37%|███▋      | 598/1614 [00:00<00:00, 3000.26it/s] 56%|█████▋    | 909/1614 [00:00<00:00, 3050.13it/s] 75%|███████▌  | 1215/1614 [00:00<00:00, 3044.72it/s] 94%|█████████▍| 1520/1614 [00:00<00:00, 3004.87it/s]100%|██████████| 1614/1614 [00:00<00:00, 2995.97it/s]
+  ppbr_az                    raw                applied=True  a=+0.187 gap_sd=-0.2601 (61s)
+  ppbr_az                    log_if_admissible  applied=True  a=+0.148 gap_sd=+0.3060 (153s)
+  ppbr_az                    rank_normal        applied=True  a=+0.243 gap_sd=-0.1794 (152s)
+Found local copy...
+Loading...
+Done!
+  0%|          | 0/1130 [00:00<?, ?it/s] 14%|█▍        | 160/1130 [00:00<00:00, 1587.33it/s] 29%|██▉       | 326/1130 [00:00<00:00, 1629.54it/s] 46%|████▋     | 524/1130 [00:00<00:00, 1783.69it/s] 65%|██████▍   | 732/1130 [00:00<00:00, 1900.07it/s] 85%|████████▍ | 959/1130 [00:00<00:00, 2008.23it/s]100%|██████████| 1130/1130 [00:00<00:00, 1756.00it/s]
+  vdss_lombardo              raw                applied=True  a=+0.082 gap_sd=-1.3674 (161s)
+  vdss_lombardo              log_if_admissible  applied=True  a=+0.400 gap_sd=-0.0832 (125s)
+  vdss_lombardo              rank_normal        applied=True  a=+0.391 gap_sd=-0.0880 (484s)
+Found local copy...
+Loading...
+Done!
+  0%|          | 0/667 [00:00<?, ?it/s] 15%|█▍        | 97/667 [00:00<00:00, 967.74it/s] 29%|██▉       | 194/667 [00:00<00:00, 854.35it/s] 47%|████▋     | 311/667 [00:00<00:00, 966.20it/s] 63%|██████▎   | 419/667 [00:00<00:00, 1006.56it/s] 79%|███████▉  | 529/667 [00:00<00:00, 1038.74it/s] 96%|█████████▌| 639/667 [00:00<00:00, 1056.84it/s]100%|██████████| 667/667 [00:00<00:00, 1025.43it/s]
+  half_life_obach            raw                applied=True  a=+0.096 gap_sd=-0.2811 (231s)
+  half_life_obach            log_if_admissible  applied=True  a=+0.213 gap_sd=-0.0235 (239s)
+  half_life_obach            rank_normal        applied=True  a=+0.227 gap_sd=+0.0174 (61s)
+Found local copy...
+Loading...
+Done!
+  0%|          | 0/1213 [00:00<?, ?it/s] 25%|██▍       | 300/1213 [00:00<00:00, 2992.39it/s] 51%|█████     | 617/1213 [00:00<00:00, 3096.08it/s] 79%|███████▊  | 953/1213 [00:00<00:00, 3213.75it/s]100%|██████████| 1213/1213 [00:00<00:00, 3196.75it/s]
+  clearance_hepatocyte_az    raw                applied=True  a=+0.197 gap_sd=-0.1653 (56s)
+  clearance_hepatocyte_az    log_if_admissible  applied=True  a=+0.213 gap_sd=-0.1531 (70s)
+  clearance_hepatocyte_az    rank_normal        applied=True  a=+0.207 gap_sd=-0.1707 (65s)
+Found local copy...
+Loading...
+Done!
+  0%|          | 0/1102 [00:00<?, ?it/s] 36%|███▋      | 402/1102 [00:00<00:00, 4017.35it/s] 73%|███████▎  | 804/1102 [00:00<00:00, 3860.64it/s]100%|██████████| 1102/1102 [00:00<00:00, 3807.68it/s]
+  clearance_microsome_az     raw                applied=True  a=+0.217 gap_sd=-0.2309 (62s)
+  clearance_microsome_az     log_if_admissible  applied=True  a=+0.289 gap_sd=-0.2266 (87s)
+  clearance_microsome_az     rank_normal        applied=True  a=+0.285 gap_sd=-0.2416 (88s)
+Found local copy...
+Loading...
+Done!
+  0%|          | 0/7385 [00:00<?, ?it/s] 12%|█▏        | 864/7385 [00:00<00:00, 8638.53it/s] 25%|██▌       | 1861/7385 [00:00<00:00, 9416.26it/s] 38%|███▊      | 2803/7385 [00:00<00:00, 8812.61it/s] 50%|████▉     | 3689/7385 [00:00<00:00, 8328.41it/s] 61%|██████▏   | 4527/7385 [00:00<00:00, 7548.97it/s] 72%|███████▏  | 5293/7385 [00:00<00:00, 6806.51it/s] 81%|████████  | 5988/7385 [00:00<00:00, 6415.51it/s] 90%|████████▉ | 6639/7385 [00:00<00:00, 6339.98it/s] 99%|█████████▊| 7279/7385 [00:01<00:00, 6064.68it/s]100%|██████████| 7385/7385 [00:01<00:00, 6943.28it/s]
+  ld50_zhu                   raw                applied=True  a=+0.535 gap_sd=-0.0354 (223s)
+  ld50_zhu                   log_if_admissible  applied=False a=+0.535 gap_sd=-0.0354 (212s)
+  ld50_zhu                   rank_normal        applied=True  a=+0.499 gap_sd=-0.1520 (230s)
+
+prereg of the spent holdout: 864ec5131b281d6cf3d48c481c897acd803d2e93
+
+THIS IS A POST-HOC SENSITIVITY ANALYSIS, NOT A HOLDOUT RESULT.
+The holdout was opened once and is spent. What follows changes only the label's scale
+and asks whether the reported +0.817 survives. It cannot restore a confirmatory test.
+
+--- raw  (transform applied to 9 of 9 tasks) ---
+  assortativity vs gap_sd         rho=+0.883  95% CI [+0.474, +1.000]  excludes 0: True
+  assortativity vs correction_sd  rho=+0.883  95% CI [+0.500, +1.000]  excludes 0: True
+  assortativity vs access_sd      rho=-0.333  95% CI [-0.897, +0.434]  excludes 0: False
+  CONFOUND CHECK, assortativity vs label_sd: rho=-0.700 CI [-0.948, -0.158]
+
+--- log_if_admissible  (transform applied to 5 of 9 tasks) ---
+  assortativity vs gap_sd         rho=+0.017  95% CI [-0.737, +0.722]  excludes 0: False
+  assortativity vs correction_sd  rho=+0.600  95% CI [-0.174, +1.000]  excludes 0: False
+  assortativity vs access_sd      rho=-0.400  95% CI [-0.949, +0.431]  excludes 0: False
+  CONFOUND CHECK, assortativity vs label_sd: rho=+0.883 CI [+0.402, +1.000]
+
+--- rank_normal  (transform applied to 9 of 9 tasks) ---
+  assortativity vs gap_sd         rho=+0.250  95% CI [-0.541, +0.846]  excludes 0: False
+  assortativity vs correction_sd  rho=+0.400  95% CI [-0.389, +0.895]  excludes 0: False
+  assortativity vs access_sd      rho=-0.583  95% CI [-0.927, +0.105]  excludes 0: False
+  CONFOUND CHECK, assortativity vs label_sd: rho=+0.650 CI [-0.053, +1.000]
+
+Read the confound check before the correlation above it. The pre-registered holdout's
+defect was that the statistic and the gap both tracked the label's scale; a scale on
+which that correlation is gone is a scale on which the main number means what it says.
