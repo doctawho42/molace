@@ -1,0 +1,67 @@
+# Increment 6, frozen before the held-out set is touched for this question.
+#
+# WHY THIS EXISTS. The project has repeatedly wanted a ceiling on attainable accuracy from the graph
+# alone, and repeatedly failed to get one. Substituting (1 - r) for the representation's Bayes error
+# gives skill <= 1 - sqrt(1 - r), and increment 4 measured that it is violated on 28 of 40 targets,
+# because neighbours do not coincide in feature space so r understates the signal fraction.
+#
+# THE IDEA, derived 2026-10-05 and NOT a theorem. Model the label correlation as decaying
+# geometrically with hop distance on the graph:
+#
+#     rho_d = (1 - nu) * lambda^d,    nu = the noise fraction, lambda in (0, 1]
+#
+# Target assortativity is the one-hop value and the shared-neighbour correlation is the two-hop value:
+#
+#     r = (1 - nu) * lambda,  rho_nn = (1 - nu) * lambda^2   =>   1 - nu = r^2 / rho_nn
+#
+# so the noise fraction is estimated by two statistics instead of one, both read off the graph with
+# nothing trained, and the ceiling becomes
+#
+#     skill <= 1 - sqrt(1 - r^2 / rho_nn)
+#
+# This is a ONE-PARAMETER MODEL solved from two equations, not an identity. It can be wrong.
+#
+# WHAT HAS ALREADY BEEN SEEN, stated so the reader can discount it. On the 40 ChEMBL targets the new
+# ceiling is violated 0 times against the old one's 29, with mean slack +0.053. Those 40 targets are
+# therefore the set this was FOUND on and cannot confirm it. This plan is frozen before the held-out
+# set is read for this question.
+
+held_out_set:
+  targets: the 30 MoleculeACE targets, 29 distinct ChEMBL identifiers, CHEMBL237 twice (Ki and EC50)
+  why_it_is_held_out: >
+    These 30 are the discovery set for the project's ORIGINAL claim about attainable accuracy, and the
+    40 ChEMBL targets were curated to exclude their identifiers. For the ceiling formula they have
+    never been used: the formula did not exist when they were last read. That makes them a valid
+    confirmation set for THIS claim and not for the earlier one.
+  arms: the three arms' RMSEs already in results/spine.csv, not refitted
+  split: MoleculeACE's own 80/20, the split those RMSEs were computed on
+  graph: kNN, k = 10, Tanimoto on ECFP4 Morgan r=2 2048 bits, union-symmetrised
+  statistics: Pearson target assortativity and shared-neighbour correlation, both recomputed here so
+    the pair is consistent, via src/molace/measures/neighbourhood.py
+  skill: 1 - RMSE_arm / RMSE_base, base = predicting the training mean on the test split
+  compared_against: the best of the three arms, because a ceiling must bound all of them
+  bootstrap: cluster bootstrap over receptor class, 10000 draws, seed 0
+
+decision_rule:
+  admissible_iff: r^2 / rho_nn lies in (0, 1] on every target; where it does not, the formula is
+    undefined there and that is reported rather than patched
+  valid_iff: the ceiling is violated on at most 1 of the 30 targets
+  not_vacuous_iff: the mean slack, ceiling minus best attained skill, is below 0.15
+  informative_iff: Spearman(ceiling, best attained skill) is positive with an interval excluding zero
+  adds_something_iff: the one-statistic ceiling 1 - sqrt(1 - r) is violated MORE often on these same
+    30 targets than the two-statistic one
+  if_violations_exceed_one: >
+    the formula does not hold out of sample and the project says it was a within-set fit. The talk
+    then carries it as an idea with a measured failure, not as a result.
+  if_valid_but_vacuous: >
+    a bound nothing can breach is not a bound worth reporting; it is reported with its slack and
+    called loose.
+  if_valid_but_not_informative: >
+    then it bounds without ranking, which is weaker than the project's existing claim and is said to
+    be weaker.
+
+forbidden:
+  - Fitting lambda or nu to the held-out data in any way; both come from the two statistics only.
+  - Dropping a target after seeing its number, including one where the formula is inadmissible.
+  - Reporting the new ceiling without the old one's violation count on the same set.
+  - Calling a one-parameter decay model a theorem anywhere in the project's prose.
