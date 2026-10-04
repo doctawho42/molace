@@ -1,0 +1,19 @@
+pre-registration blob: 8bf30344d87e0a9e54cd77d794ca77848baeff96
+80 cells, 40 targets x 2 constructions
+
+============================================================================================
+THE ADDITIONAL GATE: does the construction separate lambda more than the targets do?
+============================================================================================
+  nearest  lambda 0.8640  sd 0.0599  clustering 0.557
+  spread   lambda 0.7969  sd 0.1022  clustering 0.223
+  lambda variance between constructions:  14.1 %  (needs >= 25 %)
+  lambda variance between targets:        77.0 %
+  GATE: False
+
+============================================================================================
+reported unconditionally: does the identity still describe the estimator?
+============================================================================================
+  nearest  mean |error| 0.0256  mean signed -0.0127  Pearson 0.983
+  spread   mean |error| 0.0247  mean signed -0.0031  Pearson 0.980
+
+  GATE FAILED. The outcome is not reported, on the same grounds as increment 7.

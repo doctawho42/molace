@@ -1,0 +1,65 @@
+pre-registration blob: 0018a8760d7881322b23dc6dfe6b8465917ab225
+40 targets, two constructions at k = 10, nothing trained
+
+  CHEMBL217_Ki           n= 8205  nearest: C=0.559 lam=0.881 d=0.070 | spread: C=0.207 lam=0.820 d=0.078  [13s]
+  CHEMBL205_Ki           n= 7636  nearest: C=0.526 lam=0.796 d=0.106 | spread: C=0.149 lam=0.668 d=0.107  [10s]
+  CHEMBL261_Ki           n= 7082  nearest: C=0.532 lam=0.815 d=0.097 | spread: C=0.148 lam=0.664 d=0.089  [9s]
+  CHEMBL3594_Ki          n= 5779  nearest: C=0.555 lam=0.802 d=0.100 | spread: C=0.151 lam=0.648 d=0.087  [6s]
+  CHEMBL251_Ki           n= 5286  nearest: C=0.565 lam=0.908 d=0.059 | spread: C=0.217 lam=0.872 d=0.065  [6s]
+  CHEMBL224_Ki           n= 4653  nearest: C=0.535 lam=0.914 d=0.053 | spread: C=0.209 lam=0.881 d=0.061  [5s]
+  CHEMBL1628481_EC50     n= 3215  nearest: C=0.513 lam=0.818 d=0.083 | spread: C=0.216 lam=0.786 d=0.076  [3s]
+  CHEMBL256_Ki           n= 4276  nearest: C=0.545 lam=0.888 d=0.068 | spread: C=0.207 lam=0.788 d=0.094  [4s]
+  CHEMBL3242_Ki          n= 4624  nearest: C=0.571 lam=0.819 d=0.095 | spread: C=0.154 lam=0.679 d=0.086  [5s]
+  CHEMBL226_Ki           n= 4386  nearest: C=0.573 lam=0.831 d=0.084 | spread: C=0.218 lam=0.744 d=0.076  [4s]
+  CHEMBL253_Ki           n= 4063  nearest: C=0.601 lam=0.879 d=0.068 | spread: C=0.259 lam=0.852 d=0.059  [4s]
+  CHEMBL3371_Ki          n= 3904  nearest: C=0.527 lam=0.871 d=0.077 | spread: C=0.192 lam=0.834 d=0.077  [3s]
+  CHEMBL5113_Ki          n= 2272  nearest: C=0.488 lam=0.921 d=0.052 | spread: C=0.199 lam=0.882 d=0.063  [1s]
+  CHEMBL2292_EC50        n= 1857  nearest: C=0.446 lam=0.781 d=0.095 | spread: C=0.171 lam=0.758 d=0.077  [1s]
+  CHEMBL1163125_Ki       n= 1296  nearest: C=0.624 lam=0.870 d=0.088 | spread: C=0.242 lam=0.833 d=0.082  [1s]
+  CHEMBL3155_Ki          n= 2657  nearest: C=0.535 lam=0.840 d=0.086 | spread: C=0.194 lam=0.785 d=0.075  [2s]
+  CHEMBL225_Ki           n= 2584  nearest: C=0.536 lam=0.872 d=0.065 | spread: C=0.206 lam=0.834 d=0.062  [2s]
+  CHEMBL4422_EC50        n= 2272  nearest: C=0.604 lam=0.886 d=0.062 | spread: C=0.278 lam=0.844 d=0.070  [1s]
+  CHEMBL614358_EC50      n= 1243  nearest: C=0.308 lam=0.672 d=0.037 | spread: C=0.069 lam=0.384 d=0.026  [1s]
+  CHEMBL4860_Ki          n= 1243  nearest: C=0.599 lam=0.972 d=0.024 | spread: C=0.238 lam=0.969 d=0.026  [1s]
+  CHEMBL5024_Ki          n= 1011  nearest: C=0.545 lam=0.784 d=0.095 | spread: C=0.244 lam=0.714 d=0.076  [0s]
+  CHEMBL2000_Ki          n= 1080  nearest: C=0.601 lam=0.839 d=0.088 | spread: C=0.293 lam=0.773 d=0.075  [1s]
+  CHEMBL4333_EC50        n= 2464  nearest: C=0.624 lam=0.926 d=0.046 | spread: C=0.271 lam=0.889 d=0.052  [2s]
+  CHEMBL4550_Ki          n= 1513  nearest: C=0.524 lam=0.789 d=0.088 | spread: C=0.215 lam=0.714 d=0.086  [1s]
+  CHEMBL259_Ki           n= 1982  nearest: C=0.649 lam=0.895 d=0.073 | spread: C=0.306 lam=0.843 d=0.083  [1s]
+  CHEMBL4822_Ki          n= 2217  nearest: C=0.592 lam=0.849 d=0.081 | spread: C=0.268 lam=0.765 d=0.086  [1s]
+  CHEMBL222_Ki           n= 1987  nearest: C=0.570 lam=0.866 d=0.074 | spread: C=0.242 lam=0.788 d=0.083  [1s]
+  CHEMBL245_Ki           n= 1777  nearest: C=0.593 lam=0.918 d=0.059 | spread: C=0.265 lam=0.840 d=0.092  [1s]
+  CHEMBL2014_Ki          n= 2108  nearest: C=0.570 lam=0.883 d=0.065 | spread: C=0.234 lam=0.829 d=0.066  [1s]
+  CHEMBL255_Ki           n= 1843  nearest: C=0.549 lam=0.926 d=0.049 | spread: C=0.216 lam=0.896 d=0.055  [1s]
+  CHEMBL4361_Ki          n= 1617  nearest: C=0.590 lam=0.973 d=0.023 | spread: C=0.254 lam=0.960 d=0.032  [1s]
+  CHEMBL4805_Ki          n=  583  nearest: C=0.529 lam=0.882 d=0.030 | spread: C=0.280 lam=0.821 d=0.044  [0s]
+  CHEMBL1784_EC50        n= 1464  nearest: C=0.644 lam=0.950 d=0.037 | spread: C=0.317 lam=0.930 d=0.045  [2s]
+  CHEMBL1833_Ki          n= 1655  nearest: C=0.510 lam=0.768 d=0.093 | spread: C=0.197 lam=0.689 d=0.065  [1s]
+  CHEMBL4227_EC50        n= 1332  nearest: C=0.562 lam=0.892 d=0.056 | spread: C=0.236 lam=0.821 d=0.070  [1s]
+  CHEMBL211_Ki           n= 1564  nearest: C=0.579 lam=0.891 d=0.068 | spread: C=0.247 lam=0.815 d=0.088  [1s]
+  CHEMBL344_Ki           n= 1593  nearest: C=0.621 lam=0.895 d=0.044 | spread: C=0.265 lam=0.807 d=0.051  [1s]
+  CHEMBL240_Ki           n= 1485  nearest: C=0.595 lam=0.906 d=0.054 | spread: C=0.183 lam=0.765 d=0.068  [1s]
+  CHEMBL3759_Ki          n= 1342  nearest: C=0.548 lam=0.842 d=0.084 | spread: C=0.235 lam=0.830 d=0.068  [1s]
+  CHEMBL2056_Ki          n= 1265  nearest: C=0.549 lam=0.848 d=0.084 | spread: C=0.239 lam=0.861 d=0.061  [1s]
+
+================================================================================================
+THE DESIGN GATE, evaluated before the outcome is read
+================================================================================================
+  nearest  clustering 0.557  lambda 0.864  decoupling 0.0690  mean degree 13.5
+  spread   clustering 0.223  lambda 0.797  decoupling 0.0695  mean degree 17.9
+  decoupling variance between constructions:   0.0 %   (increment 5's grid managed 4.2 %)
+  decoupling variance between targets:        89.3 %
+  mean per-hop decay gap:                    0.0671
+  GATE (needs >= 25% and >= 0.05): False
+
+================================================================================================
+reported unconditionally: does the identity still describe the estimator?
+================================================================================================
+  nearest  mean |error| 0.0256  mean signed -0.0127  Pearson 0.983
+  spread   mean |error| 0.0247  mean signed -0.0031  Pearson 0.980
+
+================================================================================================
+  THE DESIGN GATE FAILED. The outcome is NOT reported, in numbers or in words: a
+  construction that cannot move the quantity it contrasts has nothing to say about it.
+================================================================================================
+exit 0

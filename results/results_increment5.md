@@ -160,3 +160,82 @@ both ways: the collapse may be more complete than the energy figure suggests, an
 not evidence for the collapse being incomplete either. `non_gradient_residual` is the quantity that
 actually moves a prediction, and it has not been measured on the trained model; doing that needs the
 flow on test-to-anchor edges, which lie outside the training graph the Hodge census was computed on.
+
+---
+
+# Increments 7 and 8: two more designs, two failed gates, and the reason
+
+Pre-registrations: `prereg/increment7_decoupling.yaml`, blob
+`0018a8760d7881322b23dc6dfe6b8465917ab225`; `prereg/increment8_lambda_contrast.yaml`, blob
+`8bf30344d87e0a9e54cd77d794ca77848baeff96`. Output in
+`results/report_decoupling_designed.txt`, `results/report_lambda_contrast.txt` and
+`results/decoupling_designed.csv`.
+
+After increment 5's experiment B was refused, increment 7 built a construction designed to move
+neighbourhood overlap on purpose at fixed k, and put a **design gate before the outcome**: if the
+construction does not move the quantity the contrast is built on, the outcome is not read at all. That
+rule exists because increment 5 nearly banked a result its design had not earned.
+
+## Increment 7: the construction worked, the contrast variable did not
+
+| construction | clustering | per-hop decay lambda | decoupling abs(r - rho_nn) | mean degree |
+|---|---|---|---|---|
+| nearest (k most similar) | 0.557 | 0.864 | 0.0690 | 13.5 |
+| spread (least overlapping k of the 4k nearest) | **0.223** | 0.797 | 0.0695 | 17.9 |
+
+Clustering fell by a factor of 2.5 and the per-hop decay by 0.067, which cleared that half of the
+gate. The decoupling moved by **0.0005**: 0.0 % of its variance between constructions against 89.3 %
+between targets. Gate failed, outcome not read, and the script returns before computing it.
+
+The reason is arithmetic and it indicts both earlier plans: `abs(r - rho_nn) = r (1 - lambda)`, and the
+spread construction lowers lambda **and** lowers r, so the product barely moves. The contrast variable
+was wrong in increment 5 and wrong again in increment 7. What carries the claim is lambda itself, the
+decay model's own parameter.
+
+## Increment 8: the contrast corrected, and the same wall
+
+Increment 8 re-specified the contrast as lambda, disclosed as written on data already collected: the
+cells existed, their gate statistics were known, and the lambda-based outcome had never been computed,
+printed or looked at. That is pre-registration with respect to the outcome and not to the data, which
+is weaker than increments 3 to 7 and is labelled so wherever it appears.
+
+Its additional gate asked whether the construction separates lambda more than the targets do:
+
+| source | share of lambda's variance |
+|---|---|
+| between constructions | **14.1 %** (needed 25 %) |
+| between targets | 77.0 % |
+
+Gate failed. Outcome not read. The plan forbids re-specifying a third time, so the question is left
+open rather than re-rolled.
+
+## What three attempts actually established
+
+The same number keeps appearing: **between-target variance is 77 % to 89 % of everything**, whatever is
+varied. Increment 5's ten-construction grid, increment 7's deliberate 2.5-fold change in clustering and
+increment 8's corrected contrast all hit it. A 2.5-fold change in clustering bought 14.1 % of lambda's
+variance.
+
+So the honest conclusion is about feasibility, not about the claim: **a structural claim of this kind
+cannot be tested on 40 real targets with a handful of constructions**, because target identity swamps
+construction. What it needs is synthetic graphs with a controlled decay and a known noise fraction,
+where the contrast is set rather than hoped for, exactly as the identity's own exactness was pinned on
+regular graphs rather than argued from chemistry. That is the design for a later increment and it is
+not attempted here.
+
+## What the attempts did deliver, unconditionally
+
+Both plans required the identity's accuracy to be reported whatever the gate did, because an identity
+that stopped describing the estimator under a different construction would be a larger finding than the
+contrast it was meant to test:
+
+| construction | mean abs error | mean signed error | Pearson |
+|---|---|---|---|
+| nearest | 0.0256 | -0.0127 | 0.983 |
+| spread | **0.0247** | -0.0031 | 0.980 |
+
+The identity holds under a construction with **2.5 times less clustering**, 17.9 mean degree against
+13.5, and a quite different neighbour-selection rule. Its residual also nearly vanishes there, -0.0031
+against -0.0127, which is consistent with the train-only-neighbour explanation of increment 5: spread
+anchors reach further down the candidate pool, so the whole-graph statistics describe them better. That
+is a direction, not a tested claim.
