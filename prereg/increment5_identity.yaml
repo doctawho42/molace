@@ -1,0 +1,86 @@
+# Increment 5, frozen before any measurement. Two tests of the identity that increment 4 validated
+# at a single k on a single construction, plus one prediction this project put in its own talk and
+# admitted it had not tested.
+#
+# The identity, plain arithmetic from expanding the floor's squared error:
+#
+#     E(y_v - yhat_v)^2 / sigma^2  =  1 + 1/k + (k-1)/k * rho_nn  -  2 * r
+#
+# r   = mean label correlation across an edge, which IS target assortativity by definition
+# rho_nn = mean label correlation between two nodes that share a neighbour
+#
+# Increment 4 measured it once: k = 10, ECFP4 Tanimoto kNN, 40 ChEMBL targets, mean |error| 0.0256.
+# One point is not a functional form, and one construction is not a range of graphs. Hence A and B.
+
+shared:
+  targets: the 40 ChEMBL targets of prereg/increment3_chembl.yaml, blob 7519ef31c4374637483bae167221f9b7567ece7f
+  split: random 80/20, numpy default_rng(0), identical to scripts/rogi_chembl.py and increment 4
+  floor: molace.models.knn_floor over molace.models.anchors, uniform weights, no hyperparameter
+  measured_quantity: >
+    the floor's relative error on the test split, (RMSE_floor / RMSE_baseline)^2, baseline =
+    predicting the training mean. This is what the identity predicts, so it is what gets compared.
+  statistics: >
+    r is Pearson target assortativity on the SAME graph the floor's anchors come from; rho_nn is the
+    Pearson correlation of the label over pairs of nodes sharing a neighbour in that graph, both
+    orientations, subsampled with seed 0 above 4e6 pairs.
+  bootstrap: cluster bootstrap over targets, 10000 draws, seed 0, each target its own cluster
+
+experiment_A:
+  question: does the identity hold as a FUNCTION of k, or only at the k it was fitted-free checked at?
+  design: k in {3, 5, 10, 20, 40}; rebuild the graph, recompute both statistics and the measured
+    floor error at each k; nothing is refitted because the floor has nothing to fit.
+  stated_before_running: >
+    The identity should under-predict the error, because the measured floor averages the k nearest
+    TRAINING molecules of a test molecule while both statistics are computed over the whole graph, so
+    the real neighbours are fewer and worse than the statistics imply. That mismatch should GROW with
+    k, because a larger k reaches further down a thinner pool of training neighbours.
+  decision_rule:
+    functional_form_holds_iff: mean |predicted - measured| < 0.05 at EVERY k
+    bias_explanation_holds_iff: >
+      the mean signed error is negative at every k AND Spearman(k, |mean signed error|) is positive
+      with a bootstrap interval excluding zero.
+    if_form_fails_at_some_k: >
+      the identity does not describe this estimator at that k and the project says so, naming the k
+      and the size of the miss. A term depending on k is then missing from the derivation.
+    if_form_holds_but_bias_explanation_fails: >
+      the identity stands and MY EXPLANATION of its residual is wrong. Those are separate claims and
+      are reported separately.
+
+experiment_B:
+  question: >
+    the talk claims assortativity alone must stop predicting attainable accuracy where neighbour
+    agreement decouples from edge agreement. That claim was made without a test. This is the test.
+  design: >
+    the 10 frozen constructions of scripts/construction_variance.py (ECFP4 Tanimoto at k = 5, 10, 20,
+    30; ecfp6, maccs, rdkit, atompair at k = 10; dice and cosine at k = 10). Each (target,
+    construction) cell gets r, rho_nn and the measured floor error. Cells are pooled and split into
+    terciles by the decoupling d = |r - rho_nn|.
+  tested_quantities:
+    - mean |predicted - measured| of the full identity, per tercile
+    - Spearman of (1 - r) against the measured error, per tercile, which is assortativity ALONE
+    - the top-minus-bottom tercile difference of that Spearman, paired bootstrap over targets
+  decision_rule:
+    prediction_confirmed_iff: >
+      the identity's mean |error| in the top decoupling tercile exceeds that in the bottom tercile by
+      no more than 0.02, AND assortativity alone ranks worse in the top tercile than in the bottom,
+      with the paired bootstrap interval on that difference excluding zero.
+    if_assortativity_alone_does_not_degrade: >
+      the prediction the talk makes is WRONG and the talk is corrected to say the test was run and
+      found nothing. k is confounded with the construction here, which is a limit of reusing a frozen
+      grid rather than designing one, and it is reported either way.
+    if_the_identity_itself_degrades: >
+      then the identity is construction-specific, which is a bigger finding than the prediction it
+      was meant to test, and it leads the report.
+
+deliverable_C:
+  not_a_hypothesis: >
+    the two statistics and the prediction move out of a script and into the library, with tests that
+    pin the identity on graphs whose answer is known by hand rather than by this project's own data.
+  module: src/molace/measures/neighbourhood.py
+  functions: shared_neighbour_correlation(g, y), predicted_floor_error(g, y, k)
+
+forbidden:
+  - Choosing which k or which construction to report after seeing its result; all are reported.
+  - Dropping a target or a cell after seeing its number.
+  - Reading a tercile difference whose interval covers zero as evidence of no effect without its width.
+  - Calling the identity confirmed at a k where the frozen threshold is missed.
