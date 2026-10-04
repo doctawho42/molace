@@ -1,0 +1,74 @@
+# Increment 7, frozen before any measurement. The experiment increment 5's experiment B should have
+# been, with the lesson that experiment taught built into the rule as a gate.
+#
+# WHAT WENT WRONG LAST TIME. Increment 5 experiment B stratified 400 cells by the decoupling
+# d = |r - rho_nn| and compared ranking power across terciles. Its frozen rule passed. The project
+# refused the pass, because 77.0 % of the decoupling's variance sat between TARGETS and only 4.2 %
+# between constructions: the grid barely moved the quantity the terciles stratified on, so the terciles
+# sorted targets rather than graphs. The rule also tested each degradation separately and read "one
+# interval excludes zero, the other covers it" as an answer, which is the inference increment 2 got
+# wrong; the difference the prediction implies was -0.0132 [-0.0501, +0.0268] and covered zero.
+#
+# TWO CHANGES FOLLOW, and they are the point of this plan.
+#   1. A DESIGN GATE that is evaluated BEFORE the outcome is read. If the construction does not move
+#      the decoupling, the experiment is declared inadequate and the outcome is not reported at all.
+#   2. The tested quantity is the DIFFERENCE of the two degradations, not each separately.
+
+the_claim_under_test: >
+  The identity weights shared-neighbour agreement at (k-1)/k against assortativity's -2. On this
+  project's kNN graphs the two statistics correlate at +0.988, so assortativity alone nearly matches
+  the full identity for ranking. The claim is that this is a property of THESE graphs and not of the
+  statistic: where neighbourhoods overlap less, the per-hop decay lambda = rho_nn / r falls, the two
+  statistics part company, and assortativity alone must lose ranking power that the full identity keeps.
+
+design:
+  targets: the 40 ChEMBL targets of prereg/increment3_chembl.yaml, blob 7519ef31c4374637483bae167221f9b7567ece7f
+  split: random 80/20, numpy default_rng(0), as in increments 4, 5 and 6
+  k: 10 in both constructions, because the identity is a statement about a fixed averaging width
+  constructions:
+    nearest: >
+      the project's standard graph: each node joined to its k most similar, union-symmetrised, ECFP4
+      Tanimoto. High neighbourhood overlap by construction.
+    spread: >
+      the same k edges per node chosen to overlap as little as possible: among a node's 4k nearest
+      candidates, pick k greedily so that each new pick is the least similar to those already picked.
+      Same k, same fingerprint, same metric, same symmetrisation; only neighbourhood overlap changes.
+  why_not_threshold_graphs: >
+    A threshold graph gives every node a different degree, and the identity is stated for a fixed
+    averaging width k. Testing it there would confound the claim with a varying k, so the construction
+    that moves overlap at FIXED k is used instead.
+  floor: the k anchors of molace.models.anchors on the SAME construction, so statistics and estimator
+    always describe the same neighbourhoods
+  bootstrap: paired bootstrap over targets, 10000 draws, seed 0
+
+design_gate:
+  evaluated_first: true
+  passes_iff: >
+    the construction accounts for at least 25 % of the variance of the decoupling d = |r - rho_nn| over
+    the 80 cells, by the same between-group decomposition increment 5 used, AND the mean per-hop decay
+    lambda = rho_nn / r differs between the two constructions by at least 0.05.
+  if_it_fails: >
+    the experiment is declared INADEQUATE and the outcome is NOT reported, in numbers or in words. A
+    design that cannot move the quantity it contrasts has nothing to say about it, and reporting its
+    outcome anyway is how increment 5 nearly banked a result it had not earned.
+
+outcome_rule:
+  evaluated_only_if_the_gate_passes: true
+  tested_quantity: >
+    D = (ranking power of assortativity alone on spread minus on nearest)
+        - (ranking power of the full identity on spread minus on nearest),
+    where ranking power is the Spearman of the predictor against the measured relative floor error, and
+    a predictor that loses more is the one whose Spearman moves further toward zero.
+  claim_supported_iff: D is negative with a paired bootstrap interval excluding zero
+  if_the_interval_covers_zero: >
+    not supported, and the width is reported with it. The project does not read a covered zero as
+    evidence of no difference.
+  also_reported_unconditionally: >
+    the identity's own mean absolute error on both constructions, because an identity that stops
+    describing the estimator under a different construction is a larger finding than this contrast.
+
+forbidden:
+  - Reading or reporting the outcome if the design gate fails.
+  - Tuning the spread construction's candidate pool 4k after seeing any result.
+  - Reporting either degradation alone as the answer; the difference is the tested quantity.
+  - Dropping a target after seeing its number.
