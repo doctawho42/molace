@@ -1,0 +1,93 @@
+Found local copy...
+Loading...
+Done!
+pre-registration blob: 929acfaf7c8be3b5d5baae4257b88f1696bbf4ae
+
+MoleculeACE, 30 targets, reading the committed fits:
+  30 done
+TDC, 10 regression tasks, fitting:
+  0%|          | 0/910 [00:00<?, ?it/s] 26%|██▌       | 234/910 [00:00<00:00, 2335.45it/s] 55%|█████▌    | 504/910 [00:00<00:00, 2549.54it/s] 83%|████████▎ | 759/910 [00:00<00:00, 1754.21it/s]100%|██████████| 910/910 [00:00<00:00, 2050.94it/s]
+  caco2_wang                   abs=-0.425 delta=+0.317 [33s]
+Found local copy...
+Loading...
+Done!
+  0%|          | 0/4200 [00:00<?, ?it/s] 10%|█         | 427/4200 [00:00<00:00, 4262.32it/s] 20%|██        | 854/4200 [00:00<00:00, 4107.65it/s] 30%|███       | 1266/4200 [00:00<00:00, 4092.82it/s] 40%|███▉      | 1676/4200 [00:00<00:00, 4089.05it/s] 50%|█████     | 2109/4200 [00:00<00:00, 4174.73it/s] 60%|██████    | 2535/4200 [00:00<00:00, 4199.52it/s] 70%|███████   | 2958/4200 [00:00<00:00, 4206.09it/s] 81%|████████  | 3386/4200 [00:00<00:00, 4227.48it/s] 91%|█████████ | 3809/4200 [00:00<00:00, 4041.96it/s]100%|██████████| 4200/4200 [00:01<00:00, 4134.07it/s]
+  lipophilicity_astrazeneca    abs=+0.271 delta=+0.089 [168s]
+Found local copy...
+Loading...
+Done!
+  0%|          | 0/9982 [00:00<?, ?it/s]  6%|▌         | 565/9982 [00:00<00:01, 5648.81it/s] 13%|█▎        | 1265/9982 [00:00<00:01, 6435.80it/s] 19%|█▉        | 1909/9982 [00:00<00:01, 4967.64it/s] 27%|██▋       | 2730/9982 [00:00<00:01, 6049.81it/s] 34%|███▍      | 3435/9982 [00:00<00:01, 6371.55it/s] 42%|████▏     | 4192/9982 [00:00<00:00, 6749.09it/s]CC1=CC=C[NH+2]([O-])[CH-]1 returns RDKit error and is thus omitted...
+O=C(O)C1=C[NH+2]([O-])[CH-]C=C1 returns RDKit error and is thus omitted...
+ 53%|█████▎    | 5306/9982 [00:00<00:00, 8114.23it/s] 62%|██████▏   | 6230/9982 [00:00<00:00, 8457.10it/s] 72%|███████▏  | 7198/9982 [00:00<00:00, 8828.11it/s] 81%|████████  | 8093/9982 [00:01<00:00, 8504.82it/s] 90%|████████▉ | 8954/9982 [00:01<00:00, 7865.10it/s] 98%|█████████▊| 9780/9982 [00:01<00:00, 7974.74it/s]100%|██████████| 9982/9982 [00:01<00:00, 7480.08it/s]
+  solubility_aqsoldb           abs=+0.328 delta=+0.235 [386s]
+Found local copy...
+Loading...
+Done!
+  0%|          | 0/1614 [00:00<?, ?it/s] 23%|██▎       | 365/1614 [00:00<00:00, 3641.62it/s] 45%|████▌     | 730/1614 [00:00<00:00, 3612.41it/s] 68%|██████▊   | 1096/1614 [00:00<00:00, 3630.90it/s] 91%|█████████ | 1461/1614 [00:00<00:00, 3637.97it/s]100%|██████████| 1614/1614 [00:00<00:00, 3641.13it/s]
+  ppbr_az                      abs=+0.005 delta=-0.281 [70s]
+Found local copy...
+Loading...
+Done!
+  0%|          | 0/1130 [00:00<?, ?it/s] 29%|██▉       | 332/1130 [00:00<00:00, 3314.96it/s] 65%|██████▌   | 735/1130 [00:00<00:00, 3730.31it/s] 98%|█████████▊| 1109/1130 [00:00<00:00, 3628.17it/s]100%|██████████| 1130/1130 [00:00<00:00, 3601.08it/s]
+  vdss_lombardo                abs=-0.088 delta=-5.350 [71s]
+Found local copy...
+Loading...
+Done!
+  0%|          | 0/667 [00:00<?, ?it/s] 49%|████▊     | 325/667 [00:00<00:00, 3243.81it/s] 97%|█████████▋| 650/667 [00:00<00:00, 3210.25it/s]100%|██████████| 667/667 [00:00<00:00, 3161.26it/s]
+  half_life_obach              abs=-0.620 delta=-1.582 [35s]
+Found local copy...
+Loading...
+Done!
+  0%|          | 0/1213 [00:00<?, ?it/s] 31%|███       | 377/1213 [00:00<00:00, 3757.19it/s] 62%|██████▏   | 753/1213 [00:00<00:00, 3634.91it/s] 93%|█████████▎| 1132/1213 [00:00<00:00, 3701.63it/s]100%|██████████| 1213/1213 [00:00<00:00, 3686.04it/s]
+  clearance_hepatocyte_az      abs=+0.008 delta=-0.164 [38s]
+Found local copy...
+Loading...
+Done!
+  0%|          | 0/1102 [00:00<?, ?it/s] 35%|███▌      | 391/1102 [00:00<00:00, 3905.31it/s] 71%|███████   | 782/1102 [00:00<00:00, 3779.16it/s]100%|██████████| 1102/1102 [00:00<00:00, 3775.02it/s]
+  clearance_microsome_az       abs=+0.111 delta=-0.127 [56s]
+Found local copy...
+Loading...
+Done!
+  0%|          | 0/7385 [00:00<?, ?it/s] 12%|█▏        | 858/7385 [00:00<00:00, 8571.02it/s] 24%|██▎       | 1751/7385 [00:00<00:00, 8777.19it/s] 36%|███▌      | 2629/7385 [00:00<00:00, 8684.22it/s] 47%|████▋     | 3498/7385 [00:00<00:00, 7530.41it/s] 58%|█████▊    | 4271/7385 [00:00<00:00, 6408.66it/s] 67%|██████▋   | 4943/7385 [00:00<00:00, 5954.54it/s] 75%|███████▌  | 5560/7385 [00:00<00:00, 5816.07it/s] 83%|████████▎ | 6154/7385 [00:00<00:00, 5840.56it/s] 91%|█████████▏| 6747/7385 [00:01<00:00, 5816.10it/s] 99%|█████████▉| 7335/7385 [00:01<00:00, 5517.38it/s]100%|██████████| 7385/7385 [00:01<00:00, 6279.91it/s]
+  ld50_zhu                     abs=+0.126 delta=+0.095 [231s]
+
+==============================================================================================
+H_power -- POOLED, n = 40. NOT confirmatory: it contains the discovery set.
+==============================================================================================
+    rank_assortativity   incremental  rho=+0.813  [+0.615, +0.914]  EXCLUDES 0
+    rogi                 incremental  rho=+0.285  [+0.012, +0.635]  EXCLUDES 0
+    rank_assortativity   alone        rho=+0.840  [+0.637, +0.943]  EXCLUDES 0
+    rogi                 alone        rho=+0.055  [-0.266, +0.481]  covers 0 
+
+==============================================================================================
+FRESH SLICE -- the 10 TDC tasks alone, never used for this question
+==============================================================================================
+    rank_assortativity   incremental  rho=+0.283  [-0.521, +0.825]  covers 0 
+    rogi                 incremental  rho=+0.650  [-0.081, +0.947]  covers 0 
+    rank_assortativity   alone        rho=+0.367  [-0.539, +0.947]  covers 0 
+    rogi                 alone        rho=+0.333  [-0.500, +0.842]  covers 0 
+
+==============================================================================================
+H_task -- same 10 fits, same split, scored twice: absolute against delta
+==============================================================================================
+  ABSOLUTE skill (the pointwise arm):
+    rank_assortativity   incremental  rho=+0.283  [-0.521, +0.825]  covers 0 
+    rogi                 incremental  rho=+0.650  [-0.081, +0.947]  covers 0 
+    rank_assortativity   alone        rho=+0.367  [-0.539, +0.947]  covers 0 
+    rogi                 alone        rho=+0.333  [-0.500, +0.842]  covers 0 
+  DELTA skill (the pairwise arm, the task the confirmatory set used):
+    rank_assortativity   incremental  rho=+0.667  [-0.105, +0.983]  covers 0 
+    rogi                 incremental  rho=+0.667  [-0.064, +1.000]  covers 0 
+    rank_assortativity   alone        rho=+0.683  [-0.096, +1.000]  covers 0 
+    rogi                 alone        rho=+0.233  [-0.692, +0.873]  covers 0 
+
+==============================================================================================
+VERDICT against the frozen rule
+==============================================================================================
+  H_power resolved (exactly one direction excludes zero on the pooled set): False
+  H_task: compare the two blocks above. The frozen rule asks whether the sign or the
+  significance of the assortativity increment differs between absolute and delta skill
+  computed from the SAME fits. If it does, the two sets disagreed about the task.
+
+  If neither resolves, the previous document's 'not established' stands and nothing is
+  claimed in either direction.
