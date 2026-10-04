@@ -1,0 +1,49 @@
+  CHEMBL2835_Ki    |E|=  4335 harm=   149 ( 4.00% of cycle) certified=True gap=0.0168 [24s]  vs published 149: MATCH
+  CHEMBL2047_EC50  |E|=  4295 harm=   110 ( 3.00% of cycle) certified=True gap=0.0202 [27s]  vs published 110: MATCH
+  CHEMBL1871_Ki    |E|=  4326 harm=   124 ( 3.38% of cycle) certified=True gap=0.033 [29s]  vs published 124: MATCH
+  CHEMBL4616_EC50  |E|=  4588 harm=   169 ( 4.33% of cycle) certified=True gap=0.0265 [28s]
+  CHEMBL4203_Ki    |E|=  5209 harm=   752 (16.79% of cycle) certified=True gap=0.0256 [186s]
+  CHEMBL2034_Ki    |E|=  4927 harm=    65 ( 1.56% of cycle) certified=True gap=0.0141 [18s]
+  CHEMBL1862_Ki    |E|=  5707 harm=   491 ( 9.99% of cycle) certified=True gap=0.0417 [24s]
+  CHEMBL262_Ki     |E|=  6049 harm=   711 (13.69% of cycle) certified=True gap=0.0429 [27s]
+  CHEMBL237_EC50   |E|=  6500 harm=   229 ( 4.13% of cycle) certified=True gap=0.0187 [23s]
+  CHEMBL4005_Ki    |E|=  6358 harm=   233 ( 4.31% of cycle) certified=True gap=0.0214 [21s]
+  CHEMBL231_Ki     |E|=  6714 harm=   436 ( 7.59% of cycle) certified=True gap=0.0675 [28s]
+  CHEMBL2971_Ki    |E|=  6952 harm=   477 ( 7.98% of cycle) certified=True gap=0.0276 [32s]
+  CHEMBL218_EC50   |E|=  6783 harm=   294 ( 5.11% of cycle) certified=True gap=0.0619 [44s]
+  CHEMBL238_Ki     |E|=  7124 harm=   483 ( 7.95% of cycle) certified=True gap=0.0856 [30s]
+  CHEMBL3979_EC50  |E|=  7433 harm=   299 ( 4.74% of cycle) certified=True gap=0.0241 [57s]
+  CHEMBL287_Ki     |E|=  9197 harm=   583 ( 7.41% of cycle) certified=True gap=0.0927 [73s]
+  CHEMBL2147_Ki    |E|= 10415 harm=   946 (10.56% of cycle) certified=True gap=0.038 [104s]
+  CHEMBL4792_Ki    |E|=  9831 harm=   553 ( 6.61% of cycle) certified=True gap=0.0373 [60s]
+  CHEMBL228_Ki     |E|= 11354 harm=   591 ( 6.12% of cycle) certified=True gap=0.0411 [158s]
+  CHEMBL239_EC50   |E|= 11386 harm=   434 ( 4.49% of cycle) certified=True gap=0.0367 [165s]
+  CHEMBL219_Ki     |E|= 12600 harm=   734 ( 6.84% of cycle) certified=True gap=0.0362 [150s]
+  CHEMBL235_EC50   |E|= 15323 harm=   566 ( 4.36% of cycle) certified=True gap=0.0223 [392s]
+  CHEMBL236_Ki     |E|= 17568 harm=   625 ( 4.17% of cycle) certified=True gap=0.0548 [272s]
+  CHEMBL237_Ki     |E|= 17630 harm=   729 ( 4.85% of cycle) certified=True gap=0.0236 [542s]
+  CHEMBL204_Ki     |E|= 18073 harm=   587 ( 3.83% of cycle) certified=True gap=0.0222 [486s]
+  CHEMBL264_Ki     |E|= 19142 harm=   796 ( 4.89% of cycle) certified=True gap=0.0341 [344s]
+  CHEMBL244_Ki     |E|= 20700 harm=   562 ( 3.19% of cycle) certified=True gap=0.0276 [775s]
+  CHEMBL233_Ki     |E|= 21135 harm=   875 ( 4.86% of cycle) certified=True gap=0.0477 [507s]
+  CHEMBL214_Ki     |E|= 21861 harm=  1245 ( 6.71% of cycle) certified=True gap=0.0756 [485s]
+  CHEMBL234_Ki     |E|= 25032 harm=  1557 ( 7.28% of cycle) certified=True gap=0.0288 [762s]
+
+prereg: 864ec5131b281d6cf3d48c481c897acd803d2e93
+certified on 30 of 30 targets
+
+REPLICATION of the three targets the dense SVD could do:
+  CHEMBL2047_EC50  published  110  recomputed  110  MATCH
+  CHEMBL1871_Ki    published  124  recomputed  124  MATCH
+  CHEMBL2835_Ki    published  149  recomputed  149  MATCH
+
+harmonic as a share of the cycle space: min 0.0156, median 0.0488, max 0.1679
+harmonic over gradient:                 min 0.0869, median 0.2795, max 1.0301
+targets where harmonic >= 2x gradient (the design's expectation): 0 of 30
+
+What the harmonic share tracks, Spearman over the certified targets:
+  against graph size (|E|):          +0.103
+  against triangle coverage (|T|/|E|): -0.883
+
+The design expected the harmonic part to run 2-5x LARGER than the gradient part.
+That expectation is refuted on every certified target; the margin is reported above.
