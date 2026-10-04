@@ -1,0 +1,78 @@
+pre-registration blob: 419d0556420388d3bdfc21bde907941de2a526bc
+Both H1 and H2 are reported whatever they say; see the decision rule in the file.
+
+==============================================================================================
+DISCOVERY SET -- MoleculeACE, 30 targets. The claim was noticed here, post hoc.
+This set CANNOT confirm it. Printed so the origin is visible, not as evidence.
+==============================================================================================
+  H1, assortativity against each arm's skill:
+    skill of the pointwise arm                     rho=+0.813  95% CI [+0.550, +1.000]  EXCLUDES 0
+    skill of the pairwise arm                      rho=+0.737  95% CI [+0.413, +0.992]  EXCLUDES 0
+    skill of the kNN floor (POSITIVE CONTROL, near definitional) rho=+0.866  95% CI [+0.694, +0.951]  EXCLUDES 0
+  H1 INCREMENTAL over the roughness baseline, mean degree and task size:
+    incremental, skill of pointwise           rho=+0.707  95% CI [+0.401, +0.988]  EXCLUDES 0
+    incremental, skill of pairwise            rho=+0.647  95% CI [+0.302, +0.950]  EXCLUDES 0
+    incremental, skill of knn_floor           rho=+0.785  95% CI [+0.567, +0.952]  EXCLUDES 0
+  the reverse, does ROGI add anything over assortativity:
+    rogi over assortativity, skill of pointwise      rho=+0.102  95% CI [-0.411, +0.455]  covers 0 
+    rogi over assortativity, skill of knn_floor      rho=+0.212  95% CI [-0.163, +0.412]  covers 0 
+  ROGI alone, for comparison:
+    rogi vs skill of pointwise                     rho=-0.200  95% CI [-0.363, +0.093]  covers 0 
+    rogi vs skill of knn_floor                     rho=-0.201  95% CI [-0.400, -0.080]  EXCLUDES 0
+  H2, assortativity against differences of skill:
+    pointwise minus pairwise                       rho=+0.073  95% CI [-0.150, +0.457]  covers 0 
+    floor minus pointwise                          rho=+0.055  95% CI [-0.427, +0.541]  covers 0 
+
+==============================================================================================
+CONFIRMATORY SET -- DeepDelta, 10 benchmarks, 3 published families, no refitting.
+==============================================================================================
+   dataset    n  assortativity_pearson  assortativity_rank  skill_RandomForest  skill_ChemProp50  skill_DeepDelta5
+     Caco2  910               0.521279            0.505559            0.436784          0.472820          0.475072
+   FUBrain  253               0.154753            0.164114            0.155190          0.122290          0.244569
+  FreeSolv  642               0.480104            0.496741            0.461005          0.746254          0.761362
+  HalfLife 1321               0.219805            0.245708            0.151230          0.127411          0.133805
+   HemoTox  828               0.626624            0.560748            0.427888          0.371155          0.452077
+  HepClear  881               0.172024            0.170210            0.093536          0.082543         -0.000059
+MicroClear  731               0.171575            0.174508            0.101914          0.099934          0.081357
+  RenClear  636               0.202145            0.243878            0.111606          0.107519          0.077950
+       Sol 1128               0.521393            0.508802            0.450391          0.690041          0.709145
+      VDss 1130               0.399539            0.425375            0.313608          0.272175          0.328759
+
+  H1 on assortativity_rank (PRIMARY):
+    skill of RandomForest                          rho=+0.770  95% CI [+0.329, +1.000]  EXCLUDES 0
+    skill of ChemProp50                            rho=+0.818  95% CI [+0.373, +1.000]  EXCLUDES 0
+    skill of DeepDelta5                            rho=+0.758  95% CI [+0.245, +0.987]  EXCLUDES 0
+  H2 on assortativity_rank (PRIMARY) -- differences of family skills:
+    RandomForest minus ChemProp50                  rho=-0.152  95% CI [-0.862, +0.636]  covers 0 
+    RandomForest minus DeepDelta5                  rho=-0.503  95% CI [-0.985, +0.234]  covers 0 
+    ChemProp50 minus DeepDelta5                    rho=-0.321  95% CI [-0.976, +0.509]  covers 0 
+
+  H1 on assortativity_pearson (secondary):
+    skill of RandomForest                          rho=+0.758  95% CI [+0.237, +0.975]  EXCLUDES 0
+    skill of ChemProp50                            rho=+0.806  95% CI [+0.367, +0.987]  EXCLUDES 0
+    skill of DeepDelta5                            rho=+0.733  95% CI [+0.208, +0.961]  EXCLUDES 0
+  H2 on assortativity_pearson (secondary) -- differences of family skills:
+    RandomForest minus ChemProp50                  rho=-0.127  95% CI [-0.811, +0.652]  covers 0 
+    RandomForest minus DeepDelta5                  rho=-0.479  95% CI [-0.961, +0.247]  covers 0 
+    ChemProp50 minus DeepDelta5                    rho=-0.297  95% CI [-0.960, +0.522]  covers 0 
+
+  INCREMENT over the roughness baseline, mean degree and task size
+  (rank-residualised; does the graph statistic say anything ROGI does not):
+    skill of RandomForest     incremental  rho=+0.212  95% CI [-0.610, +0.790]  covers 0 
+    skill of ChemProp50       incremental  rho=+0.273  95% CI [-0.459, +0.826]  covers 0 
+    skill of DeepDelta5       incremental  rho=+0.248  95% CI [-0.469, +0.733]  covers 0 
+    ROGI alone against skill, for comparison:
+    rogi vs skill of RandomForest                  rho=-0.818  95% CI [-1.000, -0.231]  EXCLUDES 0
+    rogi vs skill of ChemProp50                    rho=-0.855  95% CI [-1.000, -0.337]  EXCLUDES 0
+    rogi vs skill of DeepDelta5                    rho=-0.806  95% CI [-0.988, -0.231]  EXCLUDES 0
+
+  DECISION, on the primary (rank) statistic and the pre-registered rule:
+    H1 supported (all three families positive, zero excluded): True
+    H2 supported (no pairwise difference excludes zero):       True
+    H1 survives the ROGI baseline on all three families:      False
+
+READ THIS BEFORE THE NUMBERS ABOVE. The kNN floor's own correlation is a positive
+control, not evidence: the floor IS a neighbour average and assortativity IS label
+smoothness over the neighbour graph, so a link there is close to definitional. The claim
+under test is that it reaches families that average no neighbours, which is what the
+confirmatory set is made of.

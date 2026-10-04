@@ -13,6 +13,7 @@ from dataclasses import dataclass
 
 import networkx as nx
 import numpy as np
+from scipy import stats
 
 
 @dataclass(frozen=True)
@@ -52,3 +53,33 @@ def target_assortativity(g: nx.Graph, y: np.ndarray) -> MeasureResult:
         coverage=used / g.number_of_nodes(),
         n_used=used,
     )
+
+
+def rank_assortativity(g: nx.Graph, y: np.ndarray) -> MeasureResult:
+    """Newman's coefficient computed on the label's NODE ranks.
+
+    Newman's coefficient is a Pearson correlation, so it measures LINEAR agreement between the two
+    endpoints of an edge and is pulled around by a skewed label. Measured on this project's own
+    holdout: on vdss_lombardo, whose label runs 0.01 to 700 L/kg with skewness 27, the Pearson
+    version reads 0.082 and this one 0.426 on the identical graph. Any claim compared ACROSS
+    datasets needs the version that does not depend on the label's shape.
+
+    Ranks are averaged over ties, so the value depends only on the ordering the label induces.
+
+    Be precise about which rank statistic this is, because there are two and they are not equal.
+    This one ranks the |V| NODE labels once and then takes Pearson across edge endpoints. The
+    Spearman of the edge-endpoint SAMPLE ranks that sample instead, which is degree-weighted, so a
+    high-degree molecule's label gets a different rank. Measured on this project's graphs the two
+    agree to 0.0002-0.005 (CHEMBL1862_Ki: 0.6188 against 0.6146), and no conclusion here turns on
+    the difference -- but the node-rank version is what this function computes, and
+    prereg/increment2_separation.yaml describes the other one. That deviation is recorded in
+    results/results_increment2_separation.md.
+    """
+    y = np.asarray(y, dtype=float)
+    if len(y) != g.number_of_nodes():
+        raise ValueError(
+            f"length mismatch: {len(y)} labels for {g.number_of_nodes()} nodes"
+        )
+    if np.all(y == y[0]):
+        raise ValueError("rank assortativity is undefined for a constant label")
+    return target_assortativity(g, np.asarray(stats.rankdata(y), dtype=float))
