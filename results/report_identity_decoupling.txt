@@ -1,0 +1,68 @@
+pre-registration blob: c2dcd4ef750f579a89bdfeb5e043b381307abdfe
+40 targets x 10 frozen constructions, nothing trained
+
+  CHEMBL217_Ki           n= 8205 10 cells decoupling 0.067-0.090 [86s]
+  CHEMBL205_Ki           n= 7636 10 cells decoupling 0.075-0.117 [71s]
+  CHEMBL261_Ki           n= 7082 10 cells decoupling 0.083-0.114 [61s]
+  CHEMBL3594_Ki          n= 5779 10 cells decoupling 0.070-0.114 [43s]
+  CHEMBL251_Ki           n= 5286 10 cells decoupling 0.054-0.074 [42s]
+  CHEMBL224_Ki           n= 4653 10 cells decoupling 0.048-0.061 [33s]
+  CHEMBL1628481_EC50     n= 3215 10 cells decoupling 0.064-0.098 [23s]
+  CHEMBL256_Ki           n= 4276 10 cells decoupling 0.056-0.086 [31s]
+  CHEMBL3242_Ki          n= 4624 10 cells decoupling 0.075-0.115 [31s]
+  CHEMBL226_Ki           n= 4386 10 cells decoupling 0.080-0.088 [31s]
+  CHEMBL253_Ki           n= 4063 10 cells decoupling 0.048-0.072 [28s]
+  CHEMBL3371_Ki          n= 3904 10 cells decoupling 0.051-0.081 [27s]
+  CHEMBL5113_Ki          n= 2272 10 cells decoupling 0.030-0.066 [13s]
+  CHEMBL2292_EC50        n= 1857 10 cells decoupling 0.067-0.121 [10s]
+  CHEMBL1163125_Ki       n= 1296 10 cells decoupling 0.049-0.098 [7s]
+  CHEMBL3155_Ki          n= 2657 10 cells decoupling 0.055-0.086 [15s]
+  CHEMBL225_Ki           n= 2584 10 cells decoupling 0.055-0.098 [14s]
+  CHEMBL4422_EC50        n= 2272 10 cells decoupling 0.040-0.077 [12s]
+  CHEMBL614358_EC50      n= 1243 10 cells decoupling 0.027-0.048 [6s]
+  CHEMBL4860_Ki          n= 1243 10 cells decoupling 0.020-0.030 [9s]
+  CHEMBL5024_Ki          n= 1011 10 cells decoupling 0.054-0.107 [5s]
+  CHEMBL2000_Ki          n= 1080 10 cells decoupling 0.080-0.094 [7s]
+  CHEMBL4333_EC50        n= 2464 10 cells decoupling 0.029-0.055 [13s]
+  CHEMBL4550_Ki          n= 1513 10 cells decoupling 0.057-0.103 [8s]
+  CHEMBL259_Ki           n= 1982 10 cells decoupling 0.043-0.074 [14s]
+  CHEMBL4822_Ki          n= 2217 10 cells decoupling 0.062-0.098 [14s]
+  CHEMBL222_Ki           n= 1987 10 cells decoupling 0.029-0.082 [9s]
+  CHEMBL245_Ki           n= 1777 10 cells decoupling 0.047-0.086 [9s]
+  CHEMBL2014_Ki          n= 2108 10 cells decoupling 0.024-0.074 [13s]
+  CHEMBL255_Ki           n= 1843 10 cells decoupling 0.040-0.065 [10s]
+  CHEMBL4361_Ki          n= 1617 10 cells decoupling 0.020-0.030 [11s]
+  CHEMBL4805_Ki          n=  583 10 cells decoupling 0.003-0.061 [3s]
+  CHEMBL1784_EC50        n= 1464 10 cells decoupling 0.024-0.086 [29s]
+  CHEMBL1833_Ki          n= 1655 10 cells decoupling 0.078-0.099 [8s]
+  CHEMBL4227_EC50        n= 1332 10 cells decoupling 0.034-0.068 [6s]
+  CHEMBL211_Ki           n= 1564 10 cells decoupling 0.051-0.085 [8s]
+  CHEMBL344_Ki           n= 1593 10 cells decoupling 0.043-0.067 [8s]
+  CHEMBL240_Ki           n= 1485 10 cells decoupling 0.051-0.112 [8s]
+  CHEMBL3759_Ki          n= 1342 10 cells decoupling 0.062-0.086 [5s]
+  CHEMBL2056_Ki          n= 1265 10 cells decoupling 0.063-0.084 [6s]
+
+====================================================================================================
+400 cells, decoupling |r - rho_nn| split at 0.0597 and 0.0794
+====================================================================================================
+   tercile  cells  decoupling  identity |err|  1-r alone, rho  identity rho
+       low    134      0.0435          0.0265           0.979         0.980
+       mid    132      0.0694          0.0294           0.924         0.940
+      high    134      0.0913          0.0303           0.917         0.931
+
+====================================================================================================
+high-minus-low tercile difference in ranking power, paired bootstrap over targets, 10000 usable draws
+====================================================================================================
+  assortativity alone   -0.062  [-0.119, -0.009]  EXCLUDES 0
+  the full identity     -0.049  [-0.106, +0.010]  covers 0
+
+====================================================================================================
+VERDICT against the frozen rule
+====================================================================================================
+  identity's |error| in the top tercile is no more than 0.02 worse: True (0.0303 against 0.0265)
+  assortativity alone ranks worse where the two decouple, interval excludes zero: True
+
+  THE PREDICTION HOLDS. Assortativity alone loses ranking power exactly where
+  shared-neighbour agreement decouples from edge agreement, and the full identity
+  does not. The talk's claim is now tested rather than asserted.
+exit 0

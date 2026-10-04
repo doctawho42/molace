@@ -64,9 +64,73 @@ the plan was not changed after seeing a result; the script disagreed with the pl
 corrected. Both numbers are printed by the corrected script, and the secondary one is labelled as not
 being the frozen statistic.
 
-## Experiment B: the prediction about decoupling
+## Experiment B: the frozen rule says the prediction holds, and I am not banking that
 
-PENDING; this section is written when the run finishes.
+400 cells, 40 targets by the 10 frozen constructions. Decoupling `d = |r - rho_nn|` terciles split at
+0.0597 and 0.0794.
+
+| tercile | cells | mean decoupling | identity mean abs error | assortativity alone, Spearman | full identity, Spearman |
+|---|---|---|---|---|---|
+| low | 134 | 0.0435 | 0.0265 | 0.979 | 0.980 |
+| mid | 132 | 0.0694 | 0.0294 | 0.924 | 0.940 |
+| high | 134 | 0.0913 | 0.0303 | 0.917 | 0.931 |
+
+High-minus-low difference in ranking power, paired bootstrap over targets, 10000 draws:
+
+| | difference | 95% CI | |
+|---|---|---|---|
+| assortativity alone | -0.062 | [-0.119, -0.009] | excludes 0 |
+| the full identity | -0.049 | [-0.106, +0.010] | covers 0 |
+
+Against the frozen rule both conditions are met: the identity's mean absolute error in the top
+tercile exceeds the bottom by 0.0038, well under the 0.02 allowed, and assortativity alone ranks worse
+in the top tercile with an interval excluding zero. The script prints THE PREDICTION HOLDS.
+
+**The project does not accept that verdict.** Two reasons, each sufficient on its own.
+
+### The design cannot test what the prediction is about
+
+The prediction is about graph structure: assortativity alone should fail where neighbour agreement
+decouples from edge agreement. Decomposing the decoupling's variance over the 400 cells:
+
+| source | share of variance |
+|---|---|
+| between targets | **77.0 %** |
+| between constructions | **4.2 %** |
+
+Across the ten constructions the mean decoupling runs from 0.0578 (MACCS) to 0.0741 (ECFP4 at k = 30),
+a spread of 0.016 against a cell-level standard deviation of 0.0218. The frozen grid barely moves the
+quantity the terciles stratify on, so the terciles sort TARGETS. Whatever appears in the high tercile
+is as well explained by "harder targets rank worse" as by anything structural. Reusing a frozen grid
+rather than designing one was named as a limit in the plan; the measurement shows the limit is fatal
+rather than cosmetic.
+
+### The frozen rule tested the wrong contrast
+
+The prediction implies that assortativity alone degrades MORE than the full identity does. The rule
+tested each degradation separately and read "one interval excludes zero, the other covers it" as the
+answer. That is the inference increment 2 got wrong and corrected: an interval covering zero is not
+evidence of no effect.
+
+The contrast the prediction actually implies, post hoc because the plan never asked for it:
+
+| | difference of the two degradations | 95% CI | |
+|---|---|---|---|
+| (assortativity alone) minus (full identity) | **-0.0132** | [-0.0501, +0.0268] | **covers 0** |
+
+Both degrade, by -0.062 and -0.049, and the data do not separate them.
+
+### Verdict
+
+**The prediction remains untested.** The talk's claim that assortativity alone must fail where the two
+statistics decouple is neither confirmed nor refuted here; the experiment that was meant to settle it
+could not, and the talk is corrected to say exactly that.
+
+What a real test needs, for a later increment with its own frozen plan: constructions that move
+clustering on purpose rather than incidentally. Threshold graphs are the obvious candidate, since the
+project already measured their density spanning 98x across targets at a fixed Tanimoto cut, and
+explicit rewiring at fixed degree is another. Both change neighbourhood overlap directly, which is
+what the decoupling is made of.
 
 ## What the pairwise arm is, when its flow is a gradient
 

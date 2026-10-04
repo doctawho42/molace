@@ -1,0 +1,10 @@
+difference of the two degradations, (one statistic) minus (full identity).
+Post hoc, NOT pre-registered: this is what the prediction implies, and the frozen rule
+tested each degradation separately instead, which cannot answer it.
+
+  observed -0.0132   paired bootstrap over targets [-0.0501, +0.0268]  covers 0
+  usable draws 2000 of 2000
+
+each degradation on its own, for reference:
+  assortativity alone  -0.0622
+  the full identity    -0.0491
