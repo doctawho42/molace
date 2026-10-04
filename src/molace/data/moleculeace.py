@@ -1,7 +1,13 @@
 """MoleculeACE loader.
 
 Three traps this module exists to close, all measured on the shipped data:
-  * the canonical label is `y [pEC50/pKi]`; the column named `y` is standardised and negative,
+  * the canonical label is `y [pEC50/pKi]`; the column named `y` holds the same quantity minus
+    exactly 9 on all 30 targets -- it is -log10 of the concentration in NANOmoles where the
+    canonical column is -log10 of moles. Because the offset is a constant, reading the wrong
+    column would have left every RMSE, Pearson and Spearman in this project unchanged; what it
+    would have broken is the units, making the reported potencies wrong by 9 log units and the
+    claim "the label is in log units of molar potency" false. The trap is real and its
+    numerical consequence here is nil; both halves of that are worth stating,
   * `cliff_mol` must come from the per-target CSV, because metadata/datasets.csv still
     describes the pre-Correction data (Correction: PubMed 36995229) and disagrees with the
     CSVs on cliff counts for 28 of 30 targets,
