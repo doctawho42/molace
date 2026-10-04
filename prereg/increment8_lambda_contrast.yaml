@@ -1,0 +1,65 @@
+# Increment 8, frozen before the outcome under this contrast is computed.
+#
+# FULL DISCLOSURE, because this plan is written on data that already exist.
+#
+# Increment 7 (blob 0018a8760d7881322b23dc6dfe6b8465917ab225) built two constructions at fixed k = 10
+# and put a design gate before its outcome. The gate FAILED and the outcome was not read. What the
+# gate showed:
+#
+#   construction   clustering   lambda = rho_nn / r   decoupling |r - rho_nn|
+#   nearest            0.557                  0.864                   0.0690
+#   spread             0.223                  0.797                   0.0695
+#
+#   decoupling variance between constructions: 0.0 %   between targets: 89.3 %
+#
+# So the construction moved clustering by a factor of 2.5 and the per-hop decay by 0.067, and moved
+# |r - rho_nn| by 0.0005. The reason is arithmetic: |r - rho_nn| = r (1 - lambda), and the spread
+# construction lowers lambda AND lowers r, so their product is nearly invariant. The contrast variable
+# was wrong, in increment 5 and again in increment 7. The quantity that carries the claim is lambda
+# itself, which is the decay model's parameter.
+#
+# WHAT IS AND IS NOT KNOWN AT THE MOMENT OF FREEZING. The cells of results/decoupling_designed.csv are
+# collected and their gate statistics are above. The outcome under a lambda contrast has NOT been
+# computed, printed or looked at: scripts/decoupling_designed.py returns before its outcome block when
+# the gate fails, and no other code has touched it. This plan is therefore pre-registered with respect
+# to its own outcome and NOT with respect to the data, which is weaker than increments 3 to 7 and is
+# labelled as such everywhere it is reported.
+
+data:
+  file: results/decoupling_designed.csv, 80 cells, 40 targets x {nearest, spread}, k = 10
+  provenance: produced by scripts/decoupling_designed.py under increment 7's frozen plan
+  nothing_is_recollected: true
+
+the_claim_under_test: >
+  On this project's standard graphs assortativity alone nearly matches the full identity for ranking,
+  because the two statistics correlate at +0.988. The claim is that this near-sufficiency belongs to
+  those graphs, not to the statistic: where the per-hop decay lambda is lower, assortativity alone must
+  lose more ranking power than the full identity does.
+
+design_gate:
+  already_evaluated: >
+    the lambda condition of increment 7's gate passed: the mean per-hop decay differs by 0.0671 between
+    the two constructions, above the 0.05 that plan required. That is the condition this contrast needs.
+  additional_condition: >
+    lambda must separate the constructions more than it separates the targets, measured by the same
+    between-group variance decomposition: the construction must account for at least 25 % of lambda's
+    variance over the 80 cells. If it does not, this experiment is INADEQUATE on the same grounds as
+    increment 7 and its outcome is not reported either.
+
+outcome_rule:
+  tested_quantity: >
+    D = (Spearman of (1 - r) against the measured relative floor error, on spread minus on nearest)
+        - (Spearman of the full identity against the same, on spread minus on nearest)
+  claim_supported_iff: D is negative with a paired bootstrap over targets, 10000 draws, seed 0,
+    whose interval excludes zero
+  if_the_interval_covers_zero: not supported, and its half-width is reported alongside
+  reported_unconditionally: >
+    the identity's mean absolute error on each construction, which increment 7 already reports as
+    0.0256 on nearest and 0.0247 on spread, so an identity that broke under the construction would
+    already have shown it.
+
+forbidden:
+  - Computing the outcome before this file is committed.
+  - Re-specifying the contrast a third time if this one covers zero; a covered zero is reported as a
+    covered zero, with its width, and the question is left open.
+  - Dropping a target or a construction after seeing its number.
