@@ -66,18 +66,21 @@ moment. That is a position, and positions need evidence; we have it.
 
 A measurement paper with a transport argument, not a theory paper.
 
-**Title, working:** "Homophily measures are a first moment: what graph statistics do and do not say
-about attainable accuracy on molecular property data"
+**Title, working:** "The modelability index has a closed form: dataset modelability as a Dirichlet
+energy of activity on the similarity graph"
+
+The earlier working title, "Homophily measures are a first moment", survives as the framing of section
+3 but no longer leads: after the prior-art pass the JCIM-native entry point is MODI, not homophily.
 
 **Claims, each with the evidence that backs it**
 
 | # | Claim | Evidence | Strength |
 |---|---|---|---|
-| 1 | Target assortativity predicts attainable accuracy | rho +0.875 / +0.909 / +0.810 on 40 independently curated ChEMBL targets; +0.77 / +0.82 / +0.76 on 10 DeepDelta benchmarks with published models | strong, four collections |
-| 2 | It does so beyond the existing roughness index | assortativity over ROGI +0.846 [+0.678, +0.928]; ROGI over assortativity +0.098, covers zero; ROGI alone does not predict | strong, pre-registered |
+| 1 | Target assortativity predicts attainable accuracy | rho +0.875 / +0.909 / +0.810 on 40 independently curated ChEMBL targets; +0.77 / +0.82 / +0.76 on 10 DeepDelta benchmarks with published models | strong, four collections, and a replication of Golbraikh 2014 rather than a finding |
+| 2 | It does so beyond the existing roughness index | assortativity over ROGI +0.846 [+0.678, +0.928]; ROGI over assortativity +0.098, covers zero; ROGI alone does not predict. Against MODI the picture is symmetric: assortativity over MODI covers zero everywhere, MODI over assortativity +0.293 [+0.011, +0.530] on ChEMBL-40 | strong against ROGI, near-interchangeable with MODI |
 | 3 | The link is not an artefact of one fingerprint | +0.726 on RDKit descriptors; paired drop off ECFP4 +0.163 [+0.022, +0.358] | moderate, one alternative representation |
 | 4 | It also says which model class wins, through the level | floor minus pointwise -0.343 [-0.619, -0.008]; floor wins 26/40, and 12/13 on the hardest third | moderate, interval thin |
-| 5 | For the kNN mean the link is exact, and equals a Dirichlet energy | identity verified to 1e-16 on regular graphs; 0.025-0.031 mean absolute error as a point prediction over k = 3..40 on real targets | strong, but the object is known |
+| 5 | For the kNN mean the link is exact, and equals a Dirichlet energy — so the published modelability index has a closed form | identity verified to 1e-16 on regular graphs; 0.025-0.031 mean absolute error as a point prediction over k = 3..40; reproduces MODI_q2 to 0.0083-0.0134 mean absolute difference on 80 targets, Pearson 0.996-0.997 | the paper's centre: object known, accounting new, measured against the published index |
 | 6 | Equal weights are already near-optimal locally | best linear predictor on the same neighbourhood beats the mean by +0.0013 skill at k = 10 under exchangeability | strong and new to us; needs the exchangeability assumption relaxed |
 | 7 | The nugget-style noise estimate fails out of sample, and we know why | 2/30 violations against a pre-registered threshold of 1; synthetic separation into ill-conditioning and mixed hop lengths; 1/c(d)^2 overstatement predicted and measured to 0.3 % | strong as a negative result |
 | 8 | A structural limit: the regime where the second statistic matters most is the regime where the estimator built on it does not work | five refused design gates, variance decompositions 4.2 / 0.0 / 14.1 / 10.8 / 0.9 % | honest, and the most quotable sentence in the paper |
@@ -104,16 +107,16 @@ The Hodge half does not appear. It is a separate, weaker story and it dilutes th
 
 ## What has to happen before a word of the draft is written
 
-1. **A real prior-art pass**, not three searches. Geostatistics (nugget estimation, kriging variance,
-   network design), graph signal processing (polynomial filters, spectral smoothness), and the
-   homophily-measure line (Platonov, Mironov, GraphLand, GraphPFN). Expect more collisions.
-2. **Relax exchangeability in claim 6.** Nearer neighbours correlate more; the closed form assumes
-   they do not. Redo with the measured correlation profile.
-3. **Decide the venue, which decides the paper.** JCIM or Digital Discovery, with the molecular
-   programme leading and the transport as framing. Or LoG, with the transport leading and the
-   molecules as the testbed. These are different papers and the choice cannot be deferred.
-4. **Talk to Prokhorenkova about co-authorship.** Her group knows this literature; two of the three
-   collisions above would have been obvious to them in a minute, and there are likely more.
+1. ~~A real prior-art pass~~ **done.** `docs/paper/prior-art.md`, four passes. It found MODI, which
+   reframed the paper, and confirmed the nugget and Dirichlet collisions.
+2. ~~Run MODI as a measured baseline~~ **done, increment 11.** The identity reproduces MODI_q2 to
+   0.008-0.013 across 80 targets. `results/results_increment11.md`.
+3. **Relax exchangeability in claim 6.** Nearer neighbours correlate more; the closed form assumes
+   they do not. Redo with the measured correlation profile. This is the last open blocker.
+4. One more search pass for closed-form or spectral treatments of MODI, the single collision that
+   would cost claim 5.
+5. ~~Decide the venue~~ **done: JCIM**, molecular programme leading, transport as framing.
+6. ~~Co-authorship~~ **excluded by decision.**
 
 ## Risk register
 
