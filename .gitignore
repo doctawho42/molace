@@ -11,3 +11,6 @@ data/oracle/
 results/tasks/
 .pytest_cache/
 .DS_Store
+
+# session-local harness config: launch.json points at a scratchpad path that exists only here
+.claude/
