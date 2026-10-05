@@ -1,0 +1,80 @@
+# Increment 10, frozen before any data under it is generated.
+#
+# WHY FOUR DESIGNS FAILED, now provable rather than guessed. Increments 5, 7, 8 and 9 all tried to move
+# the per-hop decay lambda = rho_nn / r by changing the GRAPH, and all four failed their design gates.
+# The arithmetic says they had to. On a stride-d circulant of degree 2 with an exponential field
+# c(delta) = exp(-delta / L):
+#
+#     r = (1 - nu) c(d),   rho_nn = (1 - nu) c(2d) = (1 - nu) c(d)^2,   so  lambda = c(d) = r / (1 - nu)
+#
+# lambda is pinned to r by the field, not by the graph. No choice of graph can separate them while the
+# field is exponential, which is exactly what the four gates kept measuring.
+#
+# THE FIX IS AT THE FIELD, NOT THE GRAPH. With a squared-exponential field
+# c(delta) = exp(-(delta / L)^2):
+#
+#     c(2d) = c(d)^4,   so  lambda = c(d)^3
+#
+# At the same c(d), and therefore at the same r for the same nu, the two field families give
+# lambda = c(d) and lambda = c(d)^3. At c(d) = 0.8 that is 0.80 against 0.51. The contrast is set by
+# construction and cannot be argued away.
+#
+# A SECOND, SHARPER CONSEQUENCE. The estimator r^2 / rho_nn assumes geometric decay. On the
+# exponential field at k = 2 it is exactly 1 - nu. On the squared-exponential field at k = 2:
+#
+#     r^2 / rho_nn = (1 - nu)^2 c(d)^2 / [(1 - nu) c(d)^4] = (1 - nu) / c(d)^2
+#
+# so it OVERSTATES the signal fraction by exactly 1 / c(d)^2, a factor this plan can predict per
+# dataset before seeing any number. That is a quantitative prediction, not a direction.
+
+generation:
+  as_increment_9: >
+    ring of 600 nodes, circulant graphs joining i to i +/- j*d, leave-one-out floor over the whole
+    graph, true noise fraction measured from the realisation, field sampled by circulant embedding with
+    negative spectrum clipped.
+  field_families:
+    exponential: c(delta) = exp(-delta / L)
+    squared_exponential: c(delta) = exp(-(delta / L)^2)
+  correlation_lengths: [2, 4, 8, 16, 32]
+  noise_fractions: [0.1, 0.2, 0.3, 0.5, 0.7]
+  degrees: [2, 10]
+  strides: [1, 3]
+  replicates: 3 per cell, seeds 0, 1, 2, so 2 * 5 * 5 * 2 * 2 * 3 = 600 datasets
+  conditioning_guard: >
+    increment 9 showed r^2 / rho_nn is ill-conditioned when rho_nn is statistically near zero: 18 % of
+    its k = 2 datasets had rho_nn inside three standard errors of zero and produced recovery errors up
+    to 40.9. Every analysis below is therefore restricted IN ADVANCE to datasets where rho_nn exceeds
+    ten of its own standard errors, and the number excluded is reported.
+
+prediction_1:
+  text: the estimator overstates the signal fraction on a squared-exponential field by 1 / c(d)^2
+  decision_rule:
+    holds_iff: >
+      at k = 2, the median ratio of (r^2 / rho_nn) to (1 - nu_true) * 1/c(d)^2 lies in [0.9, 1.1],
+      where c(d) is computed from the family and L of that dataset.
+    if_it_fails: >
+      the arithmetic above is wrong somewhere, which invalidates the reasoning that produced this plan,
+      and that leads the report ahead of everything else.
+
+design_gate:
+  evaluated_first: true
+  passes_iff: the field family accounts for at least 25 % of lambda's variance across the retained
+    datasets, by the same between-group decomposition increments 5 and 7 to 9 used
+  if_it_fails: the outcome is NOT reported, as in increments 7, 8 and 9
+
+outcome_rule:
+  evaluated_only_if_the_gate_passes: true
+  tested_quantity: >
+    Spearman of (1 - r) against the measured relative floor error within the low-lambda half and within
+    the high-lambda half of the retained datasets, and the difference, bootstrapped over cells with
+    10000 draws and seed 0. Computed WITHIN each degree as well, because degree moves lambda and the
+    identity's 1/k term together and increment 9 flagged that confound.
+  claim_supported_iff: the difference is negative with an interval excluding zero
+  stated_in_advance: >
+    the identity's own ranking is exact on these regular graphs by proof, so it carries no information
+    and is not presented as a contrast. Only the one-statistic side is a test.
+
+forbidden:
+  - Changing the grids, the families, the guard or any threshold after seeing a number.
+  - Dropping a cell, a seed, a degree or a family after seeing its result.
+  - Re-specifying the contrast again if this gate fails; four refusals are already the finding.
