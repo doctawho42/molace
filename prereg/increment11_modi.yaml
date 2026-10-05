@@ -1,0 +1,81 @@
+# Increment 11, frozen before any MODI value is computed.
+#
+# WHY. The prior-art pass for a JCIM submission found the collision that reframes the paper:
+# MODI, the MODelability Index (Golbraikh, Muratov, Tropsha, JCIM 2014), is edge homophily on a
+# 1-NN graph, and its continuous form MODI_q2 is leave-one-out q2 of similarity search, which is
+# this project's kNN floor evaluated by LOO. The paper cannot be submitted to that journal without
+# MODI measured as a baseline.
+#
+# THE INTERESTING QUESTION IS NOT WHICH INDEX WINS. The identity
+#
+#     MSE_floor / sigma^2  =  1 + 1/k + (k-1)/k * rho_nn - 2 r   =   1 - 2 m1 + m2
+#
+# says MODI_q2 is a deterministic function of two graph statistics. MODI_q2 costs a leave-one-out
+# sweep over every compound; the right-hand side costs two sparse matrix products and no prediction
+# at all. So the test is whether the identity REPRODUCES the published index without running it.
+#
+# WHAT IS EXPECTED, stated before the run so a confirmation cannot be dressed up as a surprise:
+# question A should hold, and questions B and C should both come back empty, because under the
+# identity assortativity and MODI_q2 are the same quantity up to the second moment. An empty B and C
+# is the expected result and is NOT a negative one: the contribution claimed is the closed form, not
+# superiority over MODI.
+
+definitions:
+  modi_q2: >
+    leave-one-out q2 of k-nearest-neighbour regression over the whole dataset in the project's
+    standard space: ECFP4 Morgan r=2 2048 bits, Tanimoto, k = 10 nearest OTHER compounds, equal
+    weights, no training and no split. q2 = 1 - sum (y - yhat)^2 / sum (y - mean y)^2. This follows
+    Golbraikh et al. 2014's continuous-endpoint criterion, which is similarity-search LOO q2.
+  modi_binary: >
+    the original 2014 index, class-weighted 1-NN agreement, computed ONLY on the 30 MoleculeACE
+    targets where a binary activity-cliff flag ships with the benchmark. Not computed elsewhere,
+    because binning a continuous label is the thing this project refuses to do.
+  identity_prediction: 1 + 1/k + (k-1)/k * rho_nn - 2 r, from src/molace/measures/neighbourhood.py
+  attained_skill: the best of the three arms' skill already recorded for each collection
+
+collections:
+  - the 40 ChEMBL targets, blob 7519ef31c4374637483bae167221f9b7567ece7f, skills in results/separation_chembl.csv
+  - the 30 MoleculeACE targets, arms in results/spine.csv, native 80/20 split
+  - the 10 DeepDelta benchmarks, arms in results/separation_deepdelta.csv
+  bootstrap: cluster bootstrap, 10000 draws, seed 0, each target its own cluster
+
+question_A:
+  text: does the identity reproduce MODI_q2 without any cross-validation?
+  tested_quantity: identity_prediction against (1 - modi_q2), which are the same relative error
+  decision_rule:
+    holds_iff: mean absolute difference below 0.05 on every collection, the threshold increment 5
+      used for the same identity
+    if_it_fails: >
+      the closed form does not describe the published index, which removes the paper's central claim
+      and leads the report ahead of everything else.
+
+question_B:
+  text: does assortativity say anything about attained accuracy that MODI_q2 does not?
+  tested_quantity: rank-residualised partial Spearman of rank assortativity against attained skill,
+    with MODI_q2 residualised out, via molace.analysis.correlate.incremental_contribution
+  decision_rule:
+    adds_something_iff: positive with an interval excluding zero
+    expected: empty, and an empty result is reported as the expected confirmation that they are the
+      same quantity, with its interval width
+
+question_C:
+  text: the reverse, does MODI_q2 say anything assortativity does not?
+  tested_quantity: the same with the roles swapped
+  decision_rule: same, and the same expectation
+
+question_D:
+  text: what does the second moment add, given that MODI uses only the first?
+  tested_quantity: >
+    Spearman of attained skill against (a) assortativity alone, (b) the full identity, on each
+    collection, and the paired difference between them
+  decision_rule:
+    second_moment_helps_iff: the paired difference is positive with an interval excluding zero
+    expected: >
+      small or empty on these graphs, because increment 5 measured the two statistics correlating at
+      +0.988 here. A small difference is the honest answer and is reported with its width.
+
+forbidden:
+  - Reporting B or C as a finding in either direction without its interval width.
+  - Changing k, the fingerprint or the metric after seeing any number.
+  - Dropping a collection or a target after seeing its result.
+  - Presenting an expected empty result as a discovery.
