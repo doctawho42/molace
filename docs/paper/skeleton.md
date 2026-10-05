@@ -81,14 +81,29 @@ The earlier working title, "Homophily measures are a first moment", survives as 
 | 3 | The link is not an artefact of one fingerprint | +0.726 on RDKit descriptors; paired drop off ECFP4 +0.163 [+0.022, +0.358] | moderate, one alternative representation |
 | 4 | It also says which model class wins, through the level | floor minus pointwise -0.343 [-0.619, -0.008]; floor wins 26/40, and 12/13 on the hardest third | moderate, interval thin |
 | 5 | For the kNN mean the link is exact, and equals a Dirichlet energy — so the published modelability index has a closed form | identity verified to 1e-16 on regular graphs; 0.025-0.031 mean absolute error as a point prediction over k = 3..40; reproduces MODI_q2 to 0.0083-0.0134 mean absolute difference on 80 targets, Pearson 0.996-0.997 | the paper's centre: object known, accounting new, measured against the published index |
-| 6 | Equal weights are already near-optimal locally | best linear predictor on the same neighbourhood beats the mean by +0.0013 skill at k = 10 under exchangeability | strong and new to us; needs the exchangeability assumption relaxed |
+| 6 | The neighbourhood mean is calibrated in total weight and wrong in shape | weight sum 0.97, so rescaling buys +0.0000 [-0.0003, +0.0004] out of sample; reweighting by neighbour rank buys +0.0379 [+0.0314, +0.0442] on 31 ChEMBL targets and +0.0497 [+0.0417, +0.0577] on 14 MoleculeACE ones, beating a rank-shuffled null on 44 of 45; optimal profile 3.49x down to 0.19x | strong, pre-registered, and the opposite sign from what this table asserted before increment 12 |
 | 7 | The nugget-style noise estimate fails out of sample, and we know why | 2/30 violations against a pre-registered threshold of 1; synthetic separation into ill-conditioning and mixed hop lengths; 1/c(d)^2 overstatement predicted and measured to 0.3 % | strong as a negative result |
 | 8 | A structural limit: the regime where the second statistic matters most is the regime where the estimator built on it does not work | five refused design gates, variance decompositions 4.2 / 0.0 / 14.1 / 10.8 / 0.9 % | honest, and the most quotable sentence in the paper |
 
-**Claim 6 is the one worth chasing.** If equal weights are within a thousandth of the best local
-linear predictor, then the gap between the floor and a fitted model cannot come from weighting the
-neighbourhood better. It must come from information outside it. That is a testable reframing of the
-paper's own empirical crossover and it is not, as far as the checks went, in either literature.
+**Claim 6 reversed under measurement, and is stronger for it.** The earlier version of this table
+said equal weights were within a thousandth of the best local linear predictor, and concluded that the
+floor-against-fitted-model gap could not come from weighting the neighbourhood better. Increment 12
+shows that conclusion rested on the exchangeability assumption rather than on data. Under
+exchangeability `1` is an eigenvector of the neighbour second-moment matrix and the cross-moment vector
+is parallel to it, so every optimal weight is *exactly* equal, the whole gap is `Var(mean)(1-beta)^2`,
+and fitting one scalar on the plain mean attains the k-dimensional optimum exactly. The assumption
+deletes the effect and leaves a calibration residue that reads as a null.
+
+Measured without it, the rank-resolved second moment falls from 0.714 to 0.476 across ten ranks, and
+reweighting is worth +0.038 to +0.050 skill out of sample against a rank-shuffled null of -0.002. So
+the paper's claim is now that the mean is calibrated in total and wrong in shape, which is a measured
+quantity with a sign rather than an assertion, and the vacuity theorem explains why nobody had looked:
+the natural model to write down forbids the question.
+
+**This unsettles claim 4 and that is not resolved.** Claim 4 reads the floor beating fitted models on
+the hardest third as evidence about information outside the neighbourhood. If a better-shaped floor is
+worth +0.04 skill, part of that gap was weighting after all. The re-examination needs its own frozen
+plan and does not exist yet.
 
 ## Section plan
 
@@ -97,7 +112,8 @@ paper's own empirical crossover and it is not, as far as the checks went, in eit
 3. **What the measure is.** Claim 5: the identity, its reading as a Dirichlet energy, assortativity
    as the first moment, and the second moment nobody reports. Cite the handbook; claim the accounting,
    not the object.
-4. **What averaging already achieves.** Claim 6 and its consequence for claim 4.
+4. **What averaging gets wrong.** Claim 6: the vacuity theorem, the measured rank profile, and the
+   scale-against-shape decomposition. Its consequence for claim 4 is stated as open, not as resolved.
 5. **A noise floor from two moments, and why it fails.** Claim 7, framed as a graph replication of
    nugget estimation, citing Atkinson, Kim, Zimmerman.
 6. **A limit on the whole approach.** Claim 8.
@@ -111,10 +127,13 @@ The Hodge half does not appear. It is a separate, weaker story and it dilutes th
    reframed the paper, and confirmed the nugget and Dirichlet collisions.
 2. ~~Run MODI as a measured baseline~~ **done, increment 11.** The identity reproduces MODI_q2 to
    0.008-0.013 across 80 targets. `results/results_increment11.md`.
-3. **Relax exchangeability in claim 6.** Nearer neighbours correlate more; the closed form assumes
-   they do not. Redo with the measured correlation profile. This is the last open blocker.
+3. ~~Relax exchangeability in claim 6~~ **done, increment 12.** It reversed the claim.
+   `prereg/increment12_local_weights.yaml`, `results/results_increment12.md`.
 4. One more search pass for closed-form or spectral treatments of MODI, the single collision that
-   would cost claim 5.
+   would cost claim 5. A second pass is now also needed on rank-weighted or distance-weighted kNN in
+   QSAR, since claim 6's replacement is a statement about weighting and that literature is old.
+7. **Re-examine claim 4 under the reshaped floor**, with a frozen plan. This is the new blocker and it
+   is a claim the paper leans on.
 5. ~~Decide the venue~~ **done: JCIM**, molecular programme leading, transport as framing.
 6. ~~Co-authorship~~ **excluded by decision.**
 
@@ -126,5 +145,9 @@ The Hodge half does not appear. It is a separate, weaker story and it dilutes th
 - **Claim 4's interval** clears zero by 0.008. Robust to the recovered-rounding check (200/200), but
   it is thin and a reviewer will say so first.
 - **Claim 3** rests on one alternative representation. It is reported as one, not as generality.
+- **Claim 6's replacement is a weighting result**, which puts it next to a long line of
+  distance-weighted kNN work in QSAR that the four prior-art passes did not search for, because until
+  increment 12 the claim was not about weighting. That search has to happen before drafting.
+- **Claim 4 is now partly undermined by claim 6** and the paper cannot state both as they stand.
 - **Scope.** Thirty ChEMBL targets plus forty plus ten benchmarks is a lot of molecules and one domain.
   Nothing here is shown outside molecular property prediction.

@@ -124,7 +124,7 @@ accounting, not as theory.
 | 3 | Not an artefact of one fingerprint | **Survives.** No collision found |
 | 4 | It also says which model class wins | **Survives and is strengthened**, because the field's own rankings put kNN near the bottom on average and this is the conditional exception |
 | 5 | Exact identity, equals a Dirichlet energy | **Object known, accounting new, and now measured against the published index.** 0.0083 to 0.0134 mean absolute error reproducing MODI_q2 on 80 targets. The second moment's own ranking contribution covers zero on all three collections, so it is necessary for the identity and empirically quiet here |
-| 6 | Equal weights are near-optimal locally | **Survives, and is the most novel thing in the paper.** No collision found in four passes |
+| 6 | Equal weights are near-optimal locally | **Refuted by increment 12, and replaced.** Under exchangeability the statement is a theorem about calibration and says nothing about weighting; measured without the assumption, reweighting by neighbour rank is worth +0.038 to +0.050 skill out of sample against a rank-shuffled null of -0.002. The claim becomes "the neighbourhood mean is calibrated in total and wrong in shape". Needs a fresh pass against distance-weighted kNN in QSAR, which four passes never searched because the claim was not about weighting |
 | 7 | The noise floor fails out of sample, with a diagnosis | **Replication.** Must cite Atkinson, Kim, Zimmerman and claim the graph transport, not the estimator |
 | 8 | A structural limit on the whole approach | **Survives**, and is sharper once framed as the graph version of Zimmerman's design problem |
 
@@ -146,11 +146,19 @@ needs a new baseline run before anything is written.
 
 1. ~~Run MODI on all three collections~~ **done, increment 11.** `prereg/increment11_modi.yaml`,
    `results/results_increment11.md`. The baseline table has MODI beside ROGI.
-2. **Relax exchangeability in claim 6** using the measured correlation-versus-hop profile. This is now
-   the only blocker that is also a claim the paper leans on.
+2. ~~Relax exchangeability in claim 6~~ **done, increment 12**, and it reversed the claim. The hop
+   profile turned out to be the wrong axis: the repository had no measured profile on real targets at
+   all, and the axis that matters for the kNN mean is neighbour RANK, not hop count.
 3. One more pass specifically for closed-form or spectral treatments of MODI, which is the single
    collision that would cost claim 5.
 4. **SARI** as a third baseline, nice to have rather than required.
+5. **A fifth pass on weighted kNN in QSAR** — distance-weighted, similarity-weighted and
+   locally-weighted regression variants. Claim 6's replacement is a weighting result and this is the
+   obvious place for a collision. Four passes never looked, because the claim was not about weighting
+   until increment 12 measured it.
+6. **Re-examine claim 4 under the reshaped floor**, with its own frozen plan. Claim 4 attributes the
+   floor-against-fitted-model gap to information outside the neighbourhood; +0.04 skill of that gap is
+   now known to be weighting.
 
 ## What increment 11 did to the plan
 
