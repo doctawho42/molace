@@ -1,0 +1,181 @@
+# Increment 12, frozen before any number under it exists.
+#
+# WHY. Claim 6 of docs/paper/skeleton.md says "equal weights are already near-optimal locally", on the
+# evidence that the best linear predictor on the same neighbourhood beats the mean by +0.0013 skill at
+# k = 10 "under exchangeability". That claim has no pre-registration, no committed script and no results
+# document anywhere in this repository; the number exists only in the skeleton's claim table. The
+# prior-art pass calls it the most novel thing in the paper. So it is the one claim resting on nothing,
+# and this increment either earns it or retires it.
+#
+# THE ALGEBRA SAYS THE CLAIM IS NEARLY VACUOUS AS STATED, and this is a theorem, reported
+# unconditionally below whatever the data do. Standardise the label and write c_i = E[z_v z_{u_i}],
+# C_ij = E[z_{u_i} z_{u_j}]. The best linear predictor is w* = C^-1 c with MSE* = 1 - c' C^-1 c. Under
+# exchangeability c = r 1 and C = (1-rho) I + rho 11', so C 1 = S 1 with S = 1 + (k-1) rho, and
+#
+#     w* = (r / S) 1
+#
+# EVERY OPTIMAL WEIGHT IS EQUAL. Not approximately: exactly, forced by permutation symmetry, because 1
+# is an eigenvector of C and c is parallel to it. Writing m_bar for the plain neighbourhood mean,
+# Var(m_bar) = S/k and beta = Cov(z_v, m_bar)/Var(m_bar) = k r / S, three consequences follow:
+#
+#     sum_i w*_i      = beta                         the weight sum IS the regression slope on m_bar
+#     MSE_mean - MSE* = Var(m_bar) (1 - beta)^2       the entire gap is a squared scale error
+#     MSE(best alpha m_bar) = MSE*  exactly           for all k, r, rho
+#
+# The last line is the decisive one. The k-dimensional optimal weighting has PRECISELY ZERO advantage
+# over fitting one scalar on the plain mean. So "+0.0013 skill" measures how badly calibrated the
+# neighbourhood mean is, and nothing whatever about whether weighting nearer neighbours more would help:
+# exchangeability forbids that question by assuming every neighbour correlates with the target at the
+# same r. Verified three ways before this plan was written: two independent symbolic derivations
+# (Sherman-Morrison, and permutation symmetry with a one-dimensional reduction) and a numerical check
+# over 2000 random (k, r, rho) agreeing to 1.7e-15.
+#
+# WHY +0.0013 AND NOT SOMETHING LARGER. The gap vanishes exactly when beta = 1, i.e. when
+# r = S/k = Var(m_bar), i.e. when the plain mean's residual is uncorrelated with the mean. At k = 10,
+# r = 0.45, rho = 0.39 the skill gap is 0.00000; at r = 0.6, rho = 0.45 it is 0.0164. Real molecular
+# targets evidently sit near the calibrated locus. That is itself a prediction, registered below.
+#
+# WHAT THIS INCREMENT MEASURES. The term exchangeability deletes. Neighbour RANK is the axis: the 1st
+# nearest neighbour of a compound should correlate with its label more than the 10th. This repository
+# contains NO neighbour-rank measurement of any kind, and no measured correlation profile on real
+# targets at all: scripts/field_profile.py is entirely synthetic, its c_d column is an analytic input
+# constant rather than a measurement, and the project's whole "profile" is two lags (hop 1 = r, hop 2
+# = rho_nn) fitting one parameter. So the rank-resolved second moments are measured here for the first
+# time, and the reshaping gain they permit is the quantity at issue.
+
+provenance:
+  claim_under_test: claim 6 of docs/paper/skeleton.md
+  prior_art: docs/paper/prior-art.md section 5; no collision found in four passes
+  theorem_reported_unconditionally: >
+    the three displayed consequences above, and MSE(best alpha m_bar) = MSE* exactly. These are proved,
+    not measured, and are stated in the results document whether or not any gate below passes.
+
+shared:
+  collections:
+    primary: the 40 ChEMBL targets of prereg/increment3_chembl.yaml, blob 7519ef31c4374637483bae167221f9b7567ece7f
+    also_reported: [MoleculeACE-30, DeepDelta-10]
+  representation: ECFP4, Morgan radius 2, 2048 bits, exactly as src/molace/graphs/fingerprints.py
+  similarity: Tanimoto, exactly as tanimoto_matrix
+  split: random 80/20, numpy default_rng(0), identical to every earlier increment
+  neighbourhoods: >
+    models.anchors.select(sim, m), which ranks by descending similarity with ties broken on ascending
+    index. Column j of its output IS the j-th nearest neighbour, so rank is already available and no new
+    graph machinery is introduced. Note this makes the predictor side EXACTLY m-regular, unlike the
+    union-symmetrised kNN graph whose degree exceeds k; the Jensen problem that afflicts the identity on
+    irregular graphs therefore does not arise here.
+  m: 10 primary, with 5 and 20 also reported; all three fixed now
+  standardisation: >
+    z = (y - mean(y_train)) / sd(y_train), training statistics only, applied to both splits. The MSE
+    expansion 1 - 2 w'c + w'Cw requires c and C to be raw SECOND MOMENTS on this scale, not Pearson
+    correlations; second moments are what is estimated.
+  skill: 1 - RMSE_arm / RMSE_baseline, baseline = predicting the training mean on the test split,
+    identical to the nine scripts that already compute it inline
+  uncertainty: cluster bootstrap, 10000 draws, seed 0, each target its own cluster, percentile interval
+
+estimation:
+  leakage_boundary: >
+    every quantity is estimated on the TRAINING split alone. For each training compound v its m nearest
+    OTHER TRAINING compounds are taken (self excluded by masking the diagonal), and
+      c_hat_j  = mean over training v of z_v z_{NN_j(v)}
+      C_hat_jl = mean over training v of z_{NN_j(v)} z_{NN_l(v)}
+    Weights are then applied unchanged to test compounds, whose neighbours are their m nearest TRAINING
+    compounds. No test label is read before scoring.
+  forbidden_normalisation: >
+    weights are NEVER rescaled to sum to one and never passed through a softmax. Under exchangeability
+    the sum-to-one-constrained optimum is exactly 1/k, so a normalised arm reports a null by
+    construction. Any implementation that normalises is wrong and its output is void.
+
+arms:
+  - id: mean
+    weights: w_j = 1/m
+    note: the existing kNN floor arm, reproduced exactly so the new script is checkable against it
+  - id: scaled
+    weights: w_j = beta_hat / m, with beta_hat the single scalar fitted on training
+    note: beta_hat = (sum_j c_hat_j / m) / (sum_jl C_hat_jl / m^2). One free parameter.
+  - id: rank
+    weights: w = C_hat^-1 c_hat
+    note: m free parameters, the rank-resolved optimum
+decomposition:
+  gain_scale: skill(scaled) - skill(mean)
+  gain_shape: skill(rank) - skill(scaled)
+  why_this_split: >
+    gain_scale is the whole content of claim 6 as it stands. gain_shape is identically zero under
+    exchangeability BY THEOREM, so it is exactly the term the assumption deleted and the only thing this
+    increment can discover.
+
+predictions_registered_in_advance:
+  prediction_1:
+    text: the rank profile declines, so exchangeability is materially false on these data
+    tested_by: c_hat_1 - c_hat_m, pooled mean across targets
+  prediction_2:
+    text: beta_hat sits near one, which is WHY the exchangeable gap was +0.0013 rather than ten times that
+    holds_iff: the median of abs(beta_hat - 1) over the primary collection is below 0.10
+    if_it_fails: >
+      the explanation offered above for the +0.0013 figure is wrong, and that leads the report ahead of
+      everything else.
+  prediction_3:
+    text: >
+      where beta_hat is near one the floor's relative error is near 1 - r, because beta = 1 makes the
+      second moment cancel exactly and collapses the identity to a one-statistic floor
+    holds_iff: >
+      across the primary collection the Spearman of abs(beta_hat - 1) against
+      abs(measured_rel_mse - (1 - r)) is positive with an interval excluding zero
+
+design_gates:
+  evaluated_before_any_outcome: true
+  gate_1_premise:
+    passes_iff: >
+      the pooled mean of c_hat_1 - c_hat_m is positive with a cluster-bootstrap interval excluding zero
+      on the primary collection
+    if_it_fails: >
+      exchangeability is not the materially wrong assumption this plan assumes it to be, the relaxation
+      is moot, and NO outcome is reported. Claim 6 then stands as written, with the vacuity theorem
+      attached, and the report says the premise failed. This is the sixth refusal and is not a negative
+      result.
+  gate_2_conditioning:
+    declared_now: targets with cond(C_hat) >= 100 are excluded, and the number excluded is reported
+    why: >
+      increments 9 and 10 both lost numbers to an ill-conditioned inverse; increment 10 declared a
+      ten-standard-error guard in advance for the same reason. C_hat^-1 is the same hazard.
+  gate_3_sample_size:
+    declared_now: targets with n_train < 20 * m * (m + 1) / 2 are excluded, and the number is reported
+    why: C_hat has m(m+1)/2 free entries and a thin target cannot estimate them
+
+null_calibration:
+  why: >
+    fitting m weights and measuring their gain manufactures a positive number from sampling noise alone:
+    E[(S - k r_hat)^2] picks up Var(r_hat) k^2. A measured gain_shape is uninterpretable without its own
+    null.
+  surrogate: >
+    RANK-SHUFFLED surrogate. Within each training neighbourhood, permute which neighbour is called 1st,
+    2nd, ... The neighbour SET and every label are untouched; only the rank assignment is destroyed, so
+    c_hat becomes constant in j and C_hat becomes exchangeable. This is the null "exchangeability holds",
+    not the null "there is no signal".
+  draws: 200 per target, numpy default_rng(0)
+  reported: the measured gain_shape against the surrogate distribution's 95th percentile, per target
+
+outcome_rule:
+  evaluated_only_if_gate_1_passes: true
+  claim_6_survives_as_stated_iff: >
+    the median gain_shape over the retained primary targets is below 0.01 skill AND the upper end of its
+    cluster-bootstrap interval is below 0.05
+  claim_6_is_downgraded_iff: >
+    gain_shape's interval excludes zero with a median above 0.01 skill AND the measured gain_shape
+    exceeds its rank-shuffled surrogate's 95th percentile on more than half the retained targets
+  neither_holds: >
+    the claim is NOT established and the report says not established rather than claiming a null from a
+    failure to reject, which is the mistake increment 2 made and corrected
+  if_downgraded: >
+    claim 6 of the skeleton is rewritten in the headline, not in a caveat: equal weights are
+    near-optimal in SCALE and not in SHAPE, and the paper's most novel claim becomes a measured
+    quantity with a sign rather than an assertion.
+
+forbidden:
+  - Changing m, the gates, the thresholds, the surrogate or the number of draws after seeing a number.
+  - Dropping a target or a collection after seeing its result.
+  - Normalising the weights to sum to one, or through a softmax, anywhere.
+  - Estimating c_hat or C_hat on anything but the training split.
+  - Reading a gain_shape that covers zero as evidence of no reshaping without reporting its width and
+    its surrogate percentile.
+  - Reporting gain_shape without gain_scale beside it, since the second is the baseline the first is
+    measured against.
