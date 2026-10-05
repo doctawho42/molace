@@ -46,6 +46,11 @@ EXACT_CORNER_TOL = 0.05
 MIN_CONSTRUCTION_SHARE = 0.25
 
 
+def cell_seed(k: int, d: int, length: int, nu: float, seed: int) -> tuple[int, ...]:
+    """The grid cell's seed, a pure function of the declared grid. See field_profile.cell_seed."""
+    return (k, d, int(length), int(nu * 100), seed)
+
+
 def ring_field(n: int, length: float, rng: np.random.Generator) -> np.ndarray:
     """A stationary Gaussian field on a ring with covariance exp(-ring distance / length)."""
     j = np.arange(n)
@@ -85,7 +90,7 @@ def main() -> int:
             for length in LENGTHS:
                 for nu in NOISES:
                     for seed in SEEDS:
-                        rng = np.random.default_rng((k, d, length, int(nu * 100), seed))
+                        rng = np.random.default_rng(cell_seed(k, d, length, nu, seed))
                         sig = ring_field(N, length, rng) * np.sqrt(1.0 - nu)
                         noi = rng.normal(size=N) * np.sqrt(nu)
                         noi = (noi - noi.mean()) / noi.std() * np.sqrt(nu)

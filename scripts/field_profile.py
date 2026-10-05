@@ -39,6 +39,16 @@ FAMILIES = ("exponential", "squared_exponential")
 RHO_T_MIN, MIN_SHARE = 10.0, 0.25
 
 
+def cell_seed(family: str, k: int, d: int, length: int, nu: float, seed: int) -> tuple[int, ...]:
+    """The grid cell's seed, a pure function of the declared grid.
+
+    Named rather than inline because this line was once `hash(family) % 9973`, which Python
+    randomises per process, so the 600 rows this script wrote could not be regenerated. A named
+    function is one a test can call in two processes and compare.
+    """
+    return (FAMILIES.index(family), k, d, int(length), int(nu * 100), seed)
+
+
 def profile(family: str, delta: np.ndarray, length: float) -> np.ndarray:
     if family == "exponential":
         return np.exp(-delta / length)
@@ -78,8 +88,7 @@ def main() -> int:
                     cd = float(profile(family, np.array([float(d)]), length)[0])
                     for nu in NOISES:
                         for seed in SEEDS:
-                            rng = np.random.default_rng(
-                                (hash(family) % 9973, k, d, length, int(nu * 100), seed))
+                            rng = np.random.default_rng(cell_seed(family, k, d, length, nu, seed))
                             sig = ring_field(family, length, rng) * np.sqrt(1.0 - nu)
                             noi = rng.normal(size=N)
                             noi = (noi - noi.mean()) / noi.std() * np.sqrt(nu)

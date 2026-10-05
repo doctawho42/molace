@@ -25,9 +25,15 @@ the model must degrade.
 
 **Reported unconditionally, as both plans required.** These circulants are k-regular, so the floor
 identity is exact here by the proof `tests/test_neighbourhood.py` pins. Measured over 1200 synthetic
-datasets its largest absolute error is **3.2e-15**. That is the implementation agreeing with its own
+datasets its largest absolute error is **3.58e-15**. That is the implementation agreeing with its own
 proof, not an empirical finding, and it is reported because an implementation that disagreed would
 invalidate everything built on it.
+
+This figure read 3.2e-15 until 2026-10-05, which was wrong for a reason unrelated to the seeding fix
+described at the foot of this document: it quoted `field_profile`'s own maximum and attached it to all
+1200 datasets, while `report_synthetic_decay.txt` had printed 3.58e-15 for its own 600 all along. The
+combined maximum is the larger of the two and comes from increment 9, whose data are bit-identical
+before and after the fix.
 
 ## Increment 9, question 1: the estimator has two distinct failure modes
 
@@ -87,15 +93,21 @@ guard declared in the plan:
 
 | field family | datasets | median ratio to the prediction | IQR |
 |---|---|---|---|
-| exponential | 59 | **0.9947** | [0.9648, 1.0208] |
-| squared-exponential | 75 | **0.9970** | [0.9725, 1.0186] |
+| exponential | 61 | **0.9973** | [0.9754, 1.0204] |
+| squared-exponential | 76 | **0.9993** | [0.9772, 1.0175] |
 
-So the reasoning that produced the plan is right to within 0.3 %.
+So the reasoning that produced the plan is right to within **0.07 %**. Had the geometric model been
+assumed instead of corrected, the median ratio would be 1.0363.
+
+These are the regenerated values. The first version of this table read 59 and 75 datasets with medians
+0.9947 and 0.9970, "right to within 0.3 %", from a run whose seeds could not be reproduced; see the
+foot of this document. The prediction holds either way, and holds more tightly now.
 
 ## And the fifth refusal, which is the finding
 
-The design gate asked whether the field family moves `lambda`. It accounts for **0.9 %** of its
-variance; the correlation length accounts for 28.0 %.
+The design gate asked whether the field family moves `lambda`. It accounts for **0.3 %** of its
+variance; the correlation length accounts for 21.4 %, degree for 5.6 % and the noise target for 1.1 %.
+The conditioning guard kept 392 of 600.
 
 | design | share of lambda's (or the decoupling's) variance the construction moved |
 |---|---|
@@ -103,7 +115,7 @@ variance; the correlation length accounts for 28.0 %.
 | increment 7, spread neighbours at fixed k | 0.0 % |
 | increment 8, same data, contrast corrected to lambda | 14.1 % |
 | increment 9, synthetic circulants | 10.8 % |
-| increment 10, two field families | **0.9 %** |
+| increment 10, two field families | **0.3 %** |
 
 Gate failed, outcome not reported, and the plan forbids a sixth re-specification.
 
@@ -129,3 +141,50 @@ Named, not attempted, and each follows from a measured failure above rather than
 - a decay model that uses the actual distribution of edge hop lengths instead of a single `lambda`,
   since mode two's bias is entirely explained by edges spanning several distances at once;
 - and, for the low-decay regime, far more pairs per node than a 600-node graph at degree 2 can supply.
+
+
+## A correction: increment 10's numbers come from a regenerated run
+
+Found on 2026-10-05 while writing increment 12. `scripts/field_profile.py` seeded each synthetic field
+with
+
+    np.random.default_rng((hash(family) % 9973, k, d, length, int(nu * 100), seed))
+
+and Python randomises `hash` on a `str` per process unless `PYTHONHASHSEED` is pinned. So the 600 rows
+this increment originally wrote were a valid realisation of the frozen design — within one process the
+mapping was constant, and every cell of the grid was generated exactly as the plan specified — but a
+realisation that could never be drawn again. In a project whose whole method is a frozen plan and a
+reproducible measurement, a number nobody can recompute cannot be checked against its plan.
+
+The seed is now `FAMILIES.index(family)`, an explicit index into the declared grid, lifted into a named
+`cell_seed` function so a test can call it in two processes and compare. `tests/test_seeding_is_reproducible.py`
+pins both the property and the class: no generator may call `hash()` at all.
+
+**What changed.** The old seeds are unrecoverable, so the data had to be regenerated and every
+increment-10 figure moved. Nothing qualitative moved with them.
+
+| figure | before | after |
+|---|---|---|
+| conditioning guard kept | 391 of 600 | 392 of 600 |
+| prediction 1, median ratio, squared-exponential | 0.9970 | 0.9993 |
+| prediction 1, accuracy of the plan's arithmetic | 0.3 % | **0.07 %** |
+| lambda variance from the field family | 0.9 % | 0.3 % |
+| lambda variance from the correlation length | 28.0 % | 21.4 % |
+| field_profile's own max identity error | 3.21e-15 | 2.97e-15 |
+
+Prediction 1 still holds and holds more tightly. The design gate still fails, and by a wider margin:
+0.3 % against the 25 % the plan demanded. The fifth refusal stands.
+
+**Increment 9 is unaffected and this was verified rather than assumed.** `scripts/synthetic_decay.py`
+seeded on `(k, d, length, int(nu * 100), seed)`, all numeric, so it never had the defect.
+Regenerating it reproduced `results/synthetic_decay.csv` **bit-identically** — same md5,
+`55cb03606f48f4edee6adea33023f4d9` — and its report identically apart from one elapsed-time line. So
+every figure in this document that comes from increment 9 is reproducible and unchanged: the 0.4150
+mean absolute recovery error at `k = 2`, the single 40.85 outlier, the 0.180 ill-conditioned share, and
+the mixed-hop bias series 0.0237 / 0.1136 / 0.2224 / 0.338. That file's `cell_seed` refactor is proved
+behaviour-preserving by the identical md5.
+
+No pre-registration was touched. `prereg/increment9_synthetic.yaml` and
+`prereg/increment10_field_profile.yaml` remain frozen at their committed blob hashes, and nothing in
+either plan's grid, guard, threshold or decision rule changed — only the arithmetic that turns the
+declared grid into a seed.

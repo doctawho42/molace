@@ -2,29 +2,29 @@ pre-registration blob: 5de3f710cb9a89aef11498965b1e3c79bf00cbc6
 600 datasets, n = 600, two field families, nothing trained
 
   k= 2 d=1   150 datasets  [2s]
-  k= 2 d=3   300 datasets  [5s]
-  k=10 d=1   450 datasets  [9s]
-  k=10 d=3   600 datasets  [12s]
+  k= 2 d=3   300 datasets  [3s]
+  k=10 d=1   450 datasets  [5s]
+  k=10 d=3   600 datasets  [7s]
 
-  conditioning guard, declared in the plan: kept 391 of 600, excluded 209 where rho_nn is within 10 standard errors of zero
-  identity's max |error| over all 600: 3.21e-15 (exact by proof on regular graphs)
+  conditioning guard, declared in the plan: kept 392 of 600, excluded 208 where rho_nn is within 10 standard errors of zero
+  identity's max |error| over all 600: 2.97e-15 (exact by proof on regular graphs)
 
 ====================================================================================================
 PREDICTION 1: on a squared-exponential field the estimator overstates by exactly 1/c(d)^2
 ====================================================================================================
-  exponential          n= 59  median ratio to prediction 0.9947  IQR [0.9648, 1.0208]
-  squared_exponential  n= 75  median ratio to prediction 0.9970  IQR [0.9725, 1.0186]
-                            median ratio if the geometric model were assumed: 1.0366
+  exponential          n= 61  median ratio to prediction 0.9973  IQR [0.9754, 1.0204]
+  squared_exponential  n= 76  median ratio to prediction 0.9993  IQR [0.9772, 1.0175]
+                            median ratio if the geometric model were assumed: 1.0363
   PREDICTION 1 holds (median in [0.9, 1.1]): True
 
 ====================================================================================================
 THE DESIGN GATE, evaluated before the outcome
 ====================================================================================================
-  exponential          mean lambda 0.8622  sd 0.0841
-  squared_exponential  mean lambda 0.8809  sd 0.1061
-  lambda variance between family     :   0.9 %
-  lambda variance between k          :   5.2 %
-  lambda variance between length     :  28.0 %
+  exponential          mean lambda 0.8702  sd 0.0910
+  squared_exponential  mean lambda 0.8817  sd 0.1130
+  lambda variance between family     :   0.3 %
+  lambda variance between k          :   5.6 %
+  lambda variance between length     :  21.4 %
   lambda variance between nu_target  :   1.1 %
   GATE (family needs >= 25%): False   (four previous designs managed 4.2 %, 0.0 %, 14.1 %, 10.8 %)
 
