@@ -1,0 +1,89 @@
+# Increment 9, frozen before any synthetic data is generated.
+#
+# WHY SYNTHETIC. Three real-data designs (increments 5, 7, 8) failed to test a structural claim because
+# between-target variance was 77 % to 89 % of everything that was varied. And increment 6's two-statistic
+# estimator of attainable accuracy failed its validity threshold on the held-out set, 2 violations of 30
+# where at most 1 was allowed, with NO WAY TO TELL whether that was the decay model's approximation
+# error or the data's. Real datasets cannot say, because the true noise fraction is never known there.
+# Synthetic graphs with a prescribed field can, and the contrast is set rather than hoped for.
+#
+# THE SETTING, chosen so the geometric decay model is EXACT in one corner and degrades controllably
+# away from it.
+#
+#   n nodes equally spaced on a ring; a stationary Gaussian signal with covariance exp(-delta / L) in
+#   ring distance; independent noise added to a prescribed fraction nu of the total variance.
+#
+#   Graphs are circulants: node i joined to i +/- j*d for j = 1 .. k/2. Then
+#     * every edge spans ring distance exactly d*j for some j,
+#     * at k = 2 every edge spans exactly d and every shared-neighbour pair exactly 2d,
+#   so at k = 2 the one-hop and two-hop correlations are exactly (1-nu)*lam and (1-nu)*lam^2 with
+#   lam = exp(-d/L), and therefore r^2 / rho_nn = 1 - nu EXACTLY, whatever d and L are.
+#
+#   At k > 2 an edge spans several different distances at once, the single-lambda model stops being
+#   exact, and the estimator must degrade. How fast is the question increment 6 could not ask.
+#
+# These graphs are k-regular, so the floor identity itself is exact here by the proof increment 5
+# pinned in tests. That is stated, not tested: what is tested below is the ESTIMATOR built on top of
+# it, and the ranking claim.
+
+generation:
+  n_nodes: 600
+  correlation_lengths: [2, 4, 8, 16, 32]
+  noise_fractions: [0.1, 0.2, 0.3, 0.5, 0.7]
+  degrees: [2, 4, 10, 20]
+  strides: [1, 3]
+  replicates: 3 per cell, seeds 0, 1, 2, so 5 * 5 * 4 * 2 * 3 = 600 datasets
+  field: >
+    eigendecomposition of the circulant covariance, negative eigenvalues clipped to zero before
+    sampling. The TRUE noise fraction is then measured from the realisation as
+    Var(noise) / Var(signal + noise), not assumed from the target, so a clipped spectrum cannot
+    silently move it.
+  floor: leave-one-out over the whole graph, mean of a node's graph neighbours, no split, because that
+    is exactly the quantity the identity predicts and a split would add the train-only mismatch that
+    increments 5 and 7 already measured separately.
+  skill: 1 - RMSE_floor / sd(y), the dimensionless form used throughout the project
+
+primary_question_1:
+  text: does r^2 / rho_nn recover the TRUE signal fraction 1 - nu?
+  decision_rule:
+    exact_corner_holds_iff: >
+      at k = 2, where the geometric model is exact by construction, the mean absolute error of
+      (r^2 / rho_nn) against the realisation's true 1 - nu is below 0.05.
+    degradation_is_the_mixed_hop_explanation_iff: >
+      the mean absolute recovery error increases with k, by Spearman(k, mean |recovery error|) positive
+      with a bootstrap interval excluding zero over the 600 datasets, resampling cells.
+    if_the_exact_corner_fails: >
+      the estimator is wrong for a reason other than mixed hop lengths, which would be a larger finding
+      than increment 6's failure, and it leads the report.
+    if_it_holds_but_does_not_degrade_with_k: >
+      then mixed hop lengths are NOT why increment 6 missed its threshold, and the project says the
+      cause is still unknown rather than inventing a second story.
+
+primary_question_2:
+  text: >
+    does assortativity ALONE lose ranking power against the measured floor error where the per-hop
+    decay is lower, as the talk claims and as three real-data designs could not test?
+  design_gate: >
+    the construction must account for at least 25 % of the variance of lam = rho_nn / r across the 600
+    datasets. Unlike increments 7 and 8 this is expected to pass by construction, and it is still
+    evaluated and reported first, because a gate that is only applied when it might fail is not a gate.
+  tested_quantity: >
+    Spearman of (1 - r) against the measured relative floor error, computed within the low-lam half and
+    within the high-lam half of the datasets, and the difference between them.
+  claim_supported_iff: the difference is negative with a bootstrap interval excluding zero
+  stated_in_advance: >
+    the full identity's own ranking power is NOT a test here: these graphs are regular, so the identity
+    is exact and its ranking is perfect in both halves by the proof, not by measurement. Only the
+    one-statistic side carries information, and the report says so rather than presenting a guaranteed
+    contrast as a finding.
+
+also_reported_unconditionally:
+  - the identity's mean absolute error, which must be at machine precision on regular graphs or the
+    implementation disagrees with its own test suite
+  - the ceiling's violation rate against the TRUE ceiling 1 - sqrt(nu), per degree
+
+forbidden:
+  - Changing the grids, the field, or any threshold after seeing a number.
+  - Dropping a cell, a seed or a degree after seeing its result.
+  - Presenting the identity's exactness on these regular graphs as a new empirical result.
+  - Reading a covered zero as evidence of no effect without its width.
