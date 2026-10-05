@@ -42,11 +42,35 @@ def _maybe(fn, *a, **kw):
 def measure_target(name: str, seed: int, force: bool = False) -> dict:
     CACHE.mkdir(parents=True, exist_ok=True)
     path = CACHE / f"{name}__seed{seed}.json"
-    if path.is_file() and not force:
-        return json.loads(path.read_text())
-
     plan = load_prereg()
     k = plan["graphs"]["primary"]["k"]
+    if path.is_file() and not force:
+        rec = json.loads(path.read_text())
+        if rec.get("prereg") == prereg_fingerprint():
+            return rec
+        # The cache was written under a different version of the plan. Serving it silently once put
+        # 30 of these 90 records into results/spine.csv under a superseded pre-registration; the
+        # only difference there was a prose note, which is exactly why nobody noticed. Decide on the
+        # parameters the measurement actually reads, not on the blob.
+        if rec.get("plan_k") == k:
+            log.warning(
+                "%s was measured under plan %s rather than %s, but the only plan parameter this "
+                "measurement reads is unchanged (k=%d); serving the cached record",
+                path.name, str(rec.get("prereg"))[:12], prereg_fingerprint()[:12], k)
+            return rec
+        if "plan_k" not in rec:
+            # Written before the parameter was recorded, so equivalence cannot be checked here.
+            # Say so rather than refusing: a stale file is a reason to look, not to break the run.
+            log.warning(
+                "%s was measured under plan %s rather than %s and records no parameters, so it "
+                "cannot be checked; serving it. Recompute with force=True to remove the doubt",
+                path.name, str(rec.get("prereg"))[:12], prereg_fingerprint()[:12])
+            return rec
+        raise ValueError(
+            f"{path} was measured under pre-registration {rec.get('prereg')}, whose k is "
+            f"{rec.get('plan_k')!r} against the current plan's {k}. Recompute with force=True or "
+            "delete the cache; serving it would mix two plans in one table."
+        )
     df = ma.load_target(name)
     fp = ecfp4(df["smiles"].tolist())
     y = df["y"].to_numpy(dtype=float)
@@ -67,6 +91,7 @@ def measure_target(name: str, seed: int, force: bool = False) -> dict:
         "receptor_class": ma.receptor_class(name),
         "seed": seed,
         "prereg": prereg_fingerprint(),
+        "plan_k": k,
         "n_molecules": int(len(df)),
         "assortativity": asrt.value,
         "assortativity_coverage": asrt.coverage,
@@ -111,7 +136,7 @@ def run_sweep(datasets=None, seeds=(0, 1, 2), force: bool = False) -> pd.DataFra
         if not per_seed:
             continue
         head = per_seed[0]
-        row = {k: v for k, v in head.items() if k not in {"seed", "per_learner_gap"}}
+        row = {k: v for k, v in head.items() if k not in {"seed", "per_learner_gap", "plan_k"}}
         for field in ("rmse_pointwise", "rmse_knn_floor", "rmse_pairwise",
                       "rmse_cliff_pointwise", "rmse_cliff_knn_floor", "rmse_cliff_pairwise",
                       "gap", "access", "correction"):

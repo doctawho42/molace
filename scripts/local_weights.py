@@ -27,6 +27,7 @@ import pandas as pd
 
 warnings.filterwarnings("ignore")
 
+from molace.analysis.checkpoint import load_checkpoint, save_checkpoint
 from molace.analysis.correlate import cluster_bootstrap_mean, cluster_bootstrap_spearman
 from molace.data import deepdelta as dd
 from molace.data import moleculeace as ma
@@ -192,7 +193,8 @@ def main() -> int:
           f"gate 3 n_train >= {SIZE_FACTOR}*m(m+1)/2; {SURROGATES} rank-shuffled surrogates")
     print()
 
-    rows = pd.read_csv(PARTIAL).to_dict("records") if PARTIAL.exists() else []
+    rows = load_checkpoint(PARTIAL, ["collection", "dataset", "m", "n_molecules",
+                                     "gate3_pass"])
     done = {(r["collection"], r["dataset"]) for r in rows}
     if done:
         print(f"resuming from {PARTIAL}: {len(done)} targets already done\n")
@@ -207,7 +209,7 @@ def main() -> int:
             print(f"  SKIP {coll} {name}: {type(exc).__name__}: {exc}", flush=True)
             continue
         rows.extend(got)
-        pd.DataFrame(rows).to_csv(PARTIAL, index=False)
+        save_checkpoint(PARTIAL, rows)
         p = next((g for g in got if g["m"] == M_PRIMARY), got[0])
         msg = (f"  {coll:16s} {name:28s} n={p['n_molecules']:5d} "
                f"gate3={'y' if p['gate3_pass'] else 'n'}")

@@ -14,9 +14,9 @@ to that journal without MODI measured. 80 targets across three collections.
 
 | collection | targets | mean absolute difference | max | Pearson |
 |---|---|---|---|---|
-| ChEMBL-40 | 40 | **0.0108** | 0.0440 | 0.9974 |
-| MoleculeACE-30 | 30 | **0.0083** | 0.0257 | 0.9959 |
-| DeepDelta-10 | 10 | **0.0134** | 0.0404 | 0.9971 |
+| ChEMBL-40 | 40 | **0.0103** | 0.0436 | 0.9975 |
+| MoleculeACE-30 | 30 | **0.0083** | 0.0238 | 0.9960 |
+| DeepDelta-10 | 10 | **0.0123** | 0.0362 | 0.9975 |
 
 The frozen threshold was 0.05 on every collection. It holds everywhere with a factor of three to
 spare.
@@ -34,7 +34,7 @@ Rank-residualised partial Spearman against the best attained skill.
 
 | collection | assortativity over MODI_q2 | MODI_q2 over assortativity |
 |---|---|---|
-| ChEMBL-40 | +0.222 [-0.064, +0.483] covers 0 | **+0.293 [+0.011, +0.530] excludes 0** |
+| ChEMBL-40 | +0.240 [-0.048, +0.497] covers 0 | **+0.305 [+0.026, +0.539] excludes 0** |
 | MoleculeACE-30 | +0.101 [-0.245, +0.438] covers 0 | +0.263 [-0.092, +0.580] covers 0 |
 | DeepDelta-10 | +0.018 [-0.711, +0.925] covers 0 | +0.200 [-0.590, +0.963] covers 0 |
 
@@ -43,7 +43,7 @@ expected direction rather than a surprise: MODI_q2 carries the second moment imp
 evaluates the estimator whose error the identity expands, while assortativity is the first moment
 alone. So MODI is the richer statistic of the two, and the identity says exactly why.
 
-The size matters more than the sign. The interval clears zero by 0.011 on the largest collection only,
+The size matters more than the sign. The interval clears zero by 0.026 on the largest collection only,
 and covers zero on the other two. Reported as a small effect visible at n = 40, not as a separation.
 
 ## D. What the second moment adds
@@ -51,8 +51,8 @@ and covers zero on the other two. Reported as a small effect visible at n = 40, 
 | collection | assortativity alone | full identity | difference |
 |---|---|---|---|
 | ChEMBL-40 | 0.928 | 0.943 | +0.0156 [-0.0171, +0.0600] covers 0 |
-| MoleculeACE-30 | 0.842 | 0.854 | +0.0120 [-0.0554, +0.0844] covers 0 |
-| DeepDelta-10 | 0.758 | 0.806 | +0.0485 [-0.1299, +0.3396] covers 0 |
+| MoleculeACE-30 | 0.842 | 0.854 | +0.0120 [-0.0542, +0.0849] covers 0 |
+| DeepDelta-10 | 0.758 | 0.806 | +0.0485 [-0.1132, +0.3376] covers 0 |
 
 Covers zero on all three, as the plan said to expect: increment 5 measured the two statistics
 correlating at +0.988 on these graphs, so the second moment has little room to act here. The honest
@@ -83,6 +83,38 @@ binary 1-NN agreement can resolve on a benchmark built specifically to contain a
 - Claim 1 of the skeleton is a replication of Golbraikh 2014 at larger scale under a frozen plan, and
   is labelled as one.
 - Claim 5 becomes the paper's centre and is now measured against the published index rather than
-  argued: the modelability index has a closed form, reproduced to 0.008 to 0.013 across 80 targets.
+  argued: the modelability index has a closed form, reproduced to 0.008 to 0.012 across 80 targets.
 - Claim 2's baseline table now carries MODI beside ROGI, which the venue requires.
 - The second moment is reported as structurally necessary and empirically quiet, with its intervals.
+
+## A correction: these numbers come from a re-measurement with a pinned tie-break
+
+Found on 2026-10-05 by a sweep for process-dependent results, after the seeding fix recorded at the
+foot of `results_increment9_10.md`. Two defects in `scripts/modi_baseline.py`, neither of which changes
+a verdict.
+
+`modi_q2` selected its k nearest neighbours with `np.argpartition`, which guarantees nothing about
+which of several equal similarities lands inside the k. Tanimoto on 2048-bit ECFP4 is a ratio of small
+integers, so exact ties are dense: on the largest target, 2203 of 8205 rows have the kth and (k+1)th
+similarity exactly equal. The selection was therefore a property of the NumPy build rather than of the
+data. It is now `np.argsort(..., kind="stable")`, which breaks ties on ascending index by definition
+and which was checked to agree with the project's `lexsort` pattern on every row of that target.
+
+Section D's bootstrap generator was also constructed once before the per-collection loop, so each
+collection's interval depended on how many draws the collections before it had consumed. It is now
+constructed per collection, matching what `cluster_bootstrap_spearman` already did for sections B
+and C. ChEMBL-40 was first in the loop, so its interval is unaffected; the other two moved.
+
+| figure | before | after |
+|---|---|---|
+| section A, ChEMBL-40 mean absolute difference | 0.0108 | 0.0103 |
+| section A, DeepDelta-10 | 0.0134 | 0.0123 |
+| section A, largest single difference | 0.0440 | 0.0436 |
+| MODI over assortativity, ChEMBL-40 | +0.293 [+0.011, +0.530] | +0.305 [+0.026, +0.539] |
+| section D, MoleculeACE-30 interval | [-0.0554, +0.0844] | [-0.0542, +0.0849] |
+| section D, DeepDelta-10 interval | [-0.1299, +0.3396] | [-0.1132, +0.3376] |
+
+Every verdict holds and the headline improves: the closed form now reproduces MODI_q2 slightly more
+closely on two of three collections, the frozen 0.05 threshold still holds everywhere with a factor of
+four to spare, and the one interval that excluded zero still excludes it, by 0.026 rather than 0.011.
+`prereg/increment11_modi.yaml` was not touched.

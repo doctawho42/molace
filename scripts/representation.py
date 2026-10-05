@@ -27,6 +27,7 @@ import pandas as pd
 
 warnings.filterwarnings("ignore")
 
+from molace.analysis.checkpoint import load_checkpoint, save_checkpoint
 from molace.analysis.correlate import cluster_bootstrap_spearman
 from molace.graphs import knn
 from molace.graphs.constructions import descriptors, fingerprint
@@ -62,7 +63,7 @@ def main() -> int:
     print("graph and statistic stay on ECFP4 Tanimoto throughout; only the MODEL's features change")
     print()
 
-    rows = pd.read_csv(PARTIAL).to_dict("records") if PARTIAL.exists() else []
+    rows = load_checkpoint(PARTIAL, ["dataset"] + [f"skill_{k}" for k in REPS])
     done = {r["dataset"] for r in rows}
     if done:
         print(f"resuming from {PARTIAL}: {len(done)} targets already done")
@@ -93,7 +94,7 @@ def main() -> int:
             continue
         rec["provenance"] = "computed"
         rows.append(rec)
-        pd.DataFrame(rows).to_csv(PARTIAL, index=False)
+        save_checkpoint(PARTIAL, rows)
         print(f"  {m.dataset:22s} " + " ".join(f"{k.split('_')[0][:5]}={rec[f'skill_{k}']:+.3f}"
                                                for k in REPS) + f"  [{time.time()-t0:.0f}s]",
               flush=True)

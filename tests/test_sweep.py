@@ -60,3 +60,41 @@ def test_a_failing_target_does_not_lose_the_others(tmp_path, monkeypatch):
     df = sweep.run_sweep(["CHEMBL2835_Ki", "CHEMBL_nope"], seeds=(0,))
     assert len(df) == 1
     assert df.iloc[0]["dataset"] == "CHEMBL2835_Ki"
+
+
+def test_a_cache_written_under_a_different_plan_is_not_served_silently(tmp_path, monkeypatch, caplog):
+    """Serving it silently once put 30 of 90 records into the spine under a superseded plan.
+
+    The guard decides on the parameters the measurement actually reads, not on the blob hash: a
+    prose-only edit to the plan must not force a 70-minute recompute, and a changed k must not pass.
+    """
+    import json
+    import logging
+
+    monkeypatch.setattr(sweep, "CACHE", tmp_path)
+    name, seed = "CHEMBL2835_Ki", 0
+    path = tmp_path / f"{name}__seed{seed}.json"
+    k = sweep.load_prereg()["graphs"]["primary"]["k"]
+
+    # same parameters, superseded stamp: served, with a warning that says so
+    path.write_text(json.dumps({"dataset": name, "seed": seed, "prereg": "0" * 40,
+                                "plan_k": k, "assortativity": 0.123}))
+    with caplog.at_level(logging.WARNING):
+        rec = sweep.measure_target(name, seed)
+    assert rec["assortativity"] == 0.123, "a prose-only plan edit must not discard the measurement"
+    assert "rather than" in caplog.text
+
+    # written before parameters were recorded: served, but loudly, because it cannot be checked
+    path.write_text(json.dumps({"dataset": name, "seed": seed, "prereg": "0" * 40,
+                                "assortativity": 0.456}))
+    caplog.clear()
+    with caplog.at_level(logging.WARNING):
+        rec = sweep.measure_target(name, seed)
+    assert rec["assortativity"] == 0.456
+    assert "cannot be checked" in caplog.text
+
+    # a parameter the measurement reads has changed: refused rather than mixed into one table
+    path.write_text(json.dumps({"dataset": name, "seed": seed, "prereg": "0" * 40,
+                                "plan_k": k + 1, "assortativity": 0.123}))
+    with pytest.raises(ValueError, match="would mix two plans"):
+        sweep.measure_target(name, seed)

@@ -42,7 +42,10 @@ MIN_CONSTRUCTION_SHARE, MIN_LAMBDA_GAP = 0.25, 0.05
 
 def spread_pick(sim_row: np.ndarray, cand_sim, k: int, pool: int, forbid: int | None) -> np.ndarray:
     """From the pool*k most similar candidates, greedily take k that overlap least with each other."""
-    order = np.argsort(-sim_row)
+    # ties break on ascending index, as in graphs/knn.py and models/anchors.py. Tanimoto on 2048-bit
+    # ECFP4 is a ratio of small integers, so exact ties at the pool boundary are common and an
+    # unstable sort would make the pool, and so the whole spread graph, a property of the numpy build.
+    order = np.lexsort((np.arange(sim_row.shape[0]), -sim_row))
     cand = [c for c in order[: pool * k + 1] if c != forbid][: pool * k]
     if len(cand) <= k:
         return np.asarray(cand, dtype=np.int64)

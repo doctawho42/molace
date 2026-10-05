@@ -69,10 +69,16 @@ silently.
 
 ```bash
 uv sync
-./scripts/fetch_data.sh
+./scripts/fetch_data.sh            # MoleculeACE and DeepDelta, at pinned revisions
+bash scripts/restore_chembl.sh     # the 40 ChEMBL targets, from the copy in this repo
 uv run pytest
 uv run python -c "from molace.analysis.sweep import run_sweep; run_sweep().to_csv('results/spine.csv', index=False)"
 ```
+
+The inputs are pinned and the ChEMBL collection is shipped rather than re-fetched, because it came
+from a live REST query whose result moves as the database grows: a re-fetch gives a different
+collection, not more rows of the same one. `scripts/verify_chembl.py` checks a working copy against
+the committed SHA-256 manifest. See `data/PROVENANCE.md` for what pins each corpus and what does not.
 
 `uv sync` must keep the `rdkit-pypi` override in `pyproject.toml`: PyTDC depends on that deprecated
 wheel, it installs over the same package directory, and its extension modules are built against the

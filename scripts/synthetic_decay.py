@@ -31,6 +31,7 @@ from scipy import stats
 
 warnings.filterwarnings("ignore")
 
+from molace.analysis.correlate import cluster_groups, cluster_resample
 from molace.measures.assortativity import target_assortativity
 from molace.measures.neighbourhood import shared_neighbour_correlation
 
@@ -147,12 +148,11 @@ def main() -> int:
     ks = sorted(per_k)
     means = np.array([per_k[k].recovery_error.abs().mean() for k in ks])
     obs = float(stats.spearmanr(ks, means).statistic)
-    cells = t.cell.unique()
-    rng = np.random.default_rng(0)
+    groups = cluster_groups(t.cell.to_numpy())         # a cell is one (length, nu, d, seed),
+    rng = np.random.default_rng(0)                     # holding all four degrees
     draws = []
     for _ in range(DRAWS):
-        pick = rng.choice(cells, len(cells), replace=True)
-        s = t[t.cell.isin(set(pick))]
+        s = t.iloc[cluster_resample(groups, rng)]
         mm = np.array([s[s.k == k].recovery_error.abs().mean() for k in ks])
         if np.all(np.isfinite(mm)):
             draws.append(stats.spearmanr(ks, mm).statistic)

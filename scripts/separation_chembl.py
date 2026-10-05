@@ -25,6 +25,7 @@ import pandas as pd
 
 warnings.filterwarnings("ignore")
 
+from molace.analysis.checkpoint import load_checkpoint, save_checkpoint
 from molace.analysis.correlate import cluster_bootstrap_spearman
 from molace.graphs import knn
 from molace.graphs.fingerprints import ecfp4, tanimoto_matrix
@@ -52,7 +53,8 @@ def main() -> int:
     print(f"{len(meta)} ChEMBL targets, none sharing an id with the discovery set")
     print()
 
-    rows = pd.read_csv(PARTIAL).to_dict("records") if PARTIAL.exists() else []
+    rows = load_checkpoint(PARTIAL, ["dataset", "skill_pointwise", "skill_knn_floor",
+                                     "skill_pairwise"])
     done = {r["dataset"] for r in rows}
     if done:
         print(f"resuming from {PARTIAL}: {len(done)} targets already done")
@@ -86,7 +88,7 @@ def main() -> int:
             "provenance": "computed",
         }
         rows.append(rec)
-        pd.DataFrame(rows).to_csv(PARTIAL, index=False)
+        save_checkpoint(PARTIAL, rows)
         print(f"  {m.dataset:22s} n={len(y):5d} pt={rec['skill_pointwise']:+.3f} "
               f"floor={rec['skill_knn_floor']:+.3f} pair={rec['skill_pairwise']:+.3f} "
               f"[{time.time()-t0:.0f}s]", flush=True)

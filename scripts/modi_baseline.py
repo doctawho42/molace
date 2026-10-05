@@ -52,7 +52,10 @@ def modi_q2(sim: np.ndarray, y: np.ndarray, k: int) -> float:
     """Leave-one-out q2 of similarity search: Golbraikh's continuous modelability criterion."""
     s = sim.copy()
     np.fill_diagonal(s, -np.inf)                       # never your own neighbour
-    idx = np.argpartition(-s, k, axis=1)[:, :k]
+    # stable, so ties break on ascending index: argpartition gives no guarantee about which of
+    # several equal similarities lands inside the k, and 27 % of rows on the largest target have the
+    # kth and (k+1)th similarity exactly equal.
+    idx = np.argsort(-s, axis=1, kind="stable")[:, :k]
     yhat = y[idx].mean(axis=1)
     return float(1.0 - np.sum((y - yhat) ** 2) / np.sum((y - y.mean()) ** 2))
 
@@ -149,9 +152,9 @@ def main() -> int:
     print("=" * 100)
     print("D. ЧТО ДОБАВЛЯЕТ ВТОРОЙ МОМЕНТ, КОТОРОГО В MODI НЕТ")
     print("=" * 100)
-    rng = np.random.default_rng(SEED)
     for coll, s in t.groupby("collection", sort=False):
-        s = s.dropna(subset=["best_skill"]).copy()
+        rng = np.random.default_rng(SEED)              # per collection, so a collection's interval
+        s = s.dropna(subset=["best_skill"]).copy()     # does not depend on the ones before it
         if len(s) < 8:
             continue
         a = stats.spearmanr(1 - s.assortativity, s.best_skill).statistic

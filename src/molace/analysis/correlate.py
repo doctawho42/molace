@@ -42,18 +42,39 @@ def _spearman(x: np.ndarray, y: np.ndarray) -> float:
     return float(stats.spearmanr(x[ok], y[ok]).statistic)
 
 
+def cluster_groups(clusters) -> list[np.ndarray]:
+    """Row indices grouped by cluster label, in sorted label order.
+
+    Split out so the three cluster bootstraps in this project share one resampling scheme. Two of
+    them once wrote their own, as `frame.cell.isin(set(rng.choice(cells, len(cells), replace=True)))`,
+    which silently dropped the multiplicity a bootstrap depends on and turned each draw into a
+    without-replacement subsample of about 1 - 1/e of the clusters.
+    """
+    cl = np.asarray(clusters)
+    return [np.flatnonzero(cl == c) for c in np.unique(cl)]
+
+
+def cluster_resample(groups: list[np.ndarray], rng: np.random.Generator) -> np.ndarray:
+    """One bootstrap draw: clusters chosen WITH replacement, their rows concatenated.
+
+    A cluster drawn twice contributes its rows twice. That multiplicity is the whole mechanism; a
+    membership test over the drawn set is not a bootstrap.
+    """
+    pick = rng.integers(0, len(groups), size=len(groups))
+    return np.concatenate([groups[p] for p in pick])
+
+
 def cluster_bootstrap_spearman(x, y, clusters, n_resamples: int = 10000,
                                seed: int = 0) -> BootResult:
     x = np.asarray(x, dtype=float)
     y = np.asarray(y, dtype=float)
     cl = np.asarray(clusters)
     uniq = np.unique(cl)
-    groups = [np.flatnonzero(cl == c) for c in uniq]
+    groups = cluster_groups(cl)
     rng = np.random.default_rng(seed)
     draws = []
     for _ in range(n_resamples):
-        pick = rng.integers(0, len(groups), size=len(groups))
-        idx = np.concatenate([groups[p] for p in pick])
+        idx = cluster_resample(groups, rng)
         v = _spearman(x[idx], y[idx])
         if np.isfinite(v):
             draws.append(v)
@@ -88,12 +109,11 @@ def cluster_bootstrap_mean(x, clusters, n_resamples: int = 10000, seed: int = 0)
     """
     v = np.asarray(x, dtype=float)
     cl = np.asarray(clusters)
-    groups = [np.flatnonzero(cl == c) for c in np.unique(cl)]
+    groups = cluster_groups(cl)
     rng = np.random.default_rng(seed)
     draws = []
     for _ in range(n_resamples):
-        pick = rng.integers(0, len(groups), size=len(groups))
-        idx = np.concatenate([groups[p] for p in pick])
+        idx = cluster_resample(groups, rng)
         m = float(np.nanmean(v[idx]))
         if np.isfinite(m):
             draws.append(m)

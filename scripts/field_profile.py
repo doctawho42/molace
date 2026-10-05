@@ -25,6 +25,7 @@ from scipy import stats
 
 warnings.filterwarnings("ignore")
 
+from molace.analysis.correlate import cluster_groups, cluster_resample
 from molace.measures.assortativity import target_assortativity
 from molace.measures.neighbourhood import shared_neighbour_correlation
 
@@ -174,11 +175,11 @@ def main() -> int:
         print(f"  {name:4s} lambda half: n={len(s):3d} mean lambda {s['lambda'].mean():.3f}  "
               f"Spearman(1-r, measured error) {rank[name]:+.3f}")
     obs = rank["low"] - rank["high"]
-    cells = kept.cell.unique()
-    rng = np.random.default_rng(0)
+    groups = cluster_groups(kept.cell.to_numpy())      # a cell is one (k, d, length, nu, seed),
+    rng = np.random.default_rng(0)                     # holding both field families
     draws = []
     for _ in range(DRAWS):
-        s = kept[kept.cell.isin(set(rng.choice(cells, len(cells), replace=True)))]
+        s = kept.iloc[cluster_resample(groups, rng)]
         a, b = s[s["lambda"] <= med], s[s["lambda"] > med]
         if len(a) > 20 and len(b) > 20:
             v = (stats.spearmanr(1 - a.assortativity, a.measured_rel_mse).statistic

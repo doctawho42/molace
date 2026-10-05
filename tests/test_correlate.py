@@ -125,3 +125,35 @@ def test_cluster_bootstrap_mean_reports_whether_it_excludes_zero():
     assert neg.excludes_zero and neg.hi < 0
     mixed = co.cluster_bootstrap_mean(np.tile([-1.0, 1.0], 15), clusters, n_resamples=1000, seed=0)
     assert not mixed.excludes_zero
+
+
+def test_cluster_resample_keeps_the_multiplicity_a_bootstrap_depends_on():
+    """A cluster drawn twice must contribute its rows twice.
+
+    scripts/field_profile.py and scripts/synthetic_decay.py once resampled as
+    `frame.cell.isin(set(rng.choice(cells, len(cells), replace=True)))`. The set() collapsed
+    multiplicity, so each draw was a without-replacement subsample of about 1 - 1/e of the clusters
+    rather than a bootstrap, and the reported intervals were not the intervals the frozen plans
+    required. This pins the difference.
+    """
+    clusters = np.repeat(np.arange(150), 4)            # synthetic_decay's shape: 150 cells of 4
+    groups = co.cluster_groups(clusters)
+    rng = np.random.default_rng(0)
+    sizes, dup_seen = [], False
+    for _ in range(200):
+        idx = co.cluster_resample(groups, rng)
+        sizes.append(idx.size)
+        if len(np.unique(idx)) < idx.size:
+            dup_seen = True
+    assert set(sizes) == {clusters.size}, "every draw must carry as many rows as the data"
+    assert dup_seen, "with replacement, some draw must repeat a row"
+
+    broken = [len(set(rng.choice(np.arange(150), 150, replace=True))) * 4 for _ in range(200)]
+    assert np.mean(broken) / clusters.size < 0.70, "the set() form keeps about 1 - 1/e of the rows"
+    assert np.mean(sizes) / clusters.size == 1.0
+
+
+def test_cluster_resample_draws_every_cluster_when_there_is_only_one():
+    groups = co.cluster_groups(np.zeros(7, dtype=int))
+    idx = co.cluster_resample(groups, np.random.default_rng(0))
+    assert np.array_equal(np.sort(idx), np.arange(7))

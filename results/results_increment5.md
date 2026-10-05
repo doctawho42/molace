@@ -181,10 +181,10 @@ rule exists because increment 5 nearly banked a result its design had not earned
 | construction | clustering | per-hop decay lambda | decoupling abs(r - rho_nn) | mean degree |
 |---|---|---|---|---|
 | nearest (k most similar) | 0.557 | 0.864 | 0.0690 | 13.5 |
-| spread (least overlapping k of the 4k nearest) | **0.223** | 0.797 | 0.0695 | 17.9 |
+| spread (least overlapping k of the 4k nearest) | **0.237** | 0.800 | 0.0683 | 17.9 |
 
-Clustering fell by a factor of 2.5 and the per-hop decay by 0.067, which cleared that half of the
-gate. The decoupling moved by **0.0005**: 0.0 % of its variance between constructions against 89.3 %
+Clustering fell by a factor of 2.4 and the per-hop decay by 0.064, which cleared that half of the
+gate. The decoupling moved by **0.0007**: 0.0 % of its variance between constructions against 88.7 %
 between targets. Gate failed, outcome not read, and the script returns before computing it.
 
 The reason is arithmetic and it indicts both earlier plans: `abs(r - rho_nn) = r (1 - lambda)`, and the
@@ -232,10 +232,28 @@ contrast it was meant to test:
 | construction | mean abs error | mean signed error | Pearson |
 |---|---|---|---|
 | nearest | 0.0256 | -0.0127 | 0.983 |
-| spread | **0.0247** | -0.0031 | 0.980 |
+| spread | **0.0249** | -0.0019 | 0.980 |
 
-The identity holds under a construction with **2.5 times less clustering**, 17.9 mean degree against
-13.5, and a quite different neighbour-selection rule. Its residual also nearly vanishes there, -0.0031
+The identity holds under a construction with **2.4 times less clustering**, 17.9 mean degree against
+13.5, and a quite different neighbour-selection rule. Its residual also nearly vanishes there, -0.0019
 against -0.0127, which is consistent with the train-only-neighbour explanation of increment 5: spread
 anchors reach further down the candidate pool, so the whole-graph statistics describe them better. That
 is a direction, not a tested claim.
+
+## A correction to increment 7's numbers: a pinned tie-break
+
+Found on 2026-10-05 by a sweep for process-dependent results. `spread_pick` in
+`scripts/decoupling_designed.py` chose its candidate pool with `order = np.argsort(-sim_row)`, and
+NumPy's default sort is not stable, so the order among exactly-equal Tanimoto similarities was an
+implementation detail of the NumPy build rather than a function of the data. The pool then seeds a
+greedy selection, so the whole `spread` graph inherited that arbitrariness. It is now
+`np.lexsort((np.arange(n), -sim_row))`, the ascending-index tie-break already used in
+`graphs/knn.py` and `models/anchors.py`.
+
+The `spread` construction's descriptive statistics moved: clustering 0.223 to 0.237, per-hop decay
+0.797 to 0.800, decoupling 0.0695 to 0.0683, identity error 0.0247 to 0.0249 with the signed residual
+-0.0031 to -0.0019, and the between-target share of the decoupling's variance 89.3 % to 88.7 %.
+
+**The gate verdict is unchanged**: the decoupling still moves 0.0 % between constructions against the
+25 % the plan demanded, so the outcome is still not read and increment 7 remains a refusal.
+`prereg/increment7_decoupling.yaml` was not touched.

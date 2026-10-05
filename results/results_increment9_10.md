@@ -188,3 +188,33 @@ No pre-registration was touched. `prereg/increment9_synthetic.yaml` and
 `prereg/increment10_field_profile.yaml` remain frozen at their committed blob hashes, and nothing in
 either plan's grid, guard, threshold or decision rule changed — only the arithmetic that turns the
 declared grid into a seed.
+
+## And a second correction: the cluster bootstrap was not one
+
+Found by the same sweep. Both generators resampled as
+
+    s = kept[kept.cell.isin(set(rng.choice(cells, len(cells), replace=True)))]
+
+and the `set()` collapses multiplicity. A cluster drawn twice contributed its rows once, so each of the
+10000 draws was a without-replacement subsample of about `1 - 1/e` of the clusters rather than a
+bootstrap. Measured: 63.4 % of cells retained per draw, against the 100 % a bootstrap carries. Both
+plans specify "cluster bootstrap, 10000 draws", so the code did not do what the frozen plan required.
+
+Fixed by routing both scripts through one shared implementation,
+`molace.analysis.correlate.cluster_groups` and `cluster_resample`, which is the scheme
+`cluster_bootstrap_spearman` already used; that function and `cluster_bootstrap_mean` now call the same
+helper, and their own tests confirm the refactor changed none of their output.
+`tests/test_correlate.py` pins the multiplicity property and was checked to fail when `set()` is put
+back.
+
+**It moved no reported number, and the honest statement is narrower than the defect sounds.** In
+`field_profile.py` the affected bootstrap sits inside the outcome block, which returns early when the
+design gate fails — and the gate has always failed, so that block has never executed and the interval
+was never printed. In `synthetic_decay.py` the bootstrap does run, and the interval it prints is
+identical before and after: `Spearman -0.200 [-0.200, +1.000]`, verdict `False` either way. The
+statistic is a Spearman over four points, so it takes few discrete values and a 63 % subsample lands on
+the same 2.5 and 97.5 percentiles. The clusters, incidentally, are real: `field_profile`'s cell key
+omits `family` so each cell holds two rows, and `synthetic_decay`'s omits `k` so each holds four.
+
+The fix is kept because the code now matches its plan, because there is one implementation instead of
+three, and because on a finer-grained statistic the difference would not have been invisible.
