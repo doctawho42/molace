@@ -1,0 +1,13 @@
+591 of 600 datasets usable for the correlation
+
+mode one, ill-conditioning: |recovery error| against how poorly rho_nn is determined
+  Spearman(|recovery error|, 1 / |rho_nn in its own standard errors|) = +0.027
+    k= 2  +0.716   datasets with rho_nn inside 3 standard errors of zero: 0.180
+    k= 4  +0.528   datasets with rho_nn inside 3 standard errors of zero: 0.073
+    k=10  +0.548   datasets with rho_nn inside 3 standard errors of zero: 0.060
+    k=20  +0.556   datasets with rho_nn inside 3 standard errors of zero: 0.027
+
+mode two, mixed hop lengths: the bias that remains once rho_nn IS well determined
+  Spearman(k, mean |recovery error|) on the well-determined subset = +1.000
+  bootstrap over cells, 10000 draws: [+1.000, +1.000]  EXCLUDES 0
+  share of the error that is bias rather than scatter, by k: k=2: 0.224  k=4: 0.987  k=10: 1.000  k=20: 1.000

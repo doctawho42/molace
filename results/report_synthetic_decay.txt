@@ -1,0 +1,41 @@
+pre-registration blob: 85f1e3bb67f7aba04753a06b424b7d6716fcc328
+600 synthetic datasets, n = 600 each, nothing trained
+
+  k= 2 d=1    75 datasets so far  [1s]
+  k= 2 d=3   150 datasets so far  [1s]
+  k= 4 d=1   225 datasets so far  [2s]
+  k= 4 d=3   300 datasets so far  [3s]
+  k=10 d=1   375 datasets so far  [4s]
+  k=10 d=3   450 datasets so far  [5s]
+  k=20 d=1   525 datasets so far  [7s]
+  k=20 d=3   600 datasets so far  [8s]
+
+==================================================================================================
+reported unconditionally: the identity on regular graphs, which must be exact
+==================================================================================================
+  max |identity error| over 600 datasets: 3.58e-15
+  (exact by the proof increment 5 pinned in tests, not an empirical finding)
+
+==================================================================================================
+QUESTION 1: does r^2 / rho_nn recover the TRUE signal fraction?
+==================================================================================================
+    k  mean |recovery err|  mean signed  max |err|  mean lambda  ceiling_hat - ceiling_true
+    2               0.4150       0.3497    40.8518       0.7112                      0.0367
+    4               0.1499      -0.1449     0.7776       0.8096                     -0.1206
+   10               0.2579      -0.2579     0.8901       0.8596                     -0.1986
+   20               0.3622      -0.3622     0.8865       0.8300                     -0.2686
+
+  exact corner, k = 2: mean |recovery error| 0.4150 (threshold 0.05)   False
+  recovery error grows with k: Spearman -0.200 [-0.200, +1.000]   False
+
+  THE ESTIMATOR FAILS WHERE ITS MODEL IS EXACT. That is a larger finding than
+  increment 6's missed threshold and it leads the report.
+
+==================================================================================================
+QUESTION 2: the design gate first
+==================================================================================================
+  lambda variance between construction :  10.8 %
+  lambda variance between length       :  17.0 %
+  lambda variance between nu_target    :   0.7 %
+  GATE (construction needs >= 25%): False
+  GATE FAILED, outcome not reported, on the same grounds as increments 7 and 8.
