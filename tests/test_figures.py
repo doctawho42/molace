@@ -13,13 +13,13 @@ def test_every_figure_is_written(tmp_path):
 def test_captions_carry_the_prereg_hash(tmp_path):
     from molace.analysis.prereg import prereg_fingerprint
     figures.make_figures(out_dir=tmp_path)
-    caption = (tmp_path / "captions.md").read_text()
+    caption = (tmp_path / "captions.md").read_text(encoding="utf-8")
     assert prereg_fingerprint()[:12] in caption
 
 
 def test_captions_state_n_and_n_eff(tmp_path):
     figures.make_figures(out_dir=tmp_path)
-    caption = (tmp_path / "captions.md").read_text()
+    caption = (tmp_path / "captions.md").read_text(encoding="utf-8")
     assert "n_eff" in caption and "n = 30" in caption
 
 
@@ -62,7 +62,7 @@ def test_fig3_marks_the_unavailable_split_rather_than_drawing_it_as_zero(tmp_pat
     census = pd.read_csv(figures.CENSUS)
     n_unavailable = int((census["rank_method"] == "unavailable").sum())
     assert figures.LAST_FIG3_UNAVAILABLE == n_unavailable
-    caption = (tmp_path / "captions.md").read_text()
+    caption = (tmp_path / "captions.md").read_text(encoding="utf-8")
     assert "UNAVAILABLE" in caption
     # The caption may explain why the estimator was removed; it must not describe it as in use.
     assert "estimated by a randomised" not in caption

@@ -190,5 +190,5 @@ def make_figures(out_dir="results/figures") -> list[Path]:
         "line drawn. The linear result is a theorem being checked, not a measurement; the MLP "
         "magnitudes are measurements and are specific to this encoder and these graphs.",
     ]
-    (out / "captions.md").write_text("\n".join(captions))
+    (out / "captions.md").write_text("\n".join(captions), encoding="utf-8")
     return paths

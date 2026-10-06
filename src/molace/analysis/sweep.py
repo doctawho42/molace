@@ -45,7 +45,7 @@ def measure_target(name: str, seed: int, force: bool = False) -> dict:
     plan = load_prereg()
     k = plan["graphs"]["primary"]["k"]
     if path.is_file() and not force:
-        rec = json.loads(path.read_text())
+        rec = json.loads(path.read_text(encoding="utf-8"))
         if rec.get("prereg") == prereg_fingerprint():
             return rec
         # The cache was written under a different version of the plan. Serving it silently once put
@@ -118,7 +118,7 @@ def measure_target(name: str, seed: int, force: bool = False) -> dict:
         "selected_pairwise": res.pairwise.selected,
         "per_learner_gap": res.per_learner_gap,
     }
-    path.write_text(json.dumps(rec, indent=2, allow_nan=True))
+    path.write_text(json.dumps(rec, indent=2, allow_nan=True), encoding="utf-8")
     return rec
 
 

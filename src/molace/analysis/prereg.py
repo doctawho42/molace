@@ -19,7 +19,7 @@ PREREG = Path(__file__).resolve().parents[3] / "prereg" / "increment1.yaml"
 def load_prereg() -> dict:
     if not PREREG.is_file():
         raise FileNotFoundError(f"{PREREG} is missing; the plan must exist before measurement")
-    with PREREG.open() as fh:
+    with PREREG.open(encoding="utf-8") as fh:
         return yaml.safe_load(fh)
 
 
@@ -28,6 +28,6 @@ def prereg_fingerprint() -> str:
     """The git blob hash of the pre-registration file."""
     out = subprocess.run(
         ["git", "hash-object", str(PREREG)],
-        capture_output=True, text=True, check=True,
+        capture_output=True, text=True, check=True, encoding="utf-8",
     )
     return out.stdout.strip()

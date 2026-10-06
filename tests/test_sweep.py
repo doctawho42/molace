@@ -25,9 +25,9 @@ def test_record_is_cached_and_reused(tmp_path, monkeypatch):
     path = tmp_path / "CHEMBL2835_Ki__seed0.json"
     assert path.is_file()
     # corrupt the cache with a sentinel; a reuse must return the sentinel, not recompute
-    rec = json.loads(path.read_text())
+    rec = json.loads(path.read_text(encoding="utf-8"))
     rec["gap"] = -999.0
-    path.write_text(json.dumps(rec))
+    path.write_text(json.dumps(rec), encoding="utf-8")
     assert sweep.measure_target("CHEMBL2835_Ki", seed=0)["gap"] == -999.0
     assert sweep.measure_target("CHEMBL2835_Ki", seed=0, force=True)["gap"] != -999.0
     assert first["dataset"] == "CHEMBL2835_Ki"
@@ -78,7 +78,7 @@ def test_a_cache_written_under_a_different_plan_is_not_served_silently(tmp_path,
 
     # same parameters, superseded stamp: served, with a warning that says so
     path.write_text(json.dumps({"dataset": name, "seed": seed, "prereg": "0" * 40,
-                                "plan_k": k, "assortativity": 0.123}))
+                                "plan_k": k, "assortativity": 0.123}), encoding="utf-8")
     with caplog.at_level(logging.WARNING):
         rec = sweep.measure_target(name, seed)
     assert rec["assortativity"] == 0.123, "a prose-only plan edit must not discard the measurement"
@@ -86,7 +86,7 @@ def test_a_cache_written_under_a_different_plan_is_not_served_silently(tmp_path,
 
     # written before parameters were recorded: served, but loudly, because it cannot be checked
     path.write_text(json.dumps({"dataset": name, "seed": seed, "prereg": "0" * 40,
-                                "assortativity": 0.456}))
+                                "assortativity": 0.456}), encoding="utf-8")
     caplog.clear()
     with caplog.at_level(logging.WARNING):
         rec = sweep.measure_target(name, seed)
@@ -95,6 +95,7 @@ def test_a_cache_written_under_a_different_plan_is_not_served_silently(tmp_path,
 
     # a parameter the measurement reads has changed: refused rather than mixed into one table
     path.write_text(json.dumps({"dataset": name, "seed": seed, "prereg": "0" * 40,
-                                "plan_k": k + 1, "assortativity": 0.123}))
+                                "plan_k": k + 1, "assortativity": 0.123}),
+                    encoding="utf-8")
     with pytest.raises(ValueError, match="would mix two plans"):
         sweep.measure_target(name, seed)

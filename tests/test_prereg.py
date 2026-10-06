@@ -49,5 +49,5 @@ def test_fingerprint_is_a_git_blob_hash():
 def test_fingerprint_is_committed_so_results_are_anchored():
     # A dirty pre-registration cannot anchor a result.
     out = subprocess.run(["git", "status", "--porcelain", "prereg/increment1.yaml"],
-                         capture_output=True, text=True).stdout
+                         capture_output=True, text=True, encoding="utf-8").stdout
     assert out.strip() == "", f"prereg/increment1.yaml is uncommitted: {out!r}"

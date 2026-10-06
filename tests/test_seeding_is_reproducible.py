@@ -37,7 +37,7 @@ def _probe(path: str, args: str, hash_seed: str) -> str:
     env = dict(os.environ, PYTHONHASHSEED=hash_seed)
     out = subprocess.run(
         [sys.executable, "-c", PROBE.format(path=str(ROOT / path), args=args)],
-        capture_output=True, text=True, check=True, cwd=ROOT, env=env,
+        capture_output=True, text=True, encoding="utf-8", check=True, cwd=ROOT, env=env,
     )
     return out.stdout.strip()
 
@@ -70,7 +70,7 @@ def test_no_randomised_hash_anywhere_in_a_generator(path):
     These scripts generate data from a declared grid and have no legitimate use for a per-process
     hash, so the honest rule is none at all.
     """
-    tree = ast.parse((ROOT / path).read_text())
+    tree = ast.parse((ROOT / path).read_text(encoding="utf-8"))
     lines = [n.lineno for n in ast.walk(tree)
              if isinstance(n, ast.Call) and isinstance(n.func, ast.Name) and n.func.id == "hash"]
     assert not lines, (

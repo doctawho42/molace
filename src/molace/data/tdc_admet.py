@@ -39,7 +39,7 @@ def assert_spine_recorded() -> None:
             "the holdout may not be opened before the spine result is recorded at "
             f"{SPINE_REPORT}; opening it first turns the holdout into a second training set"
         )
-    if SPINE_SENTINEL not in SPINE_REPORT.read_text():
+    if SPINE_SENTINEL not in SPINE_REPORT.read_text(encoding="utf-8"):
         raise RuntimeError(
             f"{SPINE_REPORT} exists but does not contain {SPINE_SENTINEL!r}, so the spine analysis "
             "did not complete; the holdout stays shut rather than becoming a second training set"

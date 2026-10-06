@@ -42,12 +42,12 @@ def test_the_gate_rejects_a_spine_report_that_records_a_failure(tmp_path, monkey
     the report only reaches on success.
     """
     bad = tmp_path / "report_spine.txt"
-    bad.write_text("Traceback (most recent call last):\n  ValueError: boom\n")
+    bad.write_text("Traceback (most recent call last):\n  ValueError: boom\n", encoding="utf-8")
     monkeypatch.setattr(t, "SPINE_REPORT", bad)
     with pytest.raises(RuntimeError, match="holdout"):
         t.assert_spine_recorded()
 
     good = tmp_path / "ok.txt"
-    good.write_text("n = 30 | n_eff = 10.0\nPRIMARY CLAIM SUPPORTED: False\n")
+    good.write_text("n = 30 | n_eff = 10.0\nPRIMARY CLAIM SUPPORTED: False\n", encoding="utf-8")
     monkeypatch.setattr(t, "SPINE_REPORT", good)
     t.assert_spine_recorded()

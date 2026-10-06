@@ -18,7 +18,8 @@ REQUIRED = ["dataset", "skill"]
 
 def test_a_row_torn_by_an_interrupted_write_is_dropped_rather_than_resumed(tmp_path, capsys):
     p = tmp_path / "partial.csv"
-    p.write_text("dataset,skill,extra\nA,0.5,1\nB,0.7,2\nC,")        # killed mid-write
+    p.write_text("dataset,skill,extra\nA,0.5,1\nB,0.7,2\nC,",          # killed mid-write
+                 encoding="utf-8")
     rows = load_checkpoint(p, REQUIRED)
     assert [r["dataset"] for r in rows] == ["A", "B"]
     assert "dropping 1 incomplete row" in capsys.readouterr().out
@@ -26,7 +27,7 @@ def test_a_row_torn_by_an_interrupted_write_is_dropped_rather_than_resumed(tmp_p
 
 def test_a_checkpoint_from_an_older_schema_is_refused_not_resumed_onto(tmp_path):
     p = tmp_path / "partial.csv"
-    p.write_text("dataset,other\nA,1\n")
+    p.write_text("dataset,other\nA,1\n", encoding="utf-8")
     with pytest.raises(ValueError, match="older schema"):
         load_checkpoint(p, REQUIRED)
 

@@ -140,7 +140,7 @@ def main() -> int:
 
     meta = pd.DataFrame(selected)
     meta.to_csv(OUT / "selected.csv", index=False)
-    (OUT / "skipped.json").write_text(json.dumps(skipped, indent=1))
+    (OUT / "skipped.json").write_text(json.dumps(skipped, indent=1), encoding="utf-8")
     print(flush=True)
     print(f"selected {len(meta)} targets; {len(skipped)} dropped for fewer than "
           f"{MIN_COMPOUNDS} unique compounds, recorded in skipped.json")
