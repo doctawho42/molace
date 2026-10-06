@@ -78,13 +78,27 @@ leakage_boundary: >
 design_gate:
   evaluated_before_any_outcome: true
   gate_1_instrument:
+    amended: >
+      AMENDED 2026-10-06, BEFORE ANY MEASUREMENT, and the first frozen version is recorded below
+      because an amendment before measurement is legitimate while an amendment after a number is not.
+      The first version demanded 1e-12 against every one of the 40 committed values. That is
+      unsatisfiable by construction: 28 of the 40 rows of results/separation_chembl.csv carry
+      provenance "recovered_3dp" and are stored at exactly three decimals, recovered from a printed log
+      after the first run of scripts/separation_chembl.py was killed by a two-hour limit at 28 of 40
+      targets. A 1e-12 check against a value rounded to 1e-3 tests the rounding, not the instrument.
+      The tolerance is therefore split by the precision actually available in the artefact.
     passes_iff: >
-      the floor arm reproduces results/separation_chembl.csv's skill_knn_floor to within 1e-12 on every
-      one of the 40 ChEMBL targets
+      the floor arm reproduces results/separation_chembl.csv's skill_knn_floor to within 1e-12 on the 12
+      targets whose provenance is "computed", AND to within 5e-4 on the 28 whose provenance is
+      "recovered_3dp", 5e-4 being half of the last digit those rows retain
     why: >
       nothing about the floor changed, so a drift means this script is not measuring what the committed
       claim measured, and no comparison between them would be valid
     if_it_fails: the increment stops and the discrepancy is the report
+    first_frozen_version:
+      blob: 65a408a30b6bc7db03f0c2a8b2f681a1696e123b
+      passes_iff: within 1e-12 on every one of the 40 ChEMBL targets
+      why_replaced: unsatisfiable against 28 rows stored at three decimals
 
 predictions_registered_in_advance:
   prediction_1:
