@@ -79,9 +79,9 @@ The earlier working title, "Homophily measures are a first moment", survives as 
 | 1 | Target assortativity predicts attainable accuracy | rho +0.875 / +0.909 / +0.810 on 40 independently curated ChEMBL targets; +0.77 / +0.82 / +0.76 on 10 DeepDelta benchmarks with published models | strong, four collections, and a replication of Golbraikh 2014 rather than a finding |
 | 2 | It does so beyond the existing roughness index | assortativity over ROGI +0.846 [+0.678, +0.928]; ROGI over assortativity +0.098, covers zero; ROGI alone does not predict. Against MODI the picture is symmetric: assortativity over MODI covers zero everywhere, MODI over assortativity +0.305 [+0.026, +0.539] on ChEMBL-40 | strong against ROGI, near-interchangeable with MODI |
 | 3 | The link is not an artefact of one fingerprint | +0.726 on RDKit descriptors; paired drop off ECFP4 +0.163 [+0.022, +0.358] | moderate, one alternative representation |
-| 4 | It also says which model class wins, through the level | floor minus pointwise -0.343 [-0.619, -0.008]; floor wins 26/40, and 12/13 on the hardest third | moderate, interval thin |
+| 4 | **UNDER CORRECTION.** It also says which model class wins, through the level | floor minus pointwise -0.343 [-0.619, -0.008]; floor wins 26/40, and 12/13 on the hardest third | moderate, interval thin |
 | 5 | For the kNN mean the link is exact, and equals a Dirichlet energy — so the published modelability index has a closed form | identity verified to 1e-16 on regular graphs; 0.025-0.031 mean absolute error as a point prediction over k = 3..40; reproduces MODI_q2 to 0.0083-0.0123 mean absolute difference on 80 targets, Pearson 0.996-0.998 | the paper's centre: object known, accounting new, measured against the published index |
-| 6 | The neighbourhood mean is calibrated in total weight and wrong in shape | weight sum 0.97, so rescaling buys +0.0000 [-0.0003, +0.0004] out of sample; reweighting by neighbour rank buys +0.0379 [+0.0314, +0.0442] on 31 ChEMBL targets and +0.0497 [+0.0417, +0.0577] on 14 MoleculeACE ones, beating a rank-shuffled null on 44 of 45; optimal profile 3.49x down to 0.19x | strong, pre-registered, and the opposite sign from what this table asserted before increment 12 |
+| 6 | **CORRECTED to +0.0155 [+0.0118, +0.0192].** The neighbourhood mean is calibrated in total weight and wrong in shape | weight sum 0.97, so rescaling buys +0.0000 [-0.0003, +0.0004] out of sample; reweighting by neighbour rank buys +0.0379 [+0.0314, +0.0442] on 31 ChEMBL targets and +0.0497 [+0.0417, +0.0577] on 14 MoleculeACE ones, beating a rank-shuffled null on 44 of 45; optimal profile 3.49x down to 0.19x | strong, pre-registered, and the opposite sign from what this table asserted before increment 12 |
 | 7 | The nugget-style noise estimate fails out of sample, and we know why | 2/30 violations against a pre-registered threshold of 1; synthetic separation into ill-conditioning and mixed hop lengths; 1/c(d)^2 overstatement predicted and measured to 0.07 % | strong as a negative result |
 | 8 | A structural limit: the regime where the second statistic matters most is the regime where the estimator built on it does not work | five refused design gates, variance decompositions 4.2 / 0.0 / 14.1 / 10.8 / 0.3 % | honest, and the most quotable sentence in the paper |
 
@@ -151,3 +151,33 @@ The Hodge half does not appear. It is a separate, weaker story and it dilutes th
 - **Claim 4 is now partly undermined by claim 6** and the paper cannot state both as they stand.
 - **Scope.** Thirty ChEMBL targets plus forty plus ten benchmarks is a lot of molecules and one domain.
   Nothing here is shown outside molecular property prediction.
+
+
+## Two claims under correction, found 2026-10-06
+
+Both were found by adversarial review of a later plan, and both are verified against committed data.
+
+**Claim 4 is measured against an arm that excludes the best learner.** `skill_pointwise` in
+`results/separation_chembl.csv` is the mean of the histogram-gradient-boosting and MLP RMSEs, set by
+`MATCHED_FAMILIES = ("hgb", "mlp")` in `src/molace/models/pairwise.py` and used at
+`src/molace/models/gap.py:109`. SVM is excluded, and `src/molace/models/pointwise.py`'s own docstring
+says "SVM leads because it is the real bar... 21 of 30 targets, mean rank 1.60".
+`pointwise.select_by_cv` exists, takes no test arguments, and is called by **no script** —
+`tests/test_gap.py:97` even pins `assert "select_by_cv" not in src`.
+
+The averaging is **correct** for the pointwise-minus-pairwise gap, because both arms are averaged over
+the same two families and the difference is matched. It is **wrong** for claim 4, which compares the
+floor against the best a model can do. One number was used for two incompatible purposes. Over all 40
+ChEMBL targets the trained arms beat the floor on 14 of 40, median -0.016; the corrected comparison
+against the CV-selected learner has not been run and claim 4's sign is therefore not currently known.
+
+**Claim 6's magnitude is 41 % of what this table said**, +0.0155 [+0.0118, +0.0192] rather than
++0.0379, because the uniform baseline was fixed at `m = 10` while uniform at `m = 5` is better on 28 of
+31 targets. It still excludes zero and is positive on 30 of 31. See the correction appended to
+`results/results_increment12.md`. The optimal profile has cosine 0.9946 with `w_j` proportional to
+`1/j`, so Dudani 1976 is the competitor the claim must be stated against, and that comparison is not
+yet run.
+
+**Consequence for the paper.** Claim 4 cannot be stated until the baseline audit runs. Claim 6 is
+restated at the corrected magnitude. The fifth prior-art pass on weighted kNN, listed as required in
+`docs/paper/prior-art.md` and never run, is now the blocking item it was always going to be.

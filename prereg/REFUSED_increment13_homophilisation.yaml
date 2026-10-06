@@ -1,0 +1,220 @@
+# REFUSED 2026-10-06, BEFORE FREEZING AND BEFORE ANY MEASUREMENT. The sixth refusal.
+#
+# Five adversarial reviews of this draft returned "abandon" unanimously, with 19 fatal findings. Three
+# kills, each verified independently against this repository's own committed data:
+#
+# 1. GATE 1 WAS ALREADY FAILED when the draft was written. The gate required the trained model to beat
+#    the ECFP4 kNN floor on 4 of the 5 pilot targets. results/separation_chembl.csv, committed, gives
+#    S_model - S_0 = -0.076, -0.007, -0.072, -0.052, -0.050 on exactly those five: 0 of 5. Over all 40
+#    ChEMBL targets the trained arms beat the floor on 14 of 40, median -0.016. The gate contradicts
+#    claim 4 of docs/paper/skeleton.md, which is the project's own headline. The plan's author did not
+#    open the CSV before writing the plan.
+#
+# 2. THE ARM ADDED TO AVOID TAUTOLOGY WAS THE MOST TAUTOLOGICAL. A random forest's prediction IS the
+#    leaf-proximity-weighted average of training labels (Lin and Jeon, JASA 101(474):578, 2006), so
+#    arm_rf's S_theta and arm_rf's S_model are the same estimator up to a weighting. A reviewer
+#    reproduced it with the draft's exact hyperparameters: residual mean -0.003, already inside the
+#    draft's "accounting supported" band before any ChEMBL target was touched.
+#
+# 3. BOTH TERMS ARE OWNED. The residual is NC4, defined in Papyan, Han and Donoho, PNAS 117(40):24652,
+#    2020, as the fraction of points where the nearest-class-centre rule on the network's own
+#    penultimate features disagrees with the network's prediction. The draft dismissed neural collapse
+#    as "about class means in classification"; Andriopoulos et al., NeurIPS 2024 (arXiv 2409.04180) is
+#    the regression analogue and its NRC1 is verbatim this draft's gate_3. The homophilisation term is
+#    the definitional evaluation of metric learning: NCA (Goldberger et al., NeurIPS 2004) optimises
+#    leave-one-out kNN error under a learned metric, and LMNN (Weinberger and Saul, JMLR 10:207, 2009)
+#    reports exactly kNN-under-learned-metric against plain kNN. And Praski, Adamczyk and Czech
+#    (arXiv 2508.06199, 2025) already ran the molecular version at 25 models by 25 datasets with a kNN
+#    head against an ECFP baseline: nearly nothing beats ECFP.
+#
+# The draft is kept unedited below because the refusals are the record. Nothing was measured under it.
+
+# Increment 13, DRAFT. NOT FROZEN. Nothing under this plan may be measured until the draft has been
+# through an adversarial review and been committed with its blob hash recorded.
+#
+# WHY THIS AND NOT ANOTHER MEASUREMENT. Six independent breakthrough proposals for this project were
+# generated and adversarially attacked on 2026-10-06. Sixteen completed attacks, zero survivors: three
+# dead, five incremental, eight solid-section. The pre-emptions were specific and they shared a cause.
+# The project's central object is a quadratic form in the moments of a graph operator applied to a
+# label, and that object is the Wiener filter (1940s), the kriging system (Matheron 1963) and the
+# Hamburger moment problem (Shohat-Tamarkin 1943). Every question asked inside it has been asked. The
+# project had also borrowed both ends of its own design: the measures came from the graph-homophily
+# line, the data from MoleculeACE / DeepDelta / ChEMBL, the representation from ECFP4, the estimator
+# from the kNN mean. Nothing in the chain was made here, which is why no amount of further idea
+# generation inside the frame produces an own contribution.
+#
+# THE ONE THING THE PROJECT HAS NEVER MEASURED. Every result so far assumes the geometry is GIVEN.
+# ECFP4 Tanimoto, fixed, hand-designed, 2048 bits. The readout ablation is explicit about it: with the
+# encoder frozen the flow is exactly a gradient and the measured curl is 1.4e-32, machine zero. So the
+# project has proved a theorem about a model class that cannot change geometry at all.
+#
+# Modern molecular models LEARN the geometry. The classical apparatus does not cover that, because
+# kriging has no learned kernel, neural collapse is about class means in classification, and graph
+# rewiring treats the graph as an input. Here the graph would be an OUTPUT.
+#
+# THE QUESTION. Take a trained model's own internal representation, build the kNN graph in that space,
+# and measure the floor on it. Then ask whether the model's accuracy is accounted for by the floor of
+# the geometry it built. Write
+#
+#     S_0     = skill of the kNN mean on the ECFP4 Tanimoto graph        (geometry as given)
+#     S_theta = skill of the kNN mean on the model's learned embedding   (geometry as learned)
+#     S_model = skill of the trained model itself
+#
+# and decompose
+#
+#     S_model - S_0  =  (S_theta - S_0)  +  (S_model - S_theta)
+#                        homophilisation     the residual
+#
+# The first term is what learning bought by moving the geometry. The second is what the model does
+# that local averaging on its own representation does not. Both readings are informative: if the
+# residual vanishes, learning a molecular representation IS homophilisation, with an exact accounting
+# in the currency this project already owns; if it does not, the residual is the object worth naming.
+#
+# NON-TRIVIALITY, STATED BEFORE MEASUREMENT BECAUSE IT IS THE FIRST THING A REVIEWER WILL ATTACK.
+# For a model whose readout is LINEAR on its embedding, making the label linear in the embedding also
+# makes it locally smooth there, so S_theta close to S_model is expected and is not a finding. That is
+# why the plan carries a second supervised arm whose readout is strongly non-linear and whose geometry
+# is not built to linearise anything: random-forest leaf proximity. If the accounting holds THERE, it
+# is not an artefact of linear readout. The magnitude of S_theta - S_0 is informative in both arms,
+# because nothing about a linear readout requires the geometry to move at all.
+
+status: DRAFT, not frozen, no measurement permitted under it yet
+
+shared:
+  collections:
+    pilot: the first 5 targets of prereg/increment3_chembl.yaml by the order in selected.csv
+    full: all 40 ChEMBL targets, measured only if the pilot gates pass
+  representation_baseline: ECFP4, Morgan radius 2, 2048 bits, exactly as src/molace/graphs/fingerprints.py
+  similarity_baseline: Tanimoto, exactly as tanimoto_matrix
+  split: random 80/20, numpy default_rng(0), identical to every earlier increment
+  m: 10 anchors, models.anchors.select, the project's fixed constant
+  k: 10 for any graph-level statistic, the project's fixed constant
+  skill: 1 - RMSE_arm / RMSE_baseline, baseline = predicting the training mean on the test split
+  uncertainty: cluster bootstrap, 10000 draws, seed 0, each target its own cluster, percentile interval
+  dependencies: >
+    NONE added. The learned geometries come from scikit-learn estimators already in the environment.
+    torch and torch_geometric are absent and are deliberately NOT added: the README records that this
+    environment needs an rdkit-pypi override because PyTDC pulls a deprecated wheel built against the
+    previous NumPy generation, and that every `import rdkit` segfaults once it lands. A dependency
+    change is a larger risk than the arm is worth at pilot stage.
+
+embeddings:
+  leakage_boundary: >
+    Every encoder is fit on the TRAINING split alone. Test compounds are embedded by the fitted
+    encoder. A test compound's m nearest neighbours are drawn from TRAINING compounds only and
+    averaged with TRAINING labels. No test label is read before scoring. The geometry is label-
+    SUPERVISED and that is the point; it is never label-leaking.
+  arm_mlp:
+    id: mlp
+    encoder: >
+      the project's existing pointwise MLP, sklearn MLPRegressor(hidden_layer_sizes=(64,),
+      max_iter=120, early_stopping=True, n_iter_no_change=8, random_state=seed), unchanged from
+      src/molace/models/pointwise.py so the embedding belongs to a model the project already reports
+    embedding: the 64-dimensional hidden activation, relu(X @ coefs_[0] + intercepts_[0])
+    readout: linear by construction, which is why arm_rf exists
+  arm_rf:
+    id: rf
+    encoder: >
+      sklearn RandomForestRegressor(n_estimators=200, min_samples_leaf=5, max_features=0.05,
+      random_state=seed, n_jobs=-1). New to the project, added ONLY because it exposes a leaf
+      geometry; its hyperparameters are fixed here and never tuned.
+    embedding: >
+      leaf proximity. For compounds i and j, proximity = fraction of the 200 trees in which they land
+      in the same leaf, via RandomForestRegressor.apply. This is a learned SIMILARITY, used directly
+      in place of Tanimoto, so no distance metric has to be chosen for it.
+    readout: strongly non-linear, which is what makes the accounting non-trivial here
+  distance_for_vector_embeddings:
+    primary: cosine similarity on the 64-d activation
+    reported_as_sensitivity: Euclidean, converted to a similarity by negation before ranking
+    declared_now: >
+      cosine is primary. Fixing this in advance matters because the two orderings differ and choosing
+      afterwards would be choosing a result.
+
+nulls:
+  why: >
+    An encoder fit on real labels will reshape geometry; the question is whether the reshaping carries
+    signal or is an artefact of fitting 64 hidden units to 2048 noisy inputs. Increment 12 needed the
+    same guard and used a rank-shuffled surrogate; this is the same idea one level up.
+  permuted_label_arms: >
+    arm_mlp0 and arm_rf0: identical encoders, identical hyperparameters, identical seeds, fit on
+    TRAINING labels permuted by numpy default_rng(0). Everything downstream is unchanged. A learned
+    geometry that homophilises on permuted labels has learned the fingerprint's own structure, not the
+    activity.
+  reported: S_theta for each null arm beside its real counterpart, per target
+
+design_gates:
+  evaluated_on_the_pilot_before_any_outcome_is_read: true
+  gate_1_apparatus:
+    passes_iff: >
+      the trained model beats the ECFP4 floor, S_model > S_0, on at least 4 of the 5 pilot targets
+    why: >
+      if local averaging on the given geometry already matches the trained model, there is no learning
+      to account for and the question is empty rather than answered
+    if_it_fails: >
+      the increment stops and reports that on these data the trained arms do not beat the floor they
+      are being decomposed against, which is itself a finding about the benchmark
+  gate_2_geometry_moved:
+    passes_iff: >
+      the pooled mean of S_theta - S_0 is positive with a cluster-bootstrap interval excluding zero,
+      on the mlp arm, on the pilot
+    why: the decomposition has nothing to decompose if the learned geometry's floor is no better
+    if_it_fails: no outcome is reported, as in increments 7 to 10
+  gate_3_collapse_flag:
+    declared_now: >
+      a target whose embedding has its top principal component correlating with the TRAINING label
+      above 0.95 in absolute value is FLAGGED as collapsed and reported separately, never dropped.
+      A collapsed embedding makes the accounting true by construction and the reader must see which
+      targets are in that state.
+  gate_4_size:
+    declared_now: >
+      targets with fewer than 300 training compounds are excluded, and the number excluded is
+      reported. 64 hidden units on 2048 inputs cannot be fit below that.
+
+predictions_registered_in_advance:
+  prediction_1:
+    text: >
+      the residual is smaller on the mlp arm than on the rf arm, because a linear readout and a local
+      average are closer to each other than a forest and a local average are
+    holds_iff: median |S_model - S_theta| is smaller for mlp than for rf on the pilot
+    if_it_fails: >
+      the stated reason for including the rf arm is wrong and that leads the report, because the whole
+      non-triviality argument rests on it
+  prediction_2:
+    text: the permuted-label geometries do not homophilise
+    holds_iff: >
+      median S_theta(null) - S_0 is below 0.02 skill for both null arms, and its interval covers zero
+
+outcome_rule:
+  evaluated_only_if_gates_1_and_2_pass: true
+  learning_is_homophilisation_supported_iff: >
+    on the full 40 targets, the median |S_model - S_theta| is below 0.05 skill AND the upper end of
+    its cluster-bootstrap interval is below 0.10, on BOTH supervised arms, while S_theta - S_0
+    excludes zero on both
+  residual_is_the_finding_iff: >
+    S_model - S_theta excludes zero with a median above 0.05 on either arm. The report then leads with
+    the residual, its size per arm, and what it correlates with, rather than with the accounting.
+  neither: >
+    NOT ESTABLISHED, said in those words, rather than a null claimed from a failure to reject. This is
+    the mistake increment 2 made and corrected, and increment 12 restated.
+
+reported_unconditionally:
+  instrument_calibration: >
+    the identity 1 + 1/k + (k-1)/k * rho_nn - 2r against the measured floor, on EVERY geometry
+    including the learned ones. The identity is exact only on k-regular graphs and these kNN graphs
+    are union-symmetrised, so this is the instrument's calibration on new terrain and it is reported
+    whatever the gates do.
+  rank_profile_on_learned_geometry: >
+    the neighbour-rank second-moment profile c_j for j = 1..10 on each geometry, because increment 12
+    showed the profile's shape is where the information sits and nobody has measured it on a learned
+    space
+
+forbidden:
+  - Measuring anything before this draft is reviewed, revised and committed with its blob hash.
+  - Changing the encoders, their hyperparameters, the distance choice, the gates or the thresholds
+    after seeing any number.
+  - Tuning either encoder. Both hyperparameter sets are fixed above and are the project's existing
+    values where existing values exist.
+  - Dropping a target after seeing its result, including a collapsed one.
+  - Reporting the accounting without the residual, or the residual without the null arms.
+  - Claiming anything about graph neural networks. These are scikit-learn encoders and the paper may
+    only claim what they show.

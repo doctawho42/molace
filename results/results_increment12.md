@@ -158,3 +158,38 @@ The consequence for claim 4 has to be re-examined and is NOT settled here. Claim
 beating fitted models on the hardest third as evidence about information outside the neighbourhood.
 If a better-shaped floor is worth +0.04 skill, part of that gap was weighting after all, and the
 re-examination needs its own frozen plan.
+
+
+## A correction: the shape gain is 41 % of the figure reported above
+
+Found 2026-10-06 by an adversarial review of a later plan, and verified here against this increment's
+own committed CSV. **Nothing below required new data.**
+
+This increment fixed `m = 10` as "the project's fixed constant" and never selected `m`. It is not
+constant in the sense the comparison needs: from `results/local_weights.csv` alone, the uniform arm at
+`m = 5` beats the uniform arm at `m = 10` on **28 of 31** retained ChEMBL targets, median +0.0246. So
+the uniform baseline the shape gain was measured against is not the best uniform arm the project had
+already computed.
+
+Under the fair comparison, each arm at its own better `m` of the two measured:
+
+| comparison | mean | interval | median |
+|---|---|---|---|
+| as reported above, rank at `m=10` against uniform at `m=10` | +0.0379 | [+0.0314, +0.0443] | +0.0418 |
+| **each arm at its better `m`** | **+0.0155** | **[+0.0118, +0.0192]** | **+0.0157** |
+
+Both exclude zero, and the corrected effect is positive on **30 of 31** targets. So the finding
+survives at 41 % of its reported magnitude. The reshaping gain is real and it is not +0.038.
+
+The gain also grows with `m` — median +0.0149 at `m = 5`, +0.0418 at `m = 10`, +0.1180 at `m = 20`
+(4 targets) — which is consistent with more neighbours carrying more rank structure, and which is why
+the fixed-`m` comparison flattered it.
+
+**And the optimal profile is Dudani's 1976 rule.** The mean optimal weight profile reported above has
+cosine similarity **0.9946** with `w_j` proportional to `1/j`, against 0.7002 with uniform. Dudani,
+"The Distance-Weighted k-Nearest-Neighbor Rule", IEEE Trans. SMC 6(4):325, 1976, is therefore the
+natural one-parameter competitor, and the project's own prior-art document lists a fifth pass on
+weighted kNN as required and never ran it. Whether the `m`-parameter fitted optimum beats a
+one-parameter inverse-rank kernel is **not settled here**: a reviewer's probe on 8 targets found the
+kernel ahead by 0.006, which is a probe and not a measurement. That comparison needs its own frozen
+plan and is the open question this correction leaves.
