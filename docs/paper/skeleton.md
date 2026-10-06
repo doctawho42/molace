@@ -1,183 +1,285 @@
-# From repository to paper: what the prior-art pass found, and what survives
+# Paper skeleton
 
-Written 2026-10-05, after Prokhorenkova saw the talk. This is a planning document, not a draft. Its
-job is to say what can honestly be claimed, and the answer changed twice while it was being written.
+Rewritten 2026-10-06, replacing the version now at `skeleton_superseded_2026-10-06.md`. The previous
+skeleton listed eight claims and treated the identity as the finding. Eleven adversarially-tested
+attempts to build something larger on it all died, with a diagnosable cause, and two of the eight
+claims turned out to be measured against baselines the comparison requires and the project never ran.
+This version says what the material supports.
 
-## The short version
+**Every section below carries a status line.** `replication`, `known object, new accounting`,
+`own contribution`, or `correction`. Nothing is presented as new unless an adversarial prior-art pass
+failed to place it.
 
-**The theory is not ours.** Three checks, three hits, each landing on a different piece of what the
-project had been calling its theoretical contribution. What survives is an empirical programme, a
-diagnosed negative result, and a transport argument between two literatures that mostly do not cite
-each other. That is still a paper. It is not the paper we thought.
+---
 
-## What the checks found
+## What this paper is
 
-### 1. The identity is a Dirichlet energy
+A methods paper about one quantity: the error of the k-nearest-neighbour mean of an activity on a
+molecular similarity graph. The paper writes it in closed form, shows that the published continuous
+modelability index is that quantity to within a percent, shows which of its two terms every published
+index omits, and shows that it is not a property of a dataset but of a dataset **and its size**.
 
-The floor predicts `yhat = A_norm y`, so its residual is `(I - A_norm) y` and its relative error is
-`||(I - A_norm) y||^2 / ||y||^2 = 1 - 2 m1 + m2`, with `m_j = y' A_norm^j y / y'y`. Verified to 1e-16
-on regular graphs. Target assortativity is exactly `m1`.
+**Working title.** *The nearest-neighbour floor in closed form: what a modelability index measures, and
+why it is not a property of a dataset.*
 
-Dirichlet energy as a homophily metric is standard in the heterophilic-graph literature; it appears
-as a workhorse measure in the Heterophilic Graph Learning Handbook (arXiv 2407.09618), where small
-energy is read as "signal is mostly low-frequency". So the mathematics of our identity is a known
-object, written in different notation.
+**Venue.** JCIM. The modelability programme is native there (Golbraikh 2014; Luque Ruiz & Gómez-Nieto
+2018; Aldeghi/Graff 2022) and so is its critique.
 
-**What may still be ours:** the exact accounting. The handbook says Dirichlet energy measures label
-smoothness. It does not say "Newman's target assortativity is the first moment, the shared-neighbour
-correlation is the second, and the kNN mean's error is `1 - 2 m1 + m2` exactly". Pinning which
-reported statistic is which moment is small, but it is the thing that makes the rest legible.
+**Honest ceiling.** A solid methods paper. Not a breakthrough, and the introduction should not pretend
+otherwise. The project's attempts at a breakthrough are recorded in `prereg/REFUSED_*` and in the
+refusal log, and the reason they failed is stated in the Limits section because it is informative.
 
-### 2. The two-statistic noise estimate is nugget estimation
+---
 
-`1 - nu = r^2 / rho_nn` extrapolates the label correlation at hop 1 and hop 2 back to hop 0. In
-geostatistics that is the nugget: the variogram's intercept at zero lag, read as measurement error
-plus microscale variance. It is standard practice and has been for decades.
+## 1. Introduction
 
-Worse for our originality, and better for our confidence: the known cautions are our findings.
+The modelability programme asks whether a dataset is worth modelling before a model is fitted. MODI
+(Golbraikh, Muratov, Fourches & Tropsha, *JCIM* 2014, 54(1):1–4) is an activity-class-weighted
+agreement of 1-nearest-neighbour pairs with a threshold of 0.65 calibrated on 100+ datasets; its
+continuous forms MODI_q2 and MODI_ssR2 are leave-one-out and leave-group-out q² of similarity search
+(Golbraikh et al., Springer 2014 and 2021). ROGI (Aldeghi, Graff et al., *JCIM* 2022, 62(19):4660) is a
+roughness scalar; ROGI-XD (Graff et al., *Digital Discovery* 2023, 2(5):1452) corrects its
+representation dependence. RMODI (Luque Ruiz & Gómez-Nieto, *JCIM* 2018, 58(10):2069) is the regression
+analogue. Kernel target alignment serves the same role in closed form (Marcou, Horvath & Varnek,
+*JCIM* 2016, 56(1):6).
 
-- Atkinson 1997 (Int. J. Remote Sensing) calls the nugget the most appropriate estimator of
-  measurement error, then says it is less reliable than previously thought because "it is impossible
-  to account for the form of the variogram near the ordinate when selecting a mathematical model".
-  Our geometric-decay model IS a choice of form near the origin, and our mixed-hop-length bias
-  (-0.222 at k = 10) is that caution, measured.
-- Kim et al. 2010 (J. Nonparametric Statistics) give asymptotics for the nugget estimator and
-  identify a regime where it suffers from strong dependency. Structurally our ill-conditioning.
-- Zimmerman 1991 (Environmetrics) designs sampling networks specifically to estimate the
-  nugget-to-sill ratio precisely. That is our five refused design gates, thirty-five years earlier.
+Every one of these is published as a **bare point estimate per dataset**. The ROGI authors say so in
+print: *"While we do not provide a statistical estimator of ROGI uncertainty..."*, and report that
+their bootstrap *"generally correlates with, but also underestimates, the ROGI error"*. No index in the
+line carries an interval, and none reports how it moves with the amount of data.
 
-**What may still be ours:** the transport to a setting with no metric, only hop counts, and the
-synthetic separation of the two failure modes with known ground truth. We did not know we were
-reproducing geostatistics; a reader will, so we must cite it and claim replication rather than
-discovery.
+This paper takes one estimator — the kNN mean — and writes its error exactly.
 
-### 3. The bridge is partly built
+---
 
-Moran's I already appears in GNN work; GNNs are already used for inductive kriging (arXiv 2401.12681);
-spatial heterophily is already a topic (Zhou et al., KDD 2023). So "graphs meet spatial statistics" is
-not virgin ground either.
+## 2. The closed form
 
-**What may still be ours:** the specific claim that the graph-ML homophily measures and the
-geostatistical nugget-to-sill question are the same question, and that the benchmark practice of
-reporting a homophily number per dataset is reporting a first moment with no error bar and no second
-moment. That is a position, and positions need evidence; we have it.
+**Status: known object, new accounting.**
 
-## What the paper actually is
+Standardise the activity. For the mean of a compound's `k` nearest neighbours,
 
-A measurement paper with a transport argument, not a theory paper.
+    MSE / sigma^2  =  1 + 1/k + ((k-1)/k) * rho_nn  -  2r
 
-**Title, working:** "The modelability index has a closed form: dataset modelability as a Dirichlet
-energy of activity on the similarity graph"
+with `r` Newman's target assortativity of the activity across graph edges and `rho_nn` the correlation
+between the activities of two compounds sharing a neighbour. Equivalently, with
+`A_norm = D^-1 A` and `m_j = y' A_norm^j y / y'y`,
 
-The earlier working title, "Homophily measures are a first moment", survives as the framing of section
-3 but no longer leads: after the prior-art pass the JCIM-native entry point is MODI, not homophily.
+    ||(I - A_norm) y||^2 / ||y||^2  =  1 - 2 m1 + m2 ,      m1 = r exactly.
 
-**Claims, each with the evidence that backs it**
+- **Exact on k-regular graphs**, pinned by `tests/test_neighbourhood.py` at `abs=1e-12`, so a broken
+  derivation fails the suite. Verified to 3.58e-15 over 1200 synthetic circulants.
+- **An approximation on real union-symmetrised kNN graphs**: mean absolute error 0.0256 as a point
+  prediction of the measured floor over 40 ChEMBL targets at k=10, max 0.0837, and stable in k
+  (0.0269, 0.0252, 0.0256, 0.0286, 0.0306 at k = 3, 5, 10, 20, 40).
 
-| # | Claim | Evidence | Strength |
+**What is not ours.** The right-hand side is a Dirichlet energy, a standard homophily and smoothness
+measure in the heterophilic-graph literature (Heterophilic Graph Learning Handbook, arXiv 2407.09618).
+As a risk it is the Wiener filter and the kriging system. The paper says so in this section rather than
+leaving a reviewer to say it.
+
+**What is ours.** The accounting. That `m1` *is* Newman's target assortativity, the statistic
+graph-learning benchmarks already report; that `m2` is the shared-neighbour correlation; and that the
+published continuous modelability index is this expression. Measured against MODI_q2 on 80 targets
+under a plan frozen before any value existed (`prereg/increment11_modi.yaml`, blob
+`acdba0f77ff9c8fc9149dc9cd8ed39db94122ae1`):
+
+| collection | targets | mean abs. difference | max | Pearson |
+|---|---|---|---|---|
+| ChEMBL-40 | 40 | 0.0103 | 0.0436 | 0.9975 |
+| MoleculeACE-30 | 30 | 0.0083 | 0.0238 | 0.9960 |
+| DeepDelta-10 | 10 | 0.0123 | 0.0362 | 0.9975 |
+
+Frozen threshold 0.05, held everywhere with a factor of four to spare. MODI_q2 costs one leave-one-out
+prediction per compound, eight thousand on the largest target here; the right-hand side costs two
+sparse matrix products and no prediction.
+
+---
+
+## 3. The term every published index omits
+
+**Status: own contribution, with a stated limit.**
+
+`m1` alone is what the field reports. The second moment is absent from MODI, MODI_q2, RMODI, ROGI and
+kernel target alignment alike. Dropping it costs a factor of 2.5 in level: reproducing MODI_q2 from
+`1 - r` alone gives mean absolute error 0.0257 against the full identity's 0.0103 on ChEMBL-40.
+
+**The limit, stated here and not buried.** On ECFP4/Tanimoto graphs the two moments are nearly
+collinear, Pearson `+0.9895` across the 40 ChEMBL targets. As a **ranker** the second moment adds
+little: Spearman against the measured floor is `+0.9345` for `1 - r` and `+0.9497` for the full
+identity, and its incremental ranking contribution covers zero on all three collections
+(+0.0156 [−0.0171, +0.0600]; +0.0120 [−0.0542, +0.0849]; +0.0485 [−0.1132, +0.3376]).
+
+So the claim is precise: **the second moment is necessary for the level and quiet for the ranking.**
+A paper that claimed it improves ranking would be refuted by its own numbers.
+
+---
+
+## 4. Modelability is not a property of a dataset
+
+**Status: own contribution. The paper's sharpest empirical section.**
+
+Every index in section 1 is reported per dataset, as though it were a property of the chemistry. It is
+a property of the chemistry **and the sample size**. On the same 40 ChEMBL targets, under a nested
+random subsample chain:
+
+| fraction of the data | mean n | assortativity r | kNN floor (rel. MSE) |
 |---|---|---|---|
-| 1 | Target assortativity predicts attainable accuracy | rho +0.875 / +0.909 / +0.810 on 40 independently curated ChEMBL targets; +0.77 / +0.82 / +0.76 on 10 DeepDelta benchmarks with published models | strong, four collections, and a replication of Golbraikh 2014 rather than a finding |
-| 2 | It does so beyond the existing roughness index | assortativity over ROGI +0.846 [+0.678, +0.928]; ROGI over assortativity +0.098, covers zero; ROGI alone does not predict. Against MODI the picture is symmetric: assortativity over MODI covers zero everywhere, MODI over assortativity +0.305 [+0.026, +0.539] on ChEMBL-40 | strong against ROGI, near-interchangeable with MODI |
-| 3 | The link is not an artefact of one fingerprint | +0.726 on RDKit descriptors; paired drop off ECFP4 +0.163 [+0.022, +0.358] | moderate, one alternative representation |
-| 4 | **UNDER CORRECTION.** It also says which model class wins, through the level | floor minus pointwise -0.343 [-0.619, -0.008]; floor wins 26/40, and 12/13 on the hardest third | moderate, interval thin |
-| 5 | For the kNN mean the link is exact, and equals a Dirichlet energy — so the published modelability index has a closed form | identity verified to 1e-16 on regular graphs; 0.025-0.031 mean absolute error as a point prediction over k = 3..40; reproduces MODI_q2 to 0.0083-0.0123 mean absolute difference on 80 targets, Pearson 0.996-0.998 | the paper's centre: object known, accounting new, measured against the published index |
-| 6 | **CORRECTED to +0.0155 [+0.0118, +0.0192].** The neighbourhood mean is calibrated in total weight and wrong in shape | weight sum 0.97, so rescaling buys +0.0000 [-0.0003, +0.0004] out of sample; reweighting by neighbour rank buys +0.0379 [+0.0314, +0.0442] on 31 ChEMBL targets and +0.0497 [+0.0417, +0.0577] on 14 MoleculeACE ones, beating a rank-shuffled null on 44 of 45; optimal profile 3.49x down to 0.19x | strong, pre-registered, and the opposite sign from what this table asserted before increment 12 |
-| 7 | The nugget-style noise estimate fails out of sample, and we know why | 2/30 violations against a pre-registered threshold of 1; synthetic separation into ill-conditioning and mixed hop lengths; 1/c(d)^2 overstatement predicted and measured to 0.07 % | strong as a negative result |
-| 8 | A structural limit: the regime where the second statistic matters most is the regime where the estimator built on it does not work | five refused design gates, variance decompositions 4.2 / 0.0 / 14.1 / 10.8 / 0.3 % | honest, and the most quotable sentence in the paper |
+| 1/8 | 345 | 0.292 | 0.697 |
+| 1/4 | 690 | 0.383 | 0.592 |
+| 1/2 | 1380 | 0.474 | 0.501 |
+| all | 2760 | **0.556** | **0.422** |
 
-**Claim 6 reversed under measurement, and is stronger for it.** The earlier version of this table
-said equal weights were within a thousandth of the best local linear predictor, and concluded that the
-floor-against-fitted-model gap could not come from weighting the neighbourhood better. Increment 12
-shows that conclusion rested on the exchangeability assumption rather than on data. Under
-exchangeability `1` is an eigenvector of the neighbour second-moment matrix and the cross-moment vector
-is parallel to it, so every optimal weight is *exactly* equal, the whole gap is `Var(mean)(1-beta)^2`,
-and fitting one scalar on the plain mean attains the k-dimensional optimum exactly. The assumption
-deletes the effect and leaves a calibration residue that reads as a null.
+Per target, `r(n) / r(n/8)` has median **1.986** — assortativity nearly doubles over an eightfold
+change in size — and the floor falls by a median 0.275 in relative MSE.
 
-Measured without it, the rank-resolved second moment falls from 0.714 to 0.476 across ten ranks, and
-reweighting is worth +0.038 to +0.050 skill out of sample against a rank-shuffled null of -0.002. So
-the paper's claim is now that the mean is calibrated in total and wrong in shape, which is a measured
-quantity with a sign rather than an assertion, and the vacuity theorem explains why nobody had looked:
-the natural model to write down forbids the question.
+**The consequence for the field's one published threshold.** MODI's 0.65 is crossed by growing alone:
+at `n/8` **2 of 40** targets clear it; at full `n`, **10 of 40**. Same targets, same chemistry, five
+times as many declared modelable because there is more data. "This dataset is not modelable" is, in
+part, "I do not have enough of this dataset yet".
 
-**This unsettles claim 4 and that is not resolved.** Claim 4 reads the floor beating fitted models on
-the hardest third as evidence about information outside the neighbourhood. If a better-shaped floor is
-worth +0.04 skill, part of that gap was weighting after all. The re-examination needs its own frozen
-plan and does not exist yet.
+**What this section does NOT claim.** It does not claim a scaling law. Extrapolating the curve from
+small subsamples is partly circular: for a fixed point set the j-th nearest neighbour in a subsample is
+the i-th in the full set with i negative-hypergeometric, so much of the n-dependence is order
+statistics rather than chemistry. The claim is the **observation** that the index moves, which is
+enough to invalidate reporting it without a size, and which no paper in the line reports.
 
-## Section plan
+**Pre-registration note.** The numbers above come from an exploratory probe and must be re-measured
+under a frozen plan before they enter the paper. See the blocking experiments below.
 
-1. **Setup.** The dataset as a comparison graph; what is measured; the three arms.
-2. **The measure predicts attainable accuracy.** Claims 1-3. Charts, not tables.
-3. **What the measure is.** Claim 5: the identity, its reading as a Dirichlet energy, assortativity
-   as the first moment, and the second moment nobody reports. Cite the handbook; claim the accounting,
-   not the object.
-4. **What averaging gets wrong.** Claim 6: the vacuity theorem, the measured rank profile, and the
-   scale-against-shape decomposition. Its consequence for claim 4 is stated as open, not as resolved.
-5. **A noise floor from two moments, and why it fails.** Claim 7, framed as a graph replication of
-   nugget estimation, citing Atkinson, Kim, Zimmerman.
-6. **A limit on the whole approach.** Claim 8.
-7. **Method.** Pre-registration, the refused gates, what was frozen when.
+---
 
-The Hodge half does not appear. It is a separate, weaker story and it dilutes this one.
+## 5. What the neighbourhood's internal structure buys
 
-## What has to happen before a word of the draft is written
+**Status: a theorem with no found collision, whose scope must be stated exactly, plus a correction.**
 
-1. ~~A real prior-art pass~~ **done.** `docs/paper/prior-art.md`, four passes. It found MODI, which
-   reframed the paper, and confirmed the nugget and Dirichlet collisions.
-2. ~~Run MODI as a measured baseline~~ **done, increment 11.** The identity reproduces MODI_q2 to
-   0.008-0.013 across 80 targets. `results/results_increment11.md`.
-3. ~~Relax exchangeability in claim 6~~ **done, increment 12.** It reversed the claim.
-   `prereg/increment12_local_weights.yaml`, `results/results_increment12.md`.
-4. One more search pass for closed-form or spectral treatments of MODI, the single collision that
-   would cost claim 5. A second pass is now also needed on rank-weighted or distance-weighted kNN in
-   QSAR, since claim 6's replacement is a statement about weighting and that literature is old.
-7. **Re-examine claim 4 under the reshaped floor**, with a frozen plan. This is the new blocker and it
-   is a claim the paper leans on.
-5. ~~Decide the venue~~ **done: JCIM**, molecular programme leading, transport as framing.
-6. ~~Co-authorship~~ **excluded by decision.**
+### 5.1 The vacuity theorem
 
-## Risk register
+With `c_i = E[z_v z_{u_i}]` and `C_ij = E[z_{u_i} z_{u_j}]` over a compound's `k` neighbours, the best
+linear predictor is `w* = C^-1 c` with `MSE* = 1 - c' C^-1 c`. If the neighbourhood is **second-order
+exchangeable**, `c = r 1` and `C = (1-rho) I + rho 11'`, so `1` is an eigenvector of `C` with eigenvalue
+`S = 1 + (k-1) rho` and `c` is parallel to it. Hence, with `beta = k r / S`:
 
-- **Novelty.** After three checks the theoretical contribution is a known object in new notation. If
-  a fourth check finds the exact identity stated somewhere, section 3 becomes a citation and the paper
-  leans entirely on sections 2, 4, 5 and 6. It would survive that.
-- **Claim 4's interval** clears zero by 0.008. Robust to the recovered-rounding check (200/200), but
-  it is thin and a reviewer will say so first.
-- **Claim 3** rests on one alternative representation. It is reported as one, not as generality.
-- **Claim 6's replacement is a weighting result**, which puts it next to a long line of
-  distance-weighted kNN work in QSAR that the four prior-art passes did not search for, because until
-  increment 12 the claim was not about weighting. That search has to happen before drafting.
-- **Claim 4 is now partly undermined by claim 6** and the paper cannot state both as they stand.
-- **Scope.** Thirty ChEMBL targets plus forty plus ten benchmarks is a lot of molecules and one domain.
-  Nothing here is shown outside molecular property prediction.
+    w*               = (r / S) 1            every optimal weight is EXACTLY equal
+    sum_i w*_i       = beta                 the weight sum is the regression slope on the mean
+    MSE_mean - MSE*  = Var(mean) (1-beta)^2 the whole gap is a squared scale error
+    MSE(best alpha * mean) = MSE*           exactly, for all k, r, rho
 
+Two independent derivations (Sherman–Morrison; permutation symmetry with a one-dimensional reduction)
+and a numerical sweep over 2000 random `(k, r, rho)` agreeing to 1.7e-15. An adversarial prior-art pass
+that killed six other proposals found no collision for this statement.
 
-## Two claims under correction, found 2026-10-06
+**Scope, stated because the paper will be attacked here.** The theorem bounds predictors that are
+**linear in the labels of a fixed neighbour set under a fixed metric**. It says nothing about a model
+reading the query molecule's own features. A two-line counterexample makes this explicit and belongs in
+the paper: with a latent shared coordinate, exchangeability holds exactly (`c_j` all 0.50, `C`
+off-diagonals 0.50, optimal weights equal to 3e-3), `MSE*` is 0.5466 and the plain mean 0.5502 — one
+scalar of headroom, as the theorem says — while a predictor reading the query's own features attains 0.
+**Therefore this theorem is not an explanation of why fitted models tie nearest-neighbour controls**
+(Janela & Bajorath, *Nature Mach. Intell.* 2022, 4:1246), and the paper must not claim that it is.
 
-Both were found by adversarial review of a later plan, and both are verified against committed data.
+What it does explain is narrower and real: **why the rank axis was never fitted.** Write the natural
+exchangeable model and the question "should nearer neighbours get more weight" cannot be posed, because
+the answer is provably "no, they are already equal". The residual then reads as a null.
 
-**Claim 4 is measured against an arm that excludes the best learner.** `skill_pointwise` in
-`results/separation_chembl.csv` is the mean of the histogram-gradient-boosting and MLP RMSEs, set by
-`MATCHED_FAMILIES = ("hgb", "mlp")` in `src/molace/models/pairwise.py` and used at
-`src/molace/models/gap.py:109`. SVM is excluded, and `src/molace/models/pointwise.py`'s own docstring
-says "SVM leads because it is the real bar... 21 of 30 targets, mean rank 1.60".
-`pointwise.select_by_cv` exists, takes no test arguments, and is called by **no script** —
-`tests/test_gap.py:97` even pins `assert "select_by_cv" not in src`.
+### 5.2 Neighbourhoods are not exchangeable, and the correction
 
-The averaging is **correct** for the pointwise-minus-pairwise gap, because both arms are averaged over
-the same two families and the difference is matched. It is **wrong** for claim 4, which compares the
-floor against the best a model can do. One number was used for two incompatible purposes. Over all 40
-ChEMBL targets the trained arms beat the floor on 14 of 40, median -0.016; the corrected comparison
-against the CV-selected learner has not been run and claim 4's sign is therefore not currently known.
+Measured for the first time here on molecular data: the second moment between a compound's activity and
+its j-th nearest neighbour's, averaged over 31 ChEMBL targets at k=10,
 
-**Claim 6's magnitude is 41 % of what this table said**, +0.0155 [+0.0118, +0.0192] rather than
-+0.0379, because the uniform baseline was fixed at `m = 10` while uniform at `m = 5` is better on 28 of
-31 targets. It still excludes zero and is positive on 30 of 31. See the correction appended to
-`results/results_increment12.md`. The optimal profile has cosine 0.9946 with `w_j` proportional to
-`1/j`, so Dudani 1976 is the competitor the claim must be stated against, and that comparison is not
-yet run.
+    rank  1     2     3     4     5     6     7     8     9    10
+    c_j  0.714 0.660 0.629 0.597 0.572 0.542 0.523 0.513 0.499 0.476
 
-**Consequence for the paper.** Claim 4 cannot be stated until the baseline audit runs. Claim 6 is
-restated at the corrected magnitude. The fifth prior-art pass on weighted kNN, listed as required in
-`docs/paper/prior-art.md` and never run, is now the blocking item it was always going to be.
+with mean decline `+0.2384 [+0.2165, +0.2603]`, excluding zero on every collection. The exchangeability
+hypothesis is materially false.
+
+**Status: correction.** Reweighting by rank is worth `+0.0155 [+0.0118, +0.0192]` out of sample,
+positive on **30 of 31** targets, against the best training-selected uniform `m` in each arm. The
+project first reported `+0.0379` against uniform at a fixed `m = 10`; 62 % of that was the effect of
+fixing `m`, since uniform at `m = 5` beats uniform at `m = 10` on 28 of 31 targets.
+
+**And the optimal profile is a 1976 rule.** Its cosine similarity with `w_j` proportional to `1/j` is
+**0.9946**, against 0.7002 with uniform. Dudani, *IEEE Trans. SMC* 1976, 6(4):325, is therefore the
+competitor this section is stated against, with Hechenbichler & Schliep 2004 and Samworth,
+*Annals of Statistics* 2012, as the theory. Whether the fitted `m`-parameter optimum beats the
+one-parameter inverse-rank kernel is **not settled** and is a blocking experiment.
+
+---
+
+## 6. Method, and six refusals
+
+**Status: own contribution, and the part no other group can copy.**
+
+Every increment carries a YAML pre-registration committed and referenced by its **git blob hash**,
+frozen before any measurement and never edited afterwards; scripts carry the blob in a module constant
+and print it first. Design gates are evaluated before outcomes are read. 422 tests.
+
+The project has **six times refused a verdict its own frozen rule granted**, because the design could
+not earn it. Five were design gates on the decoupling of the two moments, with a proved structural
+cause: on a stride-`d` circulant with an exponential field, `lambda = rho_nn / r = c(d)` is pinned to
+`r` by the field, so no graph construction can separate them. The sixth was refused before freezing,
+when the plan's apparatus gate was found already failed by the project's own committed data.
+
+**And a baseline audit on its own claims, which belongs in this paper because it is the subject
+Janela & Bajorath's 2023 title names.** Two claims the project had published were measured against
+baselines the comparison requires and the project never ran: the reshaping gain against a fixed `m`
+(section 5.2), and the model arm for the floor-versus-model comparison, which averages histogram
+gradient boosting and an MLP and **excludes the SVM** that the project's own code comments call the
+real bar. Over 40 targets the trained arms beat the floor on only 14 of 40, median −0.016, so the
+comparison's sign depends on a choice nobody declared. Reported as a case study, with the corrected
+numbers, not as a footnote.
+
+---
+
+## 7. Limits
+
+- **The object is classical.** The identity is a Dirichlet energy, the risk is the Wiener/kriging form,
+  the weighted-kNN result is adjacent to Dudani 1976 and Samworth 2012, and the noise-floor route is
+  the Gamma test (Stefánsson/Končar/Jones 1997; Evans & Jones, *Proc. R. Soc. A* 2002). Eleven
+  adversarially-tested attempts to build a larger claim on it failed, in three recurring ways: the
+  phenomenon involved models outside the theorem's class, or the extension landed in kriging, or the
+  question was already answered inside the class. This is stated because it bounds what a reader should
+  expect from the quantity, and it is the honest reason this is a methods paper.
+- **One domain, one representation family.** Everything is ECFP4/Tanimoto on molecular activity. The
+  representation check (section 3 of the old skeleton) survives on one genuinely different
+  representation: Spearman of rank assortativity against attained skill is +0.726 on RDKit
+  physicochemical descriptors, +0.893 on MACCS, +0.915 on atom pairs.
+- **The size result uses random subsampling**, not a realistic acquisition order. Real datasets grow by
+  medicinal-chemistry series, which plausibly grows homophily less than random growth does.
+- **The two moments are nearly collinear here** (Pearson +0.9895), so this data cannot separate their
+  contributions to ranking. The regime where it could is the one five refused gates showed is
+  unreachable at this sample size.
+- **No claim about which model class wins** until the baseline audit runs.
+
+---
+
+## Blocking experiments, in order
+
+1. **The baseline audit.** Re-measure the floor-versus-model comparison with the model arm selected by
+   `pointwise.select_by_cv` on the training split, reporting all three per-learner skills beside it.
+   Keep the matched average where it is correct, for the pointwise-minus-pairwise gap, and state in the
+   paper which arm each comparison uses. Cost: about one `separation_chembl` run.
+2. **Weighted kNN against Dudani.** The inverse-rank-power family `w_j ∝ j^-alpha`, declared on the 1976
+   citation so the family is not chosen after seeing the profile, with `m` and `alpha` selected by
+   5-fold CV on the training split; against uniform-at-best-`m` and against the fitted `C^-1 c`
+   optimum. Instrument checks: `alpha = 0` must reproduce the uniform arm to machine precision, and the
+   uniform `m=10` arm must reproduce `knn_floor.predict` to the 3.553e-15 already measured.
+3. **The size dependence, pre-registered.** Re-measure section 4 under a frozen plan, with the
+   subsampling scheme, the sizes, the seeds and the decision rule declared first, and with the
+   order-statistics confound stated as a limit rather than tested as a law.
+4. **The fifth prior-art pass**, which `prior-art.md` has listed as required since the weighted-kNN
+   result existed: Dudani 1976, Hechenbichler & Schliep 2004, Samworth 2012, locally weighted
+   regression in QSAR, and Janela & Bajorath's line (*Nature Mach. Intell.* 2022, 4:1246;
+   *Sci. Rep.* 2023, 13:17816; *Pharmaceuticals* 2023, 16(4):530) which is claim-4's prior.
+
+## Dropped, with the reason
+
+- **The noise floor and the attainable-accuracy ceiling.** The two-statistic estimator is nugget
+  estimation and fails out of sample; the identified set is `lambda_min(Sigma)` from minimum-trace
+  factor analysis; the training-free bound is the Gamma test. Keep one paragraph citing all three and
+  reporting the project's measured failure as a replication of a known failure mode.
+- **The Hodge half.** 96.6 % gradient and the proved collapse are pre-empted by Balduzzi et al.,
+  NeurIPS 2018, which owns the collapse statement, the closed-form potential and the orthogonal
+  gradient/curl split; HodgeRank owns the Pythagorean residual; Wetzel's twin-network line enforces
+  loop consistency verbatim. One sentence and a citation, or nothing.
+- **Learned geometry, learning curves, acquisition functions, spectral transport, impossibility
+  theorems.** All refused; see `prereg/REFUSED_increment13_homophilisation.yaml` and the refusal log.
