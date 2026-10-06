@@ -113,44 +113,47 @@ def main() -> int:
             "modi_binary": modi_binary(sim, cls) if cls is not None else np.nan,
             "best_skill": best[coll].get(name, np.nan),
         })
+        # progress goes to stderr: results/report_modi_baseline.txt is a tracked artefact and an
+        # elapsed time makes every reproduction of it show a spurious diff.
         print(f"  {coll:15s} {name:22s} n={len(y):5d}  MODI_q2={q2:+.3f}  "
-              f"тождество={rows[-1]['identity']:.3f}  1-q2={1-q2:.3f}  [{time.time()-t0:.0f}s]",
-              flush=True)
+              f"identity={rows[-1]['identity']:.3f}  1-q2={1-q2:.3f}  [{time.time()-t0:.0f}s]",
+              file=sys.stderr, flush=True)
     t = pd.DataFrame(rows)
     t.to_csv("results/modi_baseline.csv", index=False)
 
     print()
     print("=" * 100)
-    print("A. ВОСПРОИЗВОДИТ ЛИ ТОЖДЕСТВО MODI_q2 БЕЗ КРОСС-ВАЛИДАЦИИ")
+    print("A. DOES THE IDENTITY REPRODUCE MODI_q2 WITHOUT ANY CROSS-VALIDATION")
     print("=" * 100)
     ok = True
     for coll, s in t.groupby("collection", sort=False):
         d = (s.identity - s.modi_rel_error).abs()
         held = d.mean() < TOL
         ok &= bool(held)
-        print(f"  {coll:15s} n={len(s):3d}  средняя |разница| {d.mean():.4f}  макс {d.max():.4f}  "
-              f"Пирсон {s.identity.corr(s.modi_rel_error):.4f}  {'держит' if held else 'НЕ ДЕРЖИТ'}")
-    print(f"  порог {TOL} на каждой коллекции: {ok}")
+        print(f"  {coll:15s} n={len(s):3d}  mean |difference| {d.mean():.4f}  max {d.max():.4f}  "
+              f"Pearson {s.identity.corr(s.modi_rel_error):.4f}  "
+              f"{'holds' if held else 'DOES NOT HOLD'}")
+    print(f"  frozen threshold {TOL} on every collection: {ok}")
 
     print()
     print("=" * 100)
-    print("B и C. ГОВОРИТ ЛИ ОДНО ЧТО-ТО СВЕРХ ДРУГОГО (ожидалось: пусто)")
+    print("B AND C. DOES EITHER INDEX SAY ANYTHING OVER THE OTHER (expected: neither)")
     print("=" * 100)
     for coll, s in t.groupby("collection", sort=False):
         s = s.dropna(subset=["best_skill"]).copy()
         if len(s) < 8:
-            print(f"  {coll}: слишком мало целей со скиллом"); continue
+            print(f"  {coll}: too few targets carry an attained skill"); continue
         b = incremental_contribution(s, "best_skill", ["modi_q2"], predictor="rank_assortativity",
                                      n_resamples=DRAWS, seed=SEED)
         c = incremental_contribution(s, "best_skill", ["rank_assortativity"], predictor="modi_q2",
                                      n_resamples=DRAWS, seed=SEED)
-        f = lambda x: "исключает 0" if x.excludes_zero else "накрывает 0"
-        print(f"  {coll:15s} ассортативность сверх MODI {b.rho:+.3f} [{b.lo:+.3f}, {b.hi:+.3f}] {f(b)}"
-              f"   |   MODI сверх ассортативности {c.rho:+.3f} [{c.lo:+.3f}, {c.hi:+.3f}] {f(c)}")
+        f = lambda x: "excludes 0" if x.excludes_zero else "covers 0"
+        print(f"  {coll:15s} assortativity over MODI {b.rho:+.3f} [{b.lo:+.3f}, {b.hi:+.3f}] {f(b)}"
+              f"   |   MODI over assortativity {c.rho:+.3f} [{c.lo:+.3f}, {c.hi:+.3f}] {f(c)}")
 
     print()
     print("=" * 100)
-    print("D. ЧТО ДОБАВЛЯЕТ ВТОРОЙ МОМЕНТ, КОТОРОГО В MODI НЕТ")
+    print("D. WHAT THE SECOND MOMENT ADDS, WHICH NO PUBLISHED FORM OF MODI CARRIES")
     print("=" * 100)
     for coll, s in t.groupby("collection", sort=False):
         rng = np.random.default_rng(SEED)              # per collection, so a collection's interval
@@ -159,7 +162,6 @@ def main() -> int:
             continue
         a = stats.spearmanr(1 - s.assortativity, s.best_skill).statistic
         f = stats.spearmanr(s.identity, s.best_skill).statistic
-        names = s.dataset.to_numpy()
         draws = []
         for _ in range(DRAWS):
             pick = rng.choice(len(s), len(s), replace=True)
@@ -169,18 +171,18 @@ def main() -> int:
             if np.isfinite(v):
                 draws.append(v)
         lo, hi = np.percentile(draws, [2.5, 97.5])
-        print(f"  {coll:15s} одна ассортативность {abs(a):.3f}   полное тождество {abs(f):.3f}   "
-              f"разность {abs(f)-abs(a):+.4f} [{lo:+.4f}, {hi:+.4f}]  "
-              f"{'исключает 0' if lo > 0 or hi < 0 else 'накрывает 0'}")
+        print(f"  {coll:15s} assortativity alone {abs(a):.3f}   full identity {abs(f):.3f}   "
+              f"difference {abs(f)-abs(a):+.4f} [{lo:+.4f}, {hi:+.4f}]  "
+              f"{'excludes 0' if lo > 0 or hi < 0 else 'covers 0'}")
 
     bm = t.dropna(subset=["modi_binary"])
     if len(bm):
         print()
-        print(f"  бинарный MODI 2014 на флаге обрывов, {len(bm)} целей MoleculeACE: "
-              f"среднее {bm.modi_binary.mean():.3f}, разброс "
+        print(f"  binary MODI 2014 on the cliff flag, {len(bm)} MoleculeACE targets: "
+              f"mean {bm.modi_binary.mean():.3f}, range "
               f"[{bm.modi_binary.min():.3f}, {bm.modi_binary.max():.3f}]; "
-              f"порог модельируемости из статьи 0,65, выше него "
-              f"{int((bm.modi_binary > 0.65).sum())} из {len(bm)}")
+              f"the paper's modelability threshold is 0.65, and "
+              f"{int((bm.modi_binary > 0.65).sum())} of {len(bm)} clear it")
     return 0
 
 

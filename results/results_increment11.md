@@ -18,7 +18,7 @@ to that journal without MODI measured. 80 targets across three collections.
 | MoleculeACE-30 | 30 | **0.0083** | 0.0238 | 0.9960 |
 | DeepDelta-10 | 10 | **0.0123** | 0.0362 | 0.9975 |
 
-The frozen threshold was 0.05 on every collection. It holds everywhere with a factor of three to
+The frozen threshold was 0.05 on every collection. It holds everywhere with a factor of four to
 spare.
 
 This is the paper's central claim, and it is about cost as much as about structure. MODI_q2 requires a
