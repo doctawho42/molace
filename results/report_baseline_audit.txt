@@ -1,0 +1,42 @@
+pre-registration blob: 179b8bf128302f9c266dd7af9e2815c9049f18f2
+arms: floor | matched mean('hgb', 'mlp') | CV-selected of ('svm', 'hgb', 'mlp') | each learner
+split rng(0) 80/20, m=10, 5-fold CV on the training split, 10000 draws
+
+resuming from results/baseline_audit_partial.csv: 42 targets already done
+
+wrote results/baseline_audit.csv (70 targets)
+
+====================================================================================================
+GATE 1, THE INSTRUMENT: the unchanged floor must reproduce the committed values
+====================================================================================================
+  gate 1, provenance computed       n=12  max |drift| 5.551e-17  tolerance 1e-12   PASS
+  gate 1, provenance recovered_3dp  n=28  max |drift| 4.277e-04  tolerance 5e-04   PASS
+
+====================================================================================================
+ChEMBL-40
+====================================================================================================
+  learner chosen by CV on the training split: svm 34/40, hgb 6/40
+  mean skill per learner: svm +0.4221  hgb +0.3969  mlp +0.2446
+
+  floor - CV-selected  (PRIMARY)             -0.0754 [-0.0865, -0.0639] EXCLUDES 0   floor ahead on 3/40
+  floor - matched arm  (as claim 4 has it)   +0.0271 [+0.0118, +0.0450] EXCLUDES 0   floor ahead on 26/40
+  CV-selected - matched arm                  +0.1025 [+0.0899, +0.1156] EXCLUDES 0   floor ahead on 40/40
+
+  OUTCOME, by the frozen rule:
+    CLAIM 4 REVERSES. The floor does NOT beat the best fitted model, and the
+    earlier claim rested on an arm that excluded the strongest learner.
+
+  PREDICTION 1, svm chosen on at least 21 of 40: 34 of 40  HOLDS
+  PREDICTION 2, the floor's advantage shrinks: matched +0.0271 -> CV -0.0754  HOLDS
+
+====================================================================================================
+MoleculeACE-30
+====================================================================================================
+  learner chosen by CV on the training split: svm 30/30
+  mean skill per learner: svm +0.4524  hgb +0.4289  mlp +0.2751
+
+  floor - CV-selected  (PRIMARY)             -0.0949 [-0.1084, -0.0806] EXCLUDES 0   floor ahead on 1/30
+  floor - matched arm  (as claim 4 has it)   +0.0056 [-0.0114, +0.0234] covers   0   floor ahead on 18/30
+  CV-selected - matched arm                  +0.1005 [+0.0843, +0.1182] EXCLUDES 0   floor ahead on 30/30
+
+
