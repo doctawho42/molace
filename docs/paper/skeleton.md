@@ -148,6 +148,44 @@ under a frozen plan before they enter the paper. See the blocking experiments be
 
 ---
 
+## 4a. A model arm is a choice, and this one was worth 0.10 skill
+
+**Status: own contribution, and a withdrawal.**
+
+The project previously claimed the kNN floor beats fitted models. It does not. Measured under a plan
+frozen before any number existed, with an instrument gate confirming the floor arm reproduces the
+earlier numbers to 5.551e-17:
+
+| | mean | interval | floor ahead on |
+|---|---|---|---|
+| ChEMBL-40, floor − CV-selected learner | **−0.0754** | [−0.0865, −0.0639] | 3 / 40 |
+| MoleculeACE-30, floor − CV-selected learner | **−0.0949** | [−0.1084, −0.0806] | 1 / 30 |
+| ChEMBL-40, CV-selected − the arm used before | **+0.1025** | [+0.0899, +0.1156] | 40 / 40 |
+
+The earlier arm averaged histogram gradient boosting with an MLP and excluded the SVM. Per-learner mean
+skill on ChEMBL-40: svm +0.4221, hgb +0.3969, mlp +0.2446. Cross-validation on the training split picks
+the SVM on 34 of 40 ChEMBL and 30 of 30 MoleculeACE targets, so the arm averaged the second-best learner
+with the worst and left out the one that wins.
+
+**+0.1025 is larger than every effect this paper reports**: the reshaping gain is +0.0155, the second
+moment's ranking contribution +0.0156, the MODI reproduction error 0.0103. The choice of baseline
+dominated the science, and nothing in the repository recorded that a choice had been made.
+
+**And the same error, pointed at us.** The audit fixed the model arm and left the floor at a fixed
+`m = 10`. Giving the floor its better `m` narrows the gap from −0.0824 to −0.0596 [−0.0708, −0.0482],
+still excluding zero, floor ahead on 1 of 31. Reported as a sensitivity because it was not
+pre-registered; a symmetric pre-registered version is owed.
+
+**What stays open.** Janela & Bajorath (*Nature Mach. Intell.* 2022, 4:1246) report the simple control
+meeting or exceeding complex ML. We do not reproduce that tie — but their control is 1-NN/kNN with their
+choices and ours is a uniform mean over 10 nearest training neighbours at fixed `m`, on a different
+selection and a single 80/20 split. The sensitivity shows `m` alone carries 0.023 of the 0.075. Settling
+it means running their protocol on their public data
+(`github.com/TiagoJanela/ML-for-compound-potency-prediction`), which is now the best-motivated experiment
+in the queue.
+
+---
+
 ## 5. What the neighbourhood's internal structure buys
 
 **Status: a theorem with no found collision, whose scope must be stated exactly, plus a correction.**
@@ -248,16 +286,18 @@ numbers, not as a footnote.
 - **The two moments are nearly collinear here** (Pearson +0.9895), so this data cannot separate their
   contributions to ranking. The regime where it could is the one five refused gates showed is
   unreachable at this sample size.
-- **No claim about which model class wins** until the baseline audit runs.
+- **The floor does not beat the best fitted model**, so the paper makes no claim that a simple control
+  suffices. Whether it *ties* under a protocol closer to Janela & Bajorath's remains open; see 4a.
 
 ---
 
 ## Blocking experiments, in order
 
-1. **The baseline audit.** Re-measure the floor-versus-model comparison with the model arm selected by
-   `pointwise.select_by_cv` on the training split, reporting all three per-learner skills beside it.
-   Keep the matched average where it is correct, for the pointwise-minus-pairwise gap, and state in the
-   paper which arm each comparison uses. Cost: about one `separation_chembl` run.
+1. ~~The baseline audit~~ **DONE, increment 14.** `prereg/increment14_baseline_audit.yaml`, blob
+   `179b8bf128302f9c266dd7af9e2815c9049f18f2`; `results/results_increment14.md`. **Claim 4 reverses.**
+   The floor loses to the CV-selected learner by −0.0754 [−0.0865, −0.0639] on ChEMBL-40, ahead on 3 of
+   40, and by −0.0949 [−0.1084, −0.0806] on MoleculeACE-30, ahead on 1 of 30. The arm choice was worth
+   +0.1025 [+0.0899, +0.1156]. See the new section 4a below.
 2. **Weighted kNN against Dudani.** The inverse-rank-power family `w_j ∝ j^-alpha`, declared on the 1976
    citation so the family is not chosen after seeing the profile, with `m` and `alpha` selected by
    5-fold CV on the training split; against uniform-at-best-`m` and against the fitted `C^-1 c`
