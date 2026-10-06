@@ -1,0 +1,138 @@
+# Increment 14, frozen before any number under it exists.
+#
+# WHY. Claim 4 of docs/paper/skeleton.md says the kNN floor beats fitted models, on an interval that
+# "clears zero by 0.008". The model arm it is measured against is mean(hgb, mlp): see
+# MATCHED_FAMILIES = ("hgb", "mlp") at src/molace/models/pairwise.py:34, used at
+# src/molace/models/gap.py:109. It EXCLUDES the SVM, and src/molace/models/pointwise.py's own docstring
+# says, verbatim: "SVM leads because it is the real bar. From MoleculeACE's own shipped results matrix,
+# ECFP-SVM takes 21 of 30 targets on RMSE with mean rank 1.60". The function that would fix this,
+# pointwise.select_by_cv, exists, takes no test arguments by design, and is called by NO script;
+# tests/test_gap.py:97 even pins `assert "select_by_cv" not in src`.
+#
+# The averaging is CORRECT where it is used for its purpose. The pointwise-minus-pairwise gap needs
+# matched families, because both arms are averaged over the same two learners and the difference is
+# therefore a comparison of architectures rather than of learner sets. It is WRONG as the model arm for
+# a floor-versus-best-model comparison, which is what claim 4 is. One number served two incompatible
+# purposes, and nothing in the repository recorded that it was doing so.
+#
+# This increment measures the comparison claim 4 requires and the project never ran. It does not
+# re-specify claim 4; it supplies the arm claim 4 should always have used, and reports what that does to
+# the sign. The matched arm is reported beside it, unchanged, so the size of the error is visible.
+#
+# A TIE IS A POSITIVE RESULT HERE, AND THIS IS DECLARED IN ADVANCE SO IT CANNOT BE SPUN LATER. Janela
+# and Bajorath, "Simple nearest neighbor analysis meets the accuracy of compound potency predictions
+# using complex machine learning models", Nature Machine Intelligence 2022, 4:1246-1255, report that
+# simple nearest-neighbour analysis consistently meets or exceeds state-of-the-art machine learning on
+# this task, and recommend that such controls be included in every evaluation. If the floor and the
+# CV-selected arm tie on these 40 independently curated targets, that is an independent replication of
+# a published finding on new data, and the report says so. It is NOT a null and must not be written as
+# "no difference found".
+
+provenance:
+  claim_under_test: claim 4 of docs/paper/skeleton.md
+  prior_claim_this_may_replicate: >
+    Janela and Bajorath, Nature Machine Intelligence 2022, 4:1246-1255 (observation);
+    Janela and Bajorath, Scientific Reports 2023, 13:17816 (their proposed mechanism, a
+    marginal-distribution artefact, which is NOT tested here);
+    Janela and Bajorath, Pharmaceuticals 2023, 16(4):530 (their interventional test of it)
+  what_this_increment_does_not_do: >
+    It does not test any mechanism for a tie, and it makes no claim about why methods perform alike.
+    The project's exchangeability theorem bounds predictors linear in the labels of a fixed neighbour
+    set and provably does not bound a learner reading the query's own features, so it is not offered
+    here as an explanation.
+
+shared:
+  collections:
+    primary: the 40 ChEMBL targets of prereg/increment3_chembl.yaml, blob 7519ef31c4374637483bae167221f9b7567ece7f
+    secondary: the 30 MoleculeACE targets, where the docstring's 21-of-30 claim lives
+  representation: ECFP4, Morgan radius 2, 2048 bits, exactly as src/molace/graphs/fingerprints.py
+  similarity: Tanimoto, exactly as tanimoto_matrix
+  split: >
+    random 80/20 per target, numpy default_rng(0), tr = rng.random(len(y)) < 0.8, identical to
+    scripts/separation_chembl.py line 68 and therefore to the committed claim-4 numbers
+  m: 10 anchors, models.anchors.select, the project's fixed constant
+  k: 10 for the graph statistics, the project's fixed constant
+  seed: 0 everywhere, for the split, for every learner, and for the CV folds
+  skill: 1 - RMSE_arm / RMSE_baseline, baseline = predicting the training mean on the test split
+  uncertainty: cluster bootstrap, 10000 draws, seed 0, each target its own cluster, percentile interval
+
+arms:
+  - id: floor
+    definition: models.knn_floor.predict over models.anchors.select at m = 10, uniform weights
+    note: unchanged from every earlier increment; it is the instrument check below
+  - id: pointwise_matched
+    definition: mean of the hgb and mlp test RMSEs, i.e. the arm claim 4 currently uses
+    note: reported unchanged so the size of the baseline error is visible, not to be improved
+  - id: pointwise_cv
+    definition: >
+      the learner chosen by models.pointwise.select_by_cv(X_train, y_train, seed=0, n_folds=5) on the
+      TRAINING split alone, then refitted on the whole training split and evaluated on the test split
+    note: this is the arm the comparison requires
+  - id: per_learner
+    definition: svm, hgb and mlp individually, each fitted on the training split and scored on the test
+    note: all three reported for every target so no learner set can be chosen afterwards
+leakage_boundary: >
+  select_by_cv sees only the training split, by its signature. Learners are fitted on the training
+  split. The test split is touched once, for scoring. No selection anywhere uses a test label.
+
+design_gate:
+  evaluated_before_any_outcome: true
+  gate_1_instrument:
+    passes_iff: >
+      the floor arm reproduces results/separation_chembl.csv's skill_knn_floor to within 1e-12 on every
+      one of the 40 ChEMBL targets
+    why: >
+      nothing about the floor changed, so a drift means this script is not measuring what the committed
+      claim measured, and no comparison between them would be valid
+    if_it_fails: the increment stops and the discrepancy is the report
+
+predictions_registered_in_advance:
+  prediction_1:
+    text: >
+      select_by_cv picks svm on a majority of the 40 ChEMBL targets, because pointwise.py's docstring
+      asserts svm is the real bar
+    holds_iff: svm is the selected learner on at least 21 of 40 ChEMBL targets
+    if_it_fails: >
+      the docstring's basis is a MoleculeACE results matrix and does not transfer to independently
+      curated ChEMBL targets, and that leads the report ahead of the outcome
+  prediction_2:
+    text: the floor's advantage over the model arm shrinks when the arm is the CV-selected learner
+    holds_iff: >
+      mean(skill_floor - skill_pointwise_cv) is less than mean(skill_floor - skill_pointwise_matched)
+    note: >
+      direction only, no threshold, because the SIGN of the first quantity is the question this
+      increment exists to answer and must not be pre-judged
+
+outcome_rule:
+  primary_statistic: >
+    the paired per-target difference skill_floor - skill_pointwise_cv on the 40 ChEMBL targets, with the
+    cluster bootstrap above
+  claim_4_survives_iff: the mean difference is positive and its interval excludes zero
+  claim_4_reverses_iff: >
+    the mean difference is negative and its interval excludes zero. The paper then states in its
+    headline that the floor does not beat the best fitted model and that the earlier claim rested on an
+    arm that excluded the strongest learner.
+  the_two_tie_iff: >
+    the interval covers zero. This is reported as an independent replication of Janela and Bajorath
+    2022 on 40 independently curated targets, with the interval's width given so the reader can see
+    what was excluded. It is NOT written as a null and NOT written as "claim 4 not established".
+  additionally_reported_whatever_happens: >
+    the same three branches evaluated on the 30 MoleculeACE targets, and the sign count of
+    skill_floor - skill_pointwise_cv per collection
+
+reported_unconditionally:
+  - the selected learner per target and the frequency table over learners, per collection
+  - all three per-learner skills per target
+  - pointwise_matched beside pointwise_cv, with their difference, which is the magnitude of the
+    baseline error in claim 4
+  - the floor's instrument check residual against the committed values
+  - the per-target table in full, so any arm set a reader prefers can be recomputed from it
+
+forbidden:
+  - Changing the arms, the selection rule, the fold count, the seeds or the thresholds after seeing a number.
+  - Tuning any learner. All hyperparameters are exactly those already in src/molace/models/pointwise.py.
+  - Reporting pointwise_cv without pointwise_matched beside it.
+  - Reading an interval that covers zero as "no difference" without its width and without the
+    replication reading declared above.
+  - Dropping a target after seeing its result.
+  - Offering any mechanism for a tie. This increment measures a comparison and nothing else.
