@@ -1,0 +1,473 @@
+# Increment 15, frozen before any number under it exists.
+#
+# WHY. Section 4 of docs/paper/skeleton.md claims modelability is a property of a dataset AND its
+# size, and carries a four-row table over nested random subsamples of the 40 ChEMBL targets. The
+# section's own last paragraph says the numbers "come from an exploratory probe and must be
+# re-measured under a frozen plan before they enter the paper". This is that plan. It is blocking
+# experiment 3 of the skeleton's queue.
+#
+# WHAT THE REPOSITORY HOLDS, CHECKED BEFORE THIS PLAN WAS WRITTEN.
+#   The f = 1 row reproduces exactly from committed results/modi_baseline.csv: mean n 2760.4, mean
+#   assortativity 0.5556, mean relative MSE 0.4217 (its modi_rel_error column, which is 1 - modi_q2
+#   and is misnamed), and modi_q2 > 0.65 on exactly 10 of 40 targets. Those are the skeleton's
+#   2760 / 0.556 / 0.422 / "10 of 40".
+#   The f = 1/8, 1/4 and 1/2 rows, the median ratio r(n)/r(n/8) = 1.986, the median floor fall of
+#   0.275 and the "2 of 40" at n/8 have NO committed artefact anywhere in the repository. They exist
+#   only as prose in the skeleton.
+#
+# THIS IS NOT A BLIND PRE-REGISTRATION AND DOES NOT PRETEND TO BE. The exploratory values are known
+# to its author and are written out under provenance so that no prediction below can be passed off as
+# a discovery. A pilot of arm B on committed data is also known and is disclosed: explained_fraction
+# came out at 0.978. Gate 2 is therefore declared as an INSTRUMENT CHECK ON A CLOSED-FORM PREDICTION,
+# not as a test of an open question, and the increment does not advertise a foregone conclusion as its
+# unknown.
+#
+# THREE SPECIFICATION ERRORS IN SECTION 4, FOUND BEFORE ANY MEASUREMENT.
+#
+#   (1) THE THRESHOLD IS THE WRONG INDEX'S. Section 4 counts targets with modi_q2 > 0.65 and calls
+#   0.65 "the field's one published threshold". Golbraikh, Muratov, Fourches and Tropsha, JCIM 2014,
+#   54(1):1-4, calibrate 0.65 on MODI, the activity-class-weighted 1-NN agreement, not on the
+#   continuous MODI_q2. This project's own code agrees: scripts/modi_baseline.py:185 applies 0.65 to
+#   modi_binary, and docs/paper/prior-art.md records the binary index running 0.693 to 0.809 on
+#   MoleculeACE and saturating "where the continuous quantities still separate". The modi_binary
+#   column of results/modi_baseline.csv is empty for all 40 ChEMBL rows because this project has no
+#   activity-class labels for ChEMBL. So the published threshold cannot be evaluated on the primary
+#   collection at all, and transposing it onto q2 is this project's step, not the source's. Crossing
+#   counts are therefore reported over a declared GRID of thresholds, and no number computed on
+#   modi_q2 is ever called "the field's threshold".
+#
+#   (2) THE CONFOUND IS UNDERSTATED, NOT OVERSTATED, AND IT IS CLASSICAL. Section 4 says the
+#   n-dependence "is order statistics rather than chemistry" only "partly", and states it as a limit.
+#   Under uniform subsampling of a FIXED point set with a FIXED metric, rank dilution is the only
+#   channel through which n can act: nothing about the chemistry changes, so every bit of the movement
+#   must come from which ranks of the full ordering survive. "Partly" is the wrong word. Further, that
+#   channel is published: see prior_art_this_sits_against.rank_dilution_is_classical. This plan
+#   therefore measures the decomposition instead of declaring the confound, and claims no novelty for
+#   the mechanism.
+#
+#   (3) THE SUBSAMPLE INDEX SET MUST BE SORTED, AND THE DRAFT OF THIS PLAN DID NOT SAY SO. Both
+#   neighbour selectors in this codebase break similarity ties on the ascending index:
+#   src/molace/graphs/knn.py:28 by np.lexsort((index, -s)) and scripts/modi_baseline.py:58 by
+#   np.argsort(-s, kind="stable"). Ties are not an edge case: 35.5 % of rows on CHEMBL4805_Ki and
+#   26.8 % on CHEMBL217_Ki have their 10th and 11th similarity exactly equal. An unsorted index set
+#   therefore changes which molecules land inside the k. Measured on three targets and three chains,
+#   an unsorted set at f = 1.0 moves all four gated columns by 8.0e-5 to 1.13e-2, up to ten orders
+#   above gate 1's tolerance, while the sorted set reproduces them at exactly 0.0. See
+#   shared.subsampling_of_a_target.index_set.
+
+provenance:
+  claim_under_test: section 4 of docs/paper/skeleton.md
+  exploratory_values_known_to_the_author:
+    note: >
+      declared because a prediction cannot be registered as blind when its value already sits in a
+      committed document. These are the numbers to be replicated or contradicted.
+    f_eighth: {mean_n: 345, assortativity: 0.292, floor_rel_mse: 0.697, crossing_count_at_0.65: 2}
+    f_quarter: {mean_n: 690, assortativity: 0.383, floor_rel_mse: 0.592}
+    f_half: {mean_n: 1380, assortativity: 0.474, floor_rel_mse: 0.501}
+    f_one: {mean_n: 2760, assortativity: 0.556, floor_rel_mse: 0.422, crossing_count_at_0.65: 10}
+    per_target: {median_ratio_r: 1.986, median_floor_fall: 0.275}
+    committed_provenance: f_one only, from results/modi_baseline.csv. The rest have none.
+  pilot_of_arm_b_known_to_the_author:
+    value: explained_fraction 0.978, on committed data, before this plan was written
+    consequence: >
+      gate 2 is an instrument check on a closed-form prediction, not a hypothesis test. It is
+      specified two-sided below so that a value far from the prediction is readable as the
+      instrument failure it would be, in either direction.
+  prior_art_this_sits_against:
+    modelability_line: >
+      Golbraikh, Muratov, Fourches and Tropsha, JCIM 2014, 54(1):1-4 (MODI, the 0.65 threshold);
+      Golbraikh et al., Springer 2014 and 2021 (MODI_q2, MODI_ssR2);
+      Luque Ruiz and Gomez-Nieto, JCIM 2018, 58(10):2069 (RMODI);
+      Aldeghi, Graff et al., JCIM 2022, 62(19):4660 and Graff et al., Digital Discovery 2023,
+      2(5):1452 (ROGI, ROGI-XD), whose authors state in print that they supply no uncertainty
+      estimator.
+    rank_dilution_is_classical:
+      note: >
+        THE MECHANISM ARM B ISOLATES IS PUBLISHED AND THIS PLAN CLAIMS NO NOVELTY FOR IT. Added
+        after an adversarial prior-art pass on the draft of this plan.
+      samworth_2012: >
+        Samworth, Annals of Statistics 2012, 40(5):2733, Theorem 1: regret = gamma_n(w){1+o(1)} with
+        gamma_n(w) = B1 sum_i w_ni^2 + B2 (sum_i alpha_i w_ni / n^{2/d})^2 and
+        alpha_i = i^{1+2/d} - (i-1)^{1+2/d}. For the unweighted k-NN rule the alpha sum telescopes to
+        k^{1+2/d}, so the squared-bias factor is exactly (k/n)^{2/d}: n enters only through k/n, that
+        is only through which ranks are read. This is the channel arm B isolates.
+      near_neighbour_distance_moments: >
+        E[eps_k^alpha(x)] <= C (k/(gamma n))^{alpha/D} for the k-th nearest-neighbour distance, which
+        cites Evans, Jones and Schmidt, Proc. R. Soc. A 2002, 458:2839-2849 for the same moments.
+        doi 10.1098/rspa.2002.1011 is the companion on asymptotic near-neighbour distance moments and
+        is the better citation for arm B's rank law; doi 10.1098/rspa.2002.1010 is "A proof of the
+        Gamma test".
+      gamma_test_m_test: >
+        The Gamma test line already cited at docs/paper/skeleton.md:275 and :318 contains a named,
+        implemented and documented procedure for exactly this increment's operation: the M-test, as in
+        the R package `sr` ("Smooth Regression - The Gamma Test and Tools", Haythorn, crediting
+        Antonia Jones), whose get_Mlist "investigates the effect of sample size by calculating Gamma
+        on larger and larger samples" and whose documentation reads the result as convergence: "the
+        graph will become stable when the sample size is large enough", "Gamma will converge on the
+        true noise in the relationship as sampling density on the function increases". This is an
+        extension of a citation the paper already carries, not a new discovery; what is new here is
+        the M-test's placement against section 4 rather than only against section 5, and the fact that
+        its standard reading (convergence towards a truth) is the opposite of section 4's reading
+        (the index is not a property of the data). The report must state both readings and must not
+        assert that either is settled by this measurement.
+  what_this_increment_does_not_do: >
+    It fits no scaling exponent, no power law and no extrapolation, for the reason recorded under
+    forbidden, which is evidential and not stylistic. It makes no claim about any sample size outside
+    [1/8, 1] of each target, and no claim that a realistic medicinal-chemistry acquisition order
+    behaves like uniform subsampling. It offers no mechanism for any residual arm B leaves.
+
+shared:
+  collection:
+    primary: >
+      the 40 ChEMBL targets of prereg/increment3_chembl.yaml, in the row order of
+      data/raw/chembl_targets/selected.csv, which fixes the target_index used in every seed
+    secondary: >
+      the 30 MoleculeACE targets, for the published binary index only, because that is the one
+      collection where a class flag exists and 0.65 is the source's own threshold
+  representation: ECFP4, Morgan radius 2, 2048 bits, exactly molace.graphs.fingerprints.ecfp4
+  similarity: Tanimoto, exactly tanimoto_matrix, computed ONCE per target on the full set
+  subsampling_of_a_target:
+    scheme: >
+      nested. perm = numpy.random.default_rng((15, target_index, chain)).permutation(n), and the
+      subsample at fraction f is the index set S_f below. perm does not depend on f, so
+      S_{1/8} is a subset of S_{1/4} is a subset of S_{1/2} is a subset of S_1.
+    index_set:
+      definition: S_f = numpy.sort(perm[:n_f]), AT EVERY FRACTION, not only at f = 1
+      why: >
+        sorting cannot change a set, so nesting, n_f and the minimum-size rule are untouched, but it
+        fixes the one thing that is otherwise undetermined: the index order inside the submatrix, on
+        which both neighbour selectors break similarity ties. Sorted, the subsample uses the same
+        ascending-original-index tie-break as the committed row it is compared against. Unsorted, the
+        four gated columns move by up to 1.13e-2; sorted, they reproduce at exactly 0.0. See
+        specification error (3) in the header.
+    n_f: int(numpy.floor(f * n)), declared as floor so no rounding convention is ambiguous
+    fractions: [0.125, 0.25, 0.5, 1.0]
+    chains: [0, 1, 2, 3, 4]
+    f_one_is_deterministic:
+      statement: >
+        at f = 1.0, n_f = n and S_1 = numpy.sort(perm[:n]) = numpy.arange(n) for every chain, so all
+        five chains give the identical result and the cell is computed once and reused
+      note: >
+        this is a consequence of the sort, not of any permutation invariance. Without the sort the
+        five chains give five different values for every statistic, which is how specification
+        error (3) was found.
+    seed_construction: >
+      default_rng((15, target_index, chain)). No call to hash() anywhere, per the bug fixed in commit
+      c2e7f4e; target_index is the row index in the committed selected.csv.
+  minimum_size_rule:
+    declared_before_measurement: true
+    rule: no target is dropped at any fraction
+    why_it_is_safe: >
+      the smallest target is CHEMBL4805_Ki at n = 583, so the smallest subsample is
+      floor(0.125 * 583) = 72, and knn_graph's kk = min(k, n - 1) therefore equals 10 at every
+      fraction on every target. The number is written here so it cannot be used afterwards as a
+      reason to drop a target whose result is inconvenient.
+  statistics_measured_per_configuration:
+    - assortativity: molace.measures.assortativity.target_assortativity on knn.knn_graph(sim, 10)
+    - rank_assortativity: the shape-robust version, same module, reported beside it
+    - rho_shared_neighbour: molace.measures.neighbourhood.shared_neighbour_correlation, seed 0
+    - identity: 1 + 1/k + (k-1)/k * rho - 2 * r at k = 10, the k-regular closed form
+    - modi_q2: the leave-one-out q2 of similarity search, as scripts/modi_baseline.py's modi_q2
+    - floor_rel_mse: 1 - modi_q2, the quantity section 4's fourth column reports
+    - sse and sst: carried SEPARATELY, because arm A-prime below needs the numerator and the
+      denominator of floor_rel_mse apart from each other
+    - mean_degree, coverage, n_pairs, n_f: carried so no reader has to trust an average
+  k: 10 for the graph and for the neighbour mean, the project's fixed constant
+  uncertainty:
+    per_target_values: averaged over the five chains before any bootstrap
+    bootstrap: >
+      cluster bootstrap, molace.analysis.correlate.cluster_bootstrap_mean, 10000 draws, seed 0, each
+      target its own cluster, percentile interval. Targets are resampled; chains are not.
+    ratios: >
+      declared before measurement because an interval on a ratio of two means has no default: for
+      every ratio reported below, targets are resampled and THE RATIO OF THE TWO MEANS IS RECOMPUTED
+      INSIDE EACH DRAW, paired over targets. Not a ratio of two separately bootstrapped means.
+    per_target_ratios: >
+      where a per-target ratio is reported, it is the ratio of the two chain MEANS, never the mean of
+      the five chain-level ratios. The two are different statistics and the choice is made here.
+
+arms:
+  - id: A_measured
+    definition: >
+      subsample the target to S_f, take sim[numpy.ix_(S_f, S_f)] and y[S_f], rebuild the kNN graph on
+      it, and measure every statistic above on the subsample alone, including its own label mean and
+      variance. floor_rel_mse_A = SSE_sub / SST_sub.
+    note: this is what section 4 reports, and what the field would report if it reported n at all
+  - id: A_prime_bookkeeping
+    definition: >
+      floor_rel_mse_A' = (SSE_sub / n_f) / (SST_full / n). Arm A's numerator over arm B's
+      denominator. No new measurement, no new seed, no new thinning: SSE_sub and n_f come from arm A
+      and SST_full / n from the f = 1 cell.
+    why_it_exists: >
+      so that the decomposition is exact rather than asymptotic. Per (target, fraction, chain),
+      D_A - D_B = (D_A - D_A') + (D_A' - D_B) holds identically, with the FIRST term the entire
+      variance-normaliser channel and the second the rank-dilution comparison with the normaliser
+      held common. Without it the reported residual silently contains a normaliser term that points
+      in the same direction as the effect section 4 wants to find. An earlier draft proposed
+      subtracting an asymptotic 1/n_f correction instead; that recovers only about 37 % of the
+      channel and would have labelled the problem solved.
+  - id: B_rank_dilution_null
+    definition: >
+      all n molecules retained. For each molecule i independently, draw an EXACT uniform subset of
+      exactly n_f - 1 of the other n - 1 molecules without replacement, by
+      numpy.random.default_rng((15, target_index, chain, 1)).choice(others, size=n_f-1,
+      replace=False), and let i's neighbours be the first k survivors of i's full similarity ordering,
+      that ordering being the deterministic one with ties broken on ascending ORIGINAL index, exactly
+      as modi_q2's stable argsort. Then recompute the leave-one-out sum of squares over all n
+      molecules against the FULL label mean and variance: floor_rel_mse_B = SSE_full_thinned /
+      SST_full.
+    what_it_holds_fixed: >
+      the point set, every pairwise similarity, the label distribution, SST, and the set of molecules
+      scored
+    what_it_changes: only which ranks of each molecule's own full ordering are read
+    exactness: >
+      EXACT, not approximate. The rank of the j-th survivor under a uniform subset of exactly n_f - 1
+      of the other n - 1 is negative hypergeometric with mean j*n/n_f, and the construction above
+      realises that law rather than approximating it. An earlier draft used Bernoulli(f) thinning on
+      a cost argument; the cost argument was simply wrong. Timed on the largest target,
+      CHEMBL217_Ki at n = 8205, f = 1/8: one exact chain 0.4 s against 0.7 s for Bernoulli, because
+      Generator.choice(replace=False) uses a Floyd sampler and is O(n * n_f) while per-molecule
+      Bernoulli draws n - 1 uniforms and is O(n^2). Using the exact law removes the approximation,
+      and with it the whole instrument gate the draft needed to police it.
+    fewer_than_k_survivors: >
+      cannot occur. The smallest n_f - 1 in the design is floor(0.125 * 583) - 1 = 71, which exceeds
+      k = 10 on every target at every fraction. The number is declared so the case is closed rather
+      than handled.
+    nesting: >
+      arm B's thinnings are INDEPENDENT across fractions and are not nested, because arm B is a
+      per-fraction counterfactual and not a chain. Declared because it is otherwise undetermined by
+      the seed tuple.
+    applies_to: >
+      the neighbour-list quantities, modi_q2 and floor_rel_mse. These are the ones gate 2 uses.
+    does_not_apply_to: >
+      the graph-level statistics r and rho, because arm B retains all n nodes and union symmetrisation
+      over all n is not the symmetrisation a subsample would produce. A rank-diluted graph is built
+      and its r reported, labelled an approximation, and used in NO gate.
+    what_else_differs_from_arm_A: >
+      stated exhaustively because the residual is read as "not rank dilution": (i) the variance
+      normaliser, which A-prime isolates exactly; (ii) arm A scores n_f molecules and arm B scores
+      all n, unbiased in expectation since survival is independent of identity, but a difference;
+      (iii) arm A's n_f error terms share one subsample while arm B's thinnings are independent
+      across molecules, so arm B's per-chain floor is far less variable than arm A's, which is why
+      the interval construction above is declared rather than defaulted.
+
+design_gates:
+  evaluated_before_any_outcome_is_read: true
+  gate_1_instrument:
+    passes_iff: >
+      at f = 1.0, assortativity, rank_assortativity, rho_shared_neighbour and modi_q2 each reproduce
+      the corresponding column of results/modi_baseline.csv to within 1e-12 on all 40 ChEMBL targets
+    precision_actually_available_in_the_artefact: >
+      checked before this tolerance was chosen, which is the lesson of increment 14's amended gate.
+      All 40 ChEMBL rows of those four columns are exact float reprs: repr(float(field)) == field for
+      every row, 16 to 19 characters wide. 1e-12 is satisfiable and 0.0 is expected. The CSV is read
+      with pandas.read_csv(..., float_precision="round_trip").
+    what_it_checks: >
+      the PIPELINE, not the submatrix route. With S_1 = arange(n) the f = 1 submatrix is the full
+      matrix, so this gate cannot detect an indexing error at f < 1. It is kept because it is the only
+      thing tying this script's data load order, fingerprints, k and seeds to the committed row, and
+      because it costs nothing.
+    if_it_fails: the increment stops and the discrepancy is the report
+  gate_1b_cross_route:
+    exists_because: >
+      gate 1 cannot reach the subsample route, and a submatrix check of the form
+      tanimoto_matrix(ecfp4(smiles)[S]) == sim[ix_(S,S)] is too weak: it is exact by construction,
+      since the intersection, popcount and union intermediates are small integers exactly
+      representable in float32, so it cannot fail for a correct np.ix_ call, and it would still pass
+      if the script paired that submatrix with labels drawn through a different index array. That
+      misalignment is exactly what destroys comparability across fractions.
+    passes_iff: >
+      on one declared fraction and chain per target, f = 0.5 and chain 0, all four gate-1 statistics
+      recomputed from the subsample's OWN rows -- ecfp4(smiles[S]) then tanimoto_matrix then
+      knn_graph(., 10) then the four measures with y[S] -- agree with the submatrix route to 1e-12
+    why_it_cannot_be_gamed: >
+      the two routes share no indexing code and the check exercises sim, y and the graph together
+    cost: >
+      one refingerprint of 4102 rows plus one Tanimoto and one knn_graph per target, roughly doubling
+      a single cell, not the increment
+    if_it_fails: the increment stops and the discrepancy is the report
+  gate_2_decomposition:
+    status: >
+      AN INSTRUMENT CHECK ON A CLOSED-FORM PREDICTION, NOT A TEST OF AN OPEN QUESTION. The plan's own
+      premise is that rank dilution is the only channel through which n can act under uniform
+      subsampling of a fixed point set, so a correct arm B must reproduce arm A's movement up to the
+      normaliser channel. A pilot on committed data already put the uncorrected ratio at 0.978. This
+      is declared here so the increment does not present a foregone conclusion as its unknown.
+    statistic: >
+      explained_fraction = D_B / D_A', where D_X = mean over targets of
+      floor_rel_mse_X(f = 1/8) - floor_rel_mse_X(f = 1), chains averaged per target first, interval by
+      the ratio rule declared in shared.uncertainty
+    why_the_denominator_is_D_A_prime_and_not_D_A: >
+      because A-prime and B share the variance normaliser, so this ratio is centred on 1 by
+      construction if arm B is correct. The draft centred a band on D_B / D_A, which a correct arm B
+      does NOT predict to be 1: arm A divides by the subsample's own mean and variance and arm B by
+      the full ones, a channel measured at about +2.7 % of D_A at f = 1/8 with single-target
+      excursions past 17 %. Centring a band on the wrong value would have recreated the defect this
+      gate was written to avoid.
+    passes_iff: explained_fraction lies in [0.90, 1.10], two-sided
+    also_evaluated_at_every_fraction: >
+      the same ratio at f = 1/4 and f = 1/2, so the gate can fail by inconsistency across fractions
+      even where it passes at f = 1/8. A single-fraction agreement is not the claim.
+    reading_if_it_passes: >
+      the movement of the index under uniform subsampling is rank dilution, which is the classical
+      k/n channel cited under provenance. The paper states the mechanism WITH that citation and claims
+      no novelty for it. What the paper claims is the consequence for reporting practice: an index
+      whose sample dependence is predictable from the full-n ordering alone was nevertheless published
+      per dataset, without n, by every paper in the line. This is NOT a null result and must not be
+      written as one.
+    reading_if_it_fails_low: >
+      explained_fraction materially below 0.90 does NOT mean "sample dependence beyond rank dilution
+      was discovered". It contradicts the premise, so the correct reading is one of two instrument
+      failures: either arm B does not implement the rank law, or the point set is not fixed in the way
+      assumed. The report names both and separates them with the diagnostics under
+      reported_unconditionally, and proposes no chemical mechanism.
+    reading_if_it_fails_high: >
+      explained_fraction materially above 1.10 means arm B over-predicts the movement, which is an
+      arm B mis-specification and is reported as such, never as a finding about the data.
+    residual_decomposition_reported_whatever_happens: >
+      D_A - D_B = (D_A - D_A') + (D_A' - D_B) exactly, per target and in the mean, with the first term
+      labelled the variance-normaliser channel and the second the rank-dilution comparison.
+
+predictions_registered_in_advance:
+  prediction_1:
+    text: >
+      assortativity rises with the fraction and the floor's relative MSE falls, on a large majority of
+      the 40 targets
+    holds_iff: >
+      r(f = 1) > r(f = 1/8) on at least 34 of 40 targets AND floor_rel_mse(f = 1) <
+      floor_rel_mse(f = 1/8) on at least 34 of 40
+    status: confirmatory replication; the exploratory probe already reported this direction
+    if_it_fails: >
+      the exploratory numbers do not survive a specified design, section 4 is withdrawn as claim 4
+      was, and that is the report
+  prediction_2:
+    text: the median per-target ratio r(f = 1) / r(f = 1/8) is close to the exploratory 1.986
+    holds_iff: the median ratio lies in [1.70, 2.30]
+    aggregation: >
+      the per-target ratio is the ratio of the two chain MEANS, per shared.uncertainty. The median is
+      over the 40 targets.
+    status: >
+      confirmatory replication with a declared tolerance. The interval is wide because the exploratory
+      probe's subsampling scheme, chain count and rounding are unknown, so an exact reproduction is
+      not expected and a near miss is not a failure of the claim.
+    stability_note: >
+      a ratio of correlation coefficients is unstable near zero. The committed f = 1 assortativities
+      run 0.250 to 0.592, so no f = 1 denominator is near zero, but the f = 1/8 values are not yet
+      measured. Every per-target ratio is reported beside its two inputs so a reader can see which
+      ratios rest on a small denominator, and any target whose r(f = 1/8) is below 0.05 in the chain
+      mean is reported with its ratio flagged rather than excluded.
+  prediction_3:
+    text: >
+      the count of targets above a fixed threshold on modi_q2 increases with the fraction, at every
+      threshold in the declared grid that is informative
+    grid: [0.40, 0.45, 0.50, 0.55, 0.60, 0.65, 0.70, 0.75]
+    informative_threshold: >
+      a threshold t is informative iff count(t, f = 1/8) < 40 AND count(t, f = 1) > 0, that is, iff it
+      is not saturated at the top for the small samples nor dead at the bottom for the full ones. The
+      draft's version of this clause was the logical negation of its own rationale and would have
+      deleted the most discriminating threshold while keeping the dead ones.
+    holds_iff: >
+      for every informative t, count(t, f = 1) >= count(t, f = 1/8), and strictly greater for at least
+      five of the informative thresholds
+    margins_reported: >
+      every count is reported with its margin, because an integer count read off a continuous column
+      can turn on one target. Any threshold whose f = 1 count changes under a one-target perturbation
+      is flagged as such in the report.
+    why_a_grid: >
+      so the claim does not depend on 0.65, which belongs to a different index, and so a reader can
+      see the effect is not an artefact of one cut point
+  prediction_4:
+    text: >
+      the closed form's agreement with the measured floor degrades at small n, because the identity is
+      exact only on k-regular graphs and union symmetrisation is further from regular when k is a
+      larger fraction of n
+    holds_iff: mean |identity - floor_rel_mse| at f = 1/8 exceeds the same quantity at f = 1
+    status: genuinely unknown; never measured at any fraction below 1
+    note: >
+      a prediction about section 2's INSTRUMENT, not about section 4's claim, reported whichever way it
+      goes because it bounds where the closed form may be used
+
+outcome_rule:
+  primary_statistic: >
+    the paired per-target difference floor_rel_mse(f = 1/8) - floor_rel_mse(f = 1) under arm A, chains
+    averaged per target, with the cluster bootstrap declared above
+  secondary_statistic: the same for assortativity, as r(f = 1) - r(f = 1/8)
+  section_4_survives_iff: >
+    both intervals exclude zero in the declared direction, the floor worse at n/8 and the assortativity
+    lower, AND prediction 1's sign counts hold
+  section_4_is_withdrawn_iff: >
+    either interval covers zero. The paper then drops the size claim and says the exploratory numbers
+    did not survive specification, in the same form claim 4's withdrawal took.
+  section_4_is_rewritten_iff: >
+    the intervals hold and gate 2 passes. The section then leads with the decomposition and the
+    reporting-practice consequence, with the classical k/n citation attached to the mechanism, rather
+    than with the four-row table as though the movement were a discovery about chemistry.
+  whatever_happens_the_report_gives: >
+    all four fractions, all three arms, the five-chain spread per target, the threshold grid with
+    margins, and the full per-(target, fraction, chain) table
+
+reported_unconditionally:
+  - the per-(target, fraction, chain) table in full, so any summary a reader prefers is recomputable
+  - the between-chain standard deviation of every statistic at every fraction, because the exploratory
+    probe reported a single draw and the stability of that draw is unknown
+  - the exact residual decomposition (D_A - D_A') and (D_A' - D_B), per target and in the mean
+  - the realised mean rank of the j-th survivor in arm B for j in 1..10, against the negative
+    hypergeometric mean j*n/n_f, as a reported DIAGNOSTIC and not as a gate, on both CHEMBL217_Ki
+    (n = 8205) and CHEMBL4805_Ki (n = 583), the largest and smallest targets
+  - the binary MODI on the 30 MoleculeACE targets at every fraction with its 0.65 threshold, which is
+    the only place in this project where that threshold is applied to the index it was calibrated for,
+    with the standing caveat that the project feeds modi_binary the cliff flag rather than an activity
+    class, and with BOTH per-class surviving counts beside every cell
+  - mean degree and coverage at every fraction, since both move with n and both are covariates
+  - gate 1's and gate 1b's residuals per target
+
+handling_of_the_binary_index:
+  problem_found_before_measurement: >
+    scripts/modi_baseline.py:63-73 iterates np.unique(cls), so a class absent from a subsample simply
+    does not appear and the index silently becomes the mean over one class, with no error. Measured
+    over the 30 MoleculeACE targets: CHEMBL2835_Ki has n = 615 with 60 cliffs and keeps n_f = 76 at
+    f = 1/8, expected surviving cliffs 7.4, and hypergeom.pmf(0, 615, 60, 76) = 2.363e-04 for the
+    cliff class vanishing on a single draw.
+  rule: >
+    a cell whose either class is empty in the subsample is recorded as not estimable, NaN, with both
+    per-class denominators shown. Never as a silent one-class mean. No minimum-count threshold is
+    imposed beyond that, because a declared cutoff would discard estimable cells and the two
+    denominators carried beside every cell already let a reader see which values rest on single digits.
+  where_the_guard_lives: >
+    in THIS increment's new script. scripts/modi_baseline.py is increment 11's artefact behind blob
+    acdba0f77ff9c8fc9149dc9cd8ed39db94122ae1 and is not edited. The new code reimplements the
+    function with the guard and gate 1 covers the reimplementation at f = 1.
+  cannot_disturb_a_committed_number: >
+    the minimum cliff count over the 30 targets is 60, so no class can empty at f = 1 and the guard
+    changes nothing at full n.
+
+forbidden:
+  - Fitting a scaling exponent, a power law, a saturation curve or any extrapolation beyond the four
+    measured fractions. THE REASON IS EVIDENTIAL, recorded here so it is not relaxed later as a
+    stylistic preference: an adversarial check on the exploratory values showed the comparison cannot
+    discriminate. Baselining on f = 1 leaves three points, and D(f) = C(f^-p - 1) has two free
+    parameters, so one degree of freedom. Pinned on f = 1/8 and f = 1/2 it predicts D(1/4) = 0.17005
+    against a measured 0.17000, an apparent confirmation to 5e-5 implying d = 19.5 -- but a
+    deliberately unrelated two-parameter form, quadratic in log(1/f), pinned on the same two points
+    predicts 0.17067, equally "confirmed" at any precision this design reports. And the exponent is
+    not identified: perturbing the two pinning points by the plus or minus 0.01 that between-chain
+    spread makes plausible swings the implied d from 9.5 to 94.8, and in one corner the ratio leaves
+    the family's range entirely. A pre-registered exponent comparison would therefore manufacture a
+    confirmation, which is worse than declining the comparison and saying why.
+  - Writing "the field's threshold" or "MODI's threshold" about any number computed on modi_q2.
+  - Reporting the crossing count at 0.65 alone, without the grid.
+  - Changing the fractions, the chain count, the seed construction, the index-set rule, the threshold
+    grid, the tolerances or the gate bands after seeing any number under this plan.
+  - Dropping a target, a fraction or a chain after seeing its result.
+  - Reading gate 2's pass as a negative result, or as a reason to soften section 4; and equally,
+    reading a low explained_fraction as a discovery about chemistry rather than as the instrument
+    failure the gate declares it to be.
+  - Claiming novelty for the rank-dilution mechanism, which is the classical k/n channel cited under
+    provenance.
+  - Proposing a mechanism for any residual arm B leaves.
+  - Asserting that either the M-test's convergence reading or section 4's reading is settled by this
+    measurement.
+  - Claiming anything about how a real medicinal-chemistry acquisition order behaves. The subsampling
+    here is uniform and the limit stands as section 7 already states it.
+  - Editing scripts/modi_baseline.py, results/modi_baseline.csv, or any other committed artefact of an
+    earlier increment.
