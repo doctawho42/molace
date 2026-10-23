@@ -91,6 +91,21 @@ back to hop 0. That is nugget estimation, and the known cautions are the project
   ill-conditioning.
 - **Zimmerman, Environmetrics 1991**: network design criteria aimed specifically at estimating the
   nugget-to-sill ratio precisely. The project's five refused design gates, thirty-five years earlier.
+- **The Gamma test, and its M-test.** Added 2026-10-23 after an adversarial prior-art pass on
+  increment 15's draft plan. The paper already cites the Gamma test twice in section 7 as the
+  training-free route to a noise floor (doi 10.1098/rspa.2002.1010, "A proof of the Gamma test";
+  companion 10.1098/rspa.2002.1011 on asymptotic near-neighbour distance moments, which is the better
+  citation for the rank law section 4's null arm realises). What the pass found is the **M-test**: the
+  same line ships a named, implemented, documented procedure for recomputing the statistic over
+  growing samples, which is precisely increment 15's operation. The R package `sr` (Haythorn,
+  crediting Antonia Jones as the Gamma test's principal creator) documents `get_Mlist` as
+  "investigates the effect of sample size by calculating Gamma on larger and larger samples", and
+  reads the result as convergence: "the graph will become stable when the sample size is large
+  enough", "Gamma will converge on the true noise in the relationship as sampling density on the
+  function increases". **Its standard reading is the opposite of section 4's.** The M-test treats the
+  sample-size curve as approach towards a truth; section 4 treats it as evidence that the quantity is
+  not a property of the data. Section 4 now states both readings and asserts that neither is settled
+  by the measurement.
 
 **Consequence.** Section 5 of the paper is a replication, in a setting with hop counts instead of
 distances, of a known estimator and its known failure modes. It is still worth reporting, because the
@@ -114,6 +129,33 @@ to spatial-statistics direction is travelled; the measure-to-nugget-theory direc
 
 **Consequence.** The identity's mathematics is a known object in different notation. Claim it as
 accounting, not as theory.
+
+## 6. Nonparametric statistics: the sample-size dependence of a kNN estimator
+
+Added 2026-10-23 after an adversarial prior-art pass on increment 15's draft plan, which proposed to
+lead section 4 with rank dilution as the project's own closed-form account of why a modelability index
+moves with n. It is not the project's. **That n enters a kNN estimator only through `k/n`, by way of
+neighbour-rank order statistics, is a standard result**, and the plan now forbids claiming novelty for
+the mechanism.
+
+- **Samworth, Annals of Statistics 2012, 40(5):2733** (arXiv:1101.5783), Theorem 1: the regret is
+  `gamma_n(w){1+o(1)}` with `gamma_n(w) = B1 sum_i w_ni^2 + B2 (sum_i alpha_i w_ni / n^{2/d})^2` and
+  `alpha_i = i^{1+2/d} - (i-1)^{1+2/d}`, which the paper calls the variance and squared-bias
+  contributions. For the unweighted k-NN rule the alpha sum telescopes to `k^{1+2/d}`, so the
+  squared-bias factor is exactly `(k/n)^{2/d}`: n appears only through `k/n`, that is only through
+  which ranks are read. This is the channel increment 15's null arm isolates. The same paper is
+  already the theory citation for section 5.2's weighted-kNN result, so the collision is with a
+  reference the paper carries rather than with an unknown one.
+- **Near-neighbour distance moments**: `E[eps_k^a(x)] <= C (k/(gamma n))^{a/D}` for the k-th
+  nearest-neighbour distance, citing Evans, Jones & Schmidt, *Proc. R. Soc. A* 2002, 458:2839-2849 for
+  the same moments. The distance-side statement of the identical `k/n` dependence.
+
+**Consequence.** Section 4 keeps the measurement, the accounting and the consequence for reporting
+practice, and cites the mechanism. What survives as the project's own is narrower and still real: that
+the field publishes this index as a bare point estimate per dataset although its sample dependence is
+predictable in closed form, and that the 2014 binary criterion crosses its own published threshold on
+46 % of cells by growing alone. Nobody in the modelability line reports an index as a function of n,
+and four prior-art passes before this one did not find anyone who does.
 
 ## Verdict on each claim in the skeleton
 
