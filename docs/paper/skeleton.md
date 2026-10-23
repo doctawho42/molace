@@ -71,6 +71,11 @@ between the activities of two compounds sharing a neighbour. Equivalently, with
 - **An approximation on real union-symmetrised kNN graphs**: mean absolute error 0.0256 as a point
   prediction of the measured floor over 40 ChEMBL targets at k=10, max 0.0837, and stable in k
   (0.0269, 0.0252, 0.0256, 0.0286, 0.0306 at k = 3, 5, 10, 20, 40).
+- **And it degrades as the sample shrinks**, which bounds where it may be used and was measured for
+  the first time in increment 15: mean absolute difference against the measured floor runs 0.0103,
+  0.0133, 0.0168, 0.0221 at the full set, a half, a quarter and an eighth of each target. A factor of
+  2.1, monotone, and expected: the identity is exact only on k-regular graphs, and union
+  symmetrisation is further from regular when k is a larger fraction of n.
 
 **What is not ours.** The right-hand side is a Dirichlet energy, a standard homophily and smoothness
 measure in the heterophilic-graph literature (Heterophilic Graph Learning Handbook, arXiv 2407.09618).
@@ -114,39 +119,74 @@ A paper that claimed it improves ranking would be refuted by its own numbers.
 
 ---
 
-## 4. Modelability is not a property of a dataset
+## 4. Modelability is not a property of a dataset, and the movement is in closed form
 
-**Status: own contribution. The paper's sharpest empirical section.**
+**Status: own contribution for the accounting and the consequence; the mechanism is classical and is
+cited as such.** Measured under `prereg/increment15_size_dependence.yaml`, blob
+`3d941919c5aeb34e2749cc820e8e3ae55d5ff725`, frozen before any number existed; see
+`results/results_increment15.md`.
 
-Every index in section 1 is reported per dataset, as though it were a property of the chemistry. It is
-a property of the chemistry **and the sample size**. On the same 40 ChEMBL targets, under a nested
-random subsample chain:
+Every index in section 1 is reported per dataset, as though it were a property of the chemistry. The
+quantity those indices estimate is a property of the chemistry **and the sample size**, and it moves
+far:
 
-| fraction of the data | mean n | assortativity r | kNN floor (rel. MSE) |
+| | mean | interval | sign count |
 |---|---|---|---|
-| 1/8 | 345 | 0.292 | 0.697 |
-| 1/4 | 690 | 0.383 | 0.592 |
-| 1/2 | 1380 | 0.474 | 0.501 |
-| all | 2760 | **0.556** | **0.422** |
+| floor rel. MSE at n/8 minus at n | **+0.2698** | [+0.2477, +0.2922] | 40 / 40 |
+| assortativity at n minus at n/8 | **+0.2599** | [+0.2385, +0.2807] | 40 / 40 |
 
-Per target, `r(n) / r(n/8)` has median **1.986** — assortativity nearly doubles over an eightfold
-change in size — and the floor falls by a median 0.275 in relative MSE.
+| fraction | mean n | assortativity | floor rel. MSE | between-chain sd |
+|---|---|---|---|---|
+| 1/8 | 345 | 0.2957 | 0.6915 | 0.0456 |
+| 1/4 | 690 | 0.3855 | 0.5919 | 0.0355 |
+| 1/2 | 1380 | 0.4752 | 0.4992 | 0.0186 |
+| all | 2760 | **0.5556** | **0.4217** | — |
 
-**The consequence for the field's one published threshold.** MODI's 0.65 is crossed by growing alone:
-at `n/8` **2 of 40** targets clear it; at full `n`, **10 of 40**. Same targets, same chemistry, five
-times as many declared modelable because there is more data. "This dataset is not modelable" is, in
-part, "I do not have enough of this dataset yet".
+Per target the median ratio `r(n) / r(n/8)` is **1.988**: assortativity nearly doubles over an
+eightfold change in size. Both instrument gates read exactly `0.000e+00` over all 40 targets, the
+second against a recomputation route that shares no indexing code with the first.
 
-**What this section does NOT claim.** It does not claim a scaling law. Extrapolating the curve from
-small subsamples is partly circular: for a fixed point set the j-th nearest neighbour in a subsample is
-the i-th in the full set with i negative-hypergeometric, so much of the n-dependence is order
-statistics rather than chemistry. The claim is the **observation** that the index moves, which is
-enough to invalidate reporting it without a size, and which no paper in the line reports.
+**The movement is rank dilution, and that is not ours.** A null arm that holds the point set, every
+pairwise similarity, the label distribution, the variance normaliser and the scored set at full n, and
+changes only which ranks of its own ordering each molecule reads, reproduces the measured movement at
+every fraction: ratios 1.0060, 1.0271 and 0.9848 against a band of [0.90, 1.10] declared in advance.
+That n enters a kNN estimator only through `k/n`, by neighbour-rank order statistics, is published:
+Samworth, *Annals of Statistics* 2012, 40(5):2733, Theorem 1, whose squared-bias factor for the
+unweighted rule is exactly `(k/n)^{2/d}`; and the near-neighbour distance moments
+`E[eps_k^a] <= C (k/n)^{a/D}` citing Evans, Jones & Schmidt, *Proc. R. Soc. A* 2002, 458:2839. The
+paper cites both at the mechanism and claims no novelty for it.
 
-**Pre-registration note.** The numbers above come from an exploratory probe and must be re-measured
-under a frozen plan before they enter the paper. See the blocking experiments below.
+**What is ours is the accounting and the consequence.** On the one collection where 0.65 is the
+source's own threshold — MoleculeACE, where an activity-class flag exists — the 2014 binary MODI
+declares **all 30 targets modelable at full n and only 54 % of cells at n/8** (mean 0.7592 against
+0.6514). Same targets, same chemistry, and the published criterion crosses by growing alone. On
+ChEMBL the same monotonicity holds at all eight thresholds of a declared grid; the 0.65 row runs 2 of
+40 at n/8 to 10 of 40 at full n, and it is reported inside a grid because **0.65 is the binary index's
+threshold and not this one's** — the field's threshold cannot be evaluated on ChEMBL at all, since
+this project has no activity classes there, and transposing it onto q2 is our step, not Golbraikh's.
 
----
+So the claim is exactly this: an index whose sample dependence is predictable in closed form from the
+full-n ordering alone was nevertheless published, by every paper in the line, as a bare point estimate
+with no n beside it. Reporting it that way reports a point on a curve whose position was never in
+doubt.
+
+**A normaliser channel that would have been misread.** The residual between the measured arm and the
+null decomposes exactly, to 8.67e-19, into a variance-normaliser term and a rank-dilution term. At
+n/8 the normaliser term is `+0.00753` and the rank-dilution residual `-0.00159`: 4.7 times larger and
+pointing the other way. Reported without that split, the residual reads `+0.00594` and looks like
+sample dependence beyond rank dilution, in the direction that flatters this section. It is not.
+
+**What this section does NOT claim.** No scaling law, no exponent, no extrapolation outside [1/8, 1],
+and the reason is evidential rather than stylistic: with three points and a two-parameter family, a
+deliberately unrelated quadratic in `log(1/f)` fits the measured movement as well as the classical
+power law does, and the implied dimension swings from 9.5 to 94.8 under perturbations the measured
+between-chain spread of 0.0456 makes ordinary. It also claims nothing about a realistic
+medicinal-chemistry acquisition order; the subsampling here is uniform.
+
+**And the opposite reading exists.** The Gamma test line this paper already cites contains the
+**M-test**, which recomputes the statistic over growing samples exactly as this section does, and reads
+the result as convergence towards a truth rather than as evidence that the quantity is not the data's.
+The paper states both readings and asserts that neither is settled here.
 
 ## 4a. A model arm is a choice, and this one was worth 0.10 skill
 
@@ -282,7 +322,9 @@ numbers, not as a footnote.
   representation: Spearman of rank assortativity against attained skill is +0.726 on RDKit
   physicochemical descriptors, +0.893 on MACCS, +0.915 on atom pairs.
 - **The size result uses random subsampling**, not a realistic acquisition order. Real datasets grow by
-  medicinal-chemistry series, which plausibly grows homophily less than random growth does.
+  medicinal-chemistry series, which plausibly grows homophily less than random growth does. Under
+  uniform subsampling the movement is fully accounted for by rank dilution (increment 15), so nothing
+  in section 4 bears on how a real acquisition order would behave, and the section says so.
 - **The two moments are nearly collinear here** (Pearson +0.9895), so this data cannot separate their
   contributions to ranking. The regime where it could is the one five refused gates showed is
   unreachable at this sample size.
@@ -303,9 +345,14 @@ numbers, not as a footnote.
    5-fold CV on the training split; against uniform-at-best-`m` and against the fitted `C^-1 c`
    optimum. Instrument checks: `alpha = 0` must reproduce the uniform arm to machine precision, and the
    uniform `m=10` arm must reproduce `knn_floor.predict` to the 3.553e-15 already measured.
-3. **The size dependence, pre-registered.** Re-measure section 4 under a frozen plan, with the
-   subsampling scheme, the sizes, the seeds and the decision rule declared first, and with the
-   order-statistics confound stated as a limit rather than tested as a law.
+3. ~~The size dependence, pre-registered~~ **DONE, increment 15.**
+   `prereg/increment15_size_dependence.yaml`, blob `3d941919c5aeb34e2749cc820e8e3ae55d5ff725`;
+   `results/results_increment15.md`. **Section 4 survives and is rewritten.** The index moves by
+   +0.2698 [+0.2477, +0.2922] in relative MSE and +0.2599 [+0.2385, +0.2807] in assortativity over an
+   eightfold change in size, on 40 of 40 targets; both instrument gates read exactly 0.0; and the
+   movement is entirely the classical k/n rank-dilution channel, which the section now cites rather
+   than claims. The confound was measured instead of declared, and the decomposition turned up a
+   variance-normaliser term 4.7 times the residual and pointing the other way. See section 4 above.
 4. **The fifth prior-art pass**, which `prior-art.md` has listed as required since the weighted-kNN
    result existed: Dudani 1976, Hechenbichler & Schliep 2004, Samworth 2012, locally weighted
    regression in QSAR, and Janela & Bajorath's line (*Nature Mach. Intell.* 2022, 4:1246;
