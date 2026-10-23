@@ -289,7 +289,7 @@ one-parameter inverse-rank kernel is **not settled** and is a blocking experimen
 
 Every increment carries a YAML pre-registration committed and referenced by its **git blob hash**,
 frozen before any measurement and never edited afterwards; scripts carry the blob in a module constant
-and print it first. Design gates are evaluated before outcomes are read. 422 tests.
+and print it first. Design gates are evaluated before outcomes are read. 431 tests.
 
 The project has **six times refused a verdict its own frozen rule granted**, because the design could
 not earn it. Five were design gates on the decoupling of the two moments, with a proved structural
