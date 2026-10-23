@@ -1,0 +1,104 @@
+pre-registration blob: 3d941919c5aeb34e2749cc820e8e3ae55d5ff725
+
+====================================================================================================
+GATE 1. DOES THE PIPELINE REPRODUCE THE COMMITTED ROW AT f = 1
+====================================================================================================
+  assortativity            max |difference| over 40 targets = 0.000e+00
+  rank_assortativity       max |difference| over 40 targets = 0.000e+00
+  rho_shared_neighbour     max |difference| over 40 targets = 0.000e+00
+  modi_q2                  max |difference| over 40 targets = 0.000e+00
+
+  GATE 1: PASS at tolerance 1e-12
+
+====================================================================================================
+GATE 1B. THE SUBSAMPLE ROUTE, AGAINST A ROUTE SHARING NO INDEXING CODE
+====================================================================================================
+  g1b_d_modi_q2                max = 0.000e+00
+  g1b_d_assortativity          max = 0.000e+00
+  g1b_d_rank_assortativity     max = 0.000e+00
+  g1b_d_rho_shared_neighbour   max = 0.000e+00
+
+  checked on 40 targets at f = 0.5, chain 0
+  GATE 1B: PASS at tolerance 1e-12
+
+====================================================================================================
+A. THE TABLE SECTION 4 REPORTS, RE-MEASURED
+====================================================================================================
+   fraction  mean n_f  assortativity  floor rel MSE  between-chain sd
+      0.125     344.7         0.2957         0.6915            0.0456
+       0.25     689.8         0.3855         0.5919            0.0355
+        0.5    1379.9         0.4752         0.4992            0.0186
+        1.0    2760.4         0.5556         0.4217            0.0000
+
+====================================================================================================
+B. THE PRIMARY AND SECONDARY STATISTICS
+====================================================================================================
+  floor_rel_mse(1/8) - floor_rel_mse(1)    +0.2698 [+0.2477, +0.2922]   positive on 40/40
+  assortativity(1) - assortativity(1/8)    +0.2599 [+0.2385, +0.2807]   positive on 40/40
+
+====================================================================================================
+C. GATE 2. THE DECOMPOSITION
+====================================================================================================
+   fraction       D_A   D_Aprime       D_B               D_B / D_Aprime   normaliser
+      0.125    0.2698     0.2623    0.2639       1.0060 [+0.9731, +1.0536]       0.0075
+       0.25    0.1702     0.1652    0.1697       1.0271 [+0.9873, +1.0710]       0.0050
+        0.5    0.0776     0.0770    0.0758       0.9848 [+0.9236, +1.0401]       0.0006
+
+  GATE 2: PASS, band [0.90, 1.10] two-sided at every fraction
+  Reading, per the plan: a pass means the movement is the classical k/n rank-dilution
+  channel (Samworth 2012 Thm 1; near-neighbour distance moments citing Evans, Jones and
+  Schmidt 2002). No novelty is claimed for the mechanism. A low value is an INSTRUMENT
+  failure of arm B or of the fixed-point-set premise, not a discovery about chemistry.
+
+====================================================================================================
+D. THE EXACT RESIDUAL DECOMPOSITION
+====================================================================================================
+  f = 0.125  D_A - D_B = +0.00594  =  normaliser +0.00753  +  rank-dilution residual -0.00159   (identity check 8.67e-19)
+  f = 0.25   D_A - D_B = +0.00049  =  normaliser +0.00497  +  rank-dilution residual -0.00448   (identity check 5.42e-19)
+  f = 0.5    D_A - D_B = +0.00176  =  normaliser +0.00059  +  rank-dilution residual +0.00117   (identity check 0.00e+00)
+
+====================================================================================================
+E. PREDICTIONS
+====================================================================================================
+  1  r rises on 40/40 and the floor falls on 40/40, both need >= 34  -> HOLDS
+  2  median r(1)/r(1/8) = 1.988, needs [1.70, 2.30]  -> HOLDS
+     flagged small denominators (r(1/8) < 0.05): ['CHEMBL614358_EC50']
+  3  crossing counts on modi_q2 over the declared grid. 0.65 is Golbraikh's threshold for
+     the BINARY index and its use here is this project's transposition, not the source's.
+     threshold    0.125     0.25      0.5      1.0   informative
+           0.4        8       17       33       38   yes
+          0.45        6       15       29       35   yes
+           0.5        3        9       20       32   yes
+          0.55        3        4       12       29   yes
+           0.6        2        3        9       15   yes
+          0.65        2        2        5       10   yes
+           0.7        2        2        3        6   yes
+          0.75        2        2        2        3   yes
+     -> HOLDS (monotone where informative: True; strict on 8, needs >= 5)
+  4  mean |identity - floor| : f=0.125: 0.0221  f=0.25: 0.0168  f=0.5: 0.0133  f=1.0: 0.0103
+     -> HOLDS
+
+====================================================================================================
+F. ARM B RANK DIAGNOSTIC, REPORTED NOT GATED
+====================================================================================================
+  CHEMBL217_Ki           n= 8205 f=0.125  max |realised/expected - 1| over j=1..10 = 1.1495%   (expected = j*n/n_f, the negative hypergeometric mean)
+  CHEMBL4805_Ki          n=  583 f=0.125  max |realised/expected - 1| over j=1..10 = 2.3722%   (expected = j*n/n_f, the negative hypergeometric mean)
+
+====================================================================================================
+G. THE BINARY INDEX ON MoleculeACE, WHERE 0.65 IS THE SOURCE'S OWN
+====================================================================================================
+   fraction  mean MODI   above 0.65  not estimable  min class kept
+      0.125     0.6514       81/150              0               4
+       0.25     0.6882      123/150              0              13
+        0.5     0.7291      147/150              0              24
+        1.0     0.7592       30/30               0              60
+
+====================================================================================================
+H. THE OUTCOME RULE
+====================================================================================================
+  floor difference  +0.2698 [+0.2477, +0.2922]
+  assortativity     +0.2599 [+0.2385, +0.2807]
+
+  SECTION 4 IS REWRITTEN. The intervals hold and gate 2 passes, so the section leads
+  with the decomposition and the reporting-practice consequence, with the classical
+  k/n citation attached to the mechanism, not with the table as a discovery.
