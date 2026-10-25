@@ -1,0 +1,456 @@
+# Increment 16: does a one-parameter rank kernel attain the fitted weight optimum
+#
+# SECOND DRAFT. The first went through an adversarial pre-freeze review that raised 23 findings, of
+# which 16 survived verification and 4 were fatal. Every change below is traceable to one of them, and
+# the review's own proposed fixes were themselves adversarially checked and corrected in six places.
+# The first draft is not in the repository; it was never frozen and never produced a number.
+#
+# WHY. Blocking experiment 2 of docs/paper/skeleton.md. Increment 12 fitted m free weights per target,
+# w = C^-1 c on raw second moments of the rank-resolved neighbourhood, and found a reshaping gain over
+# uniform weights; its correction put that gain at +0.0155 [+0.0118, +0.0192] once each arm gets its
+# better m, and found the mean fitted profile has cosine 0.9946 with w_j proportional to 1/j. Whether
+# an m-parameter fit beats a one-parameter kernel was left open in print.
+#
+# WHAT THE 2005 PAPER ACTUALLY SAYS, read in full before this draft was written. Itskowitz & Tropsha,
+# "k Nearest Neighbors QSAR Modeling as a Variational Problem", J. Chem. Inf. Model. 2005,
+# 45(3):777-785, doi 10.1021/ci049628+. This is the fifth prior-art pass on weighted kNN that
+# docs/paper/prior-art.md has required since the weighted-kNN result existed, and it lands hard:
+#   * Their eq (3) predicts y_i = sum_j y_j F(d_ij) with "a weighting function dependent only on
+#     distance", normalised by eq (4) to sum to one.
+#   * Their eq (17), the discrete form of the variational optimum, is
+#     -2 u_k + sum_k' F_k' V_kk' - mu = 0, "a system of linear equations with respect to F_k", with
+#     u_k = sum_i (ybar phi)_ik and V_kk' = sum_i (ybar phi)_ik (ybar phi)_ik'. That is a linear system
+#     on the weights built from label second moments with a Lagrange multiplier for the normalisation.
+#     STRUCTURALLY IT IS THIS PROJECT'S FITTED ARM w = C^-1 c, published twenty years earlier in the
+#     journal this paper targets, by the group whose index this whole line is built on.
+#   * Their eq (21) is F(d_ij) = exp(-alpha d_ij / D) / sum_j exp(-alpha d_ij / D): a normalised
+#     ONE-parameter kernel with a tuned parameter. Structurally this increment's kernel arm, indexed by
+#     distance instead of rank.
+#   * AND THEY NEVER COMPARE THEM. The sentence after eq (17) is future tense -- "Solution of the
+#     system of equations (17) together with the condition (4) will define the values of F_k which will
+#     minimize omega" -- and the next section says "We chose the weighting function in the form" (21).
+#     The optimum is derived and abandoned. The paper contains both arms and never puts them against
+#     each other.
+#   * They also never compare against uniform weights. A search of the full text for equal / uniform /
+#     unweighted / simple average returns nothing; their reference is q2 at alpha = 1, their own kernel
+#     at a fixed parameter (Table 1 reports q2(alpha) against q2(alpha=1), mean improvement 6.7 % in q2
+#     and 5.9 % in R2, maximum 28.4 % and 44.9 %). Their k runs over 1 to 7 only.
+# CONSEQUENCE. No novelty is claimed for the fitted optimum or for the use of a tuned one-parameter
+# kernel; both are cited to 2005. What is open, and what this increment measures, is the comparison
+# their own paper sets up and leaves: does the one-parameter kernel attain the fitted optimum, and does
+# either beat uniform weights, with every arm selected on the training split alone.
+#
+# WHAT THE REPOSITORY HOLDS, checked before this plan was written, from results/local_weights.csv:
+#   Mean fitted profile at m=10 over the 31 retained ChEMBL targets: 0.3487 0.1937 0.1244 0.0934
+#   0.0696 0.0393 0.0227 0.0338 0.0270 0.0187. NOT monotone: w_7 < w_8. The rank family is monotone by
+#   construction, so part of what is compared is a monotone one-parameter shape against a fitted
+#   profile whose tail is noise. Cosine against j^-alpha runs 0.7002 / 0.9148 / 0.9946 / 0.9707 /
+#   0.9252 at alpha = 0 / 0.5 / 1 / 1.5 / 2.
+#   The scale channel is EMPTY: median gain_scale +0.0000 at m=10 with beta median 0.9940, +0.0013 at
+#   m=5; fitted weight sums have median 0.9725. So a normalised one-parameter family is not handicapped
+#   against a free-scale fit.
+#   Skills: uniform +0.3545 and fitted +0.3995 at m=10; uniform +0.3624 and fitted +0.3813 at m=5. The
+#   best uniform arm sits at a SMALLER m than the best fitted arm, which is why increment 12's fixed-m
+#   comparison flattered itself.
+#
+# THIS IS NOT A BLIND PRE-REGISTRATION. Four disclosures, all under provenance:
+#   (a) THE PRIMARY OUTCOME IS ALREADY KNOWN TO THE AUTHOR. During the adversarial review a verifying
+#       agent measured mean(skill_kernel - skill_uniform) on all 40 ChEMBL targets as
+#       +0.0182 [+0.0146, +0.0218]. That was not commissioned and it cannot be unseen. This plan is
+#       therefore a pre-registration of PROCEDURE, not a blind one, and the report must say so in those
+#       words. The margin in the outcome rule is anchored to increment 12's committed +0.0155 and NOT
+#       to that figure, so the frozen plan does not contain its own primary result.
+#   (b) An 8-target probe during increment 12's correction put a one-parameter kernel ahead of the
+#       fitted optimum by about 0.006. Prediction 3 is registered with a direction because of it.
+#   (c) The alpha grid contains alpha = 1 because 1/j is Gou's published rule and the family is
+#       declared on his citation; the author also knows cosine against the measured profile peaks
+#       sharply there. The grid is not chosen by that knowledge, but the knowledge is disclosed.
+#   (d) Gate 1's tolerance was checked for satisfiability before freezing, which increments 13 and 14
+#       did not do. Recomputing c_first, c_last, skill_mean, skill_rank and cond_C from this plan's
+#       recipe reproduces the committed CSV at EXACTLY 0.000e+00 on all 40 targets at m=5 and all 31 at
+#       m=10. The declared 1e-12 therefore has twelve orders of headroom and is an instrument, not a
+#       hope.
+
+provenance:
+  claim_under_test: >
+    the open comparison in the correction section of results/results_increment12.md, and blocking
+    experiment 2 of docs/paper/skeleton.md
+  prior_art_this_sits_against:
+    itskowitz_tropsha_2005:
+      cite: >
+        Itskowitz, P.; Tropsha, A. k Nearest Neighbors QSAR Modeling as a Variational Problem: Theory
+        and Applications. J. Chem. Inf. Model. 2005, 45(3), 777-785. doi 10.1021/ci049628+
+      what_it_pre_empts: >
+        the fitted optimum (their eq 17, a linear system on the weights from label second moments with
+        a Lagrange multiplier for normalisation, structurally this project's w = C^-1 c) and the use of
+        a tuned normalised one-parameter kernel (their eq 21, exp(-alpha d/D) normalised). Novelty is
+        claimed for NEITHER.
+      what_it_leaves_open: >
+        it states eq 17 in the future tense and then substitutes eq 21 without solving it, so it never
+        compares the kernel against the optimum; and it has no uniform arm at all, its reference being
+        its own kernel at alpha = 1. Both comparisons are open.
+      how_it_differs: >
+        distance-indexed in Euclidean descriptor space with k in 1..7, against this increment's
+        rank-indexed family on Tanimoto similarity neighbourhoods
+    gou_2011:
+      cite: >
+        Gou, J.; Xiong, T.; Kuang, Y. A Novel Weighted Voting for K-Nearest Neighbor Rule.
+        J. Computers 2011, 6(5), 833-840
+      role: >
+        THE family is declared on this citation, because Gou's published rank weight IS w_i = 1/i. A
+        family declared on Gou's rule must be able to express Gou's rule, which is why alpha = 1 is on
+        the grid for a reason independent of the measured cosine.
+    dudani_1976:
+      cite: >
+        Dudani, S. A. The Distance-Weighted k-Nearest-Neighbor Rule. IEEE Trans. Systems, Man and
+        Cybernetics 1976, 6(4), 325-327
+      role: >
+        cited as the ORIGIN OF DISTANCE-WEIGHTED kNN and nothing more. Dudani's rule is
+        w_i = (d_k - d_i)/(d_k - d_1), a linear function of DISTANCE. It is NOT the rank family, and
+        the first draft of this plan misattributed the family to it. Correcting that matters: the
+        defence "the family was declared on a 1976 citation so it was not chosen after seeing the
+        profile" is only valid against a citation that contains the family.
+    bailey_jain_1978:
+      cite: >
+        Bailey, T.; Jain, A. K. A note on distance-weighted k-nearest neighbor rules. IEEE Trans.
+        Systems, Man and Cybernetics 1978, 8, 311-313
+      role: >
+        for FIXED k the asymptotic classification error of the UNWEIGHTED kNN rule is minimal among
+        weighted kNN rules, for all distributions. This bears on prediction 2 and it is a collision
+        with section 5.1, which docs/paper/prior-art.md and docs/paper/skeleton.md both currently
+        declare collision-free. It is NOT to be described as "the asymptotic form of this project's
+        vacuity theorem": it is a classification result at fixed k under different assumptions, and
+        the relationship must be stated carefully in the write-up rather than asserted here.
+    hechenbichler_schliep_2004:
+      cite: Discussion Paper 399, SFB 386, LMU Munich
+      role: >
+        the systematic treatment of DISTANCE-kernel-weighted kNN, cited as the family this increment
+        deliberately does not test. It contains no rank-indexed kernel of any kind: every kernel in it
+        is a function of the standardised distance. The first draft cited it as support for the rank
+        family, which it is not.
+    lenz_bollaert_cornelis:
+      cite: arXiv:2311.16872
+      role: >
+        the rank-weight and distance-weight taxonomy, and the largest published comparison. Its
+        section 5.1 finds distance-weights better than rank-weights KERNEL BY KERNEL WITHIN THE NN
+        CLASSIFIER, with exceptions; its overall verdict for NN keeps rank weights. It is cited in the
+        limits for the axis this increment does not test, at that strength and no stronger.
+    samworth_2012:
+      cite: Annals of Statistics 2012, 40(5), 2733
+      role: >
+        the optimal-weighting theory, already this paper's citation for section 5.2 and already in
+        section 6 of docs/paper/prior-art.md for the k/n channel
+  what_this_increment_does_not_do: >
+    It does not re-open increment 12's claim-6 verdict, which stands as downgraded. It proposes no
+    mechanism for why a one-parameter kernel would suffice. It claims nothing about distance-weighted
+    kernels, which are a different family, named above. It does not solve the 2005 paper's eq 17 in its
+    own continuous form; the fitted arm here is the discrete least-squares optimum on rank-resolved
+    second moments, which is eq 17's structure on a different index.
+
+shared:
+  collections:
+    primary: the 40 ChEMBL targets of prereg/increment3_chembl.yaml, in selected.csv row order
+    secondary: the 30 MoleculeACE targets
+  representation: ECFP4, Morgan radius 2, 2048 bits, exactly molace.graphs.fingerprints.ecfp4
+  similarity: Tanimoto, exactly tanimoto_matrix
+  split: >
+    random 80/20 per target, numpy default_rng(0), tr = rng.random(len(y)) < 0.8, identical to
+    scripts/local_weights.py line 118 and therefore to the committed increment-12 numbers
+  anchors:
+    selector: molace.models.anchors.select, so column j is the j-th nearest neighbour
+    self_exclusion: >
+      THE ESTIMATION-SIDE SQUARE BLOCK HAS ITS DIAGONAL SET TO -inf BEFORE anchors.select: the
+      training-against-training block for the final refit, and the fold-train-against-fold-train block
+      inside every CV fold. A molecule is never its own neighbour. The SCORING-SIDE block
+      (validation- or test-against-fold-train) is rectangular over disjoint index sets and is NOT
+      masked; np.fill_diagonal on it would blank unrelated pairs and break gate 1.
+      WHY THIS CLAUSE EXISTS. anchors.select does no masking -- it lexsorts (tie, -sim) and takes the
+      top columns, so a square block hands every row itself first at similarity 1.0. Masking is a
+      caller responsibility everywhere in this codebase (scripts/local_weights.py:131,
+      scripts/modi_baseline.py:54 and :66, scripts/size_dependence.py:79, models/pairwise.py:79). The
+      first draft of this plan omitted it, and the omission was FATAL AND SELF-CONFIRMING: unmasked,
+      NN_1(v) = v, so C e_1 = c exactly and w = C^-1 c = e_1, making the fitted arm 1-NN at every m.
+      Measured over all 40 ChEMBL targets at m=5, mean(skill_fitted - skill_uniform) is +0.0159 masked
+      and -0.1018 unmasked, with the fitted arm ahead on 37/40 masked and 0/40 unmasked. That is ten
+      times prediction 3's threshold, in the direction that CONFIRMS the registered direction, so the
+      increment would have reported sufficiency off a crippled competitor.
+    governs: >
+      every quantity estimated from c and C, which includes the scaled arm's beta
+  index_order: >
+    every index set handed to anchors.select is ascending in the global molecule index. Under the fold
+    generator pinned below this is a no-op -- sklearn builds train_index from a boolean mask over
+    arange(n), verified ascending on every fold of all 70 targets -- and it is asserted at the call
+    site rather than relied on, because both neighbour selectors in this codebase break similarity ties
+    on the ascending local index and a quarter to a third of rows have an exact tie at the m-th
+    neighbour. It is stated so that a later reimplementation assembling folds by concatenation
+    inherits the convention and not the hazard.
+  standardisation: >
+    z = (y - mu) / sd with mu and sd from the ESTIMATION split only: the fold-train inside CV, the full
+    training split for the final refit
+  m_grid: [3, 5, 10, 20, 40]
+  alpha_grid: [0.0, 0.25, 0.5, 0.75, 1.0, 1.5, 2.0, 3.0]
+  selection: >
+    5-fold cross-validation on the TRAINING split alone, mean held-out RMSE, folds from
+    sklearn.model_selection.KFold(n_splits=5, shuffle=True, random_state=0), mirroring
+    molace.models.pointwise.select_by_cv which takes no test arguments by design. Ties on the CV score
+    are broken toward the SMALLER m and then the SMALLER alpha, declared here so a tie is not resolved
+    by iteration order.
+  seed: 0 everywhere
+  skill: 1 - RMSE_arm / RMSE_baseline, baseline = predicting the training mean on the test split
+  uncertainty: >
+    cluster bootstrap, molace.analysis.correlate.cluster_bootstrap_mean, 10000 draws, seed 0, each
+    target its own cluster, percentile interval
+
+arms:
+  - id: uniform
+    parameters: 0
+    definition: w_j = 1/m, computed as numpy.full(m, 1.0/m)
+    selects: m, by CV
+  - id: kernel
+    parameters: 1
+    definition: >
+      w_j = j^-alpha / sum_i i^-alpha, normalised so alpha = 0 gives exactly 1/m. Computed through its
+      own expression and NOT by calling the uniform arm, so gate 2 compares two independent paths.
+      This is Gou's rank weight at alpha = 1 and the arm the increment exists to test.
+    selects: m and alpha, by CV
+  - id: kernel_scaled
+    parameters: 2
+    definition: >
+      the kernel shape times a scale beta estimated on the estimation split by the closed form
+      increment 12 used for its scaled arm, beta = (c . w_shape) / (w_shape' C w_shape)
+    selects: m and alpha, by CV
+    note: >
+      SECONDARY. The committed scale gain is nil, so this arm exists to let a reader SEE the scale
+      channel is empty rather than take the header's word for it, and to complete the parameter-count
+      ladder 0, 1, 2, m. It does not enter any prediction or outcome branch.
+  - id: fitted
+    parameters: m
+    definition: w = numpy.linalg.solve(C, c) on raw second moments, exactly increment 12's rank arm
+    selects: m, by CV, restricted to the admissible grid below
+
+weights_are_never_renormalised_after_selection: >
+  the uniform and kernel arms sum to one by construction; the fitted arm does not and must not be
+  rescaled, because forcing the sum to one makes the optimum exactly 1/m and reports a null by
+  construction. This is increment 12's forbidden_normalisation, carried over unchanged.
+
+estimability:
+  rule: >
+    the fitted arm's admissible m are those with n_est >= 20 * m(m+1)/2, twenty observations per
+    distinct entry of C, where n_est is the SAME n as the conditioning guard: the fold-train inside CV
+    and the full training split for the final refit. The kernel and uniform arms are unrestricted
+    beyond m <= n_est - 1, the -1 because the estimation side's diagonal is masked.
+  conditioning_guard:
+    rule: >
+      CANDIDATE-LEVEL, NOT FOLD-LEVEL. If cond(C) on the estimation split is not finite or is >= 100
+      on ANY of the five folds, that m is dropped from the candidate set for the whole CV on that
+      target. COND_MAX = 100 is increment 12's threshold.
+    why_candidate_level: >
+      a fold-level drop would score candidates on CV means taken over different numbers of folds and
+      over different folds, and the drop is correlated with fold difficulty, so it would
+      systematically flatter the candidate it bites.
+    what_it_actually_does_here: >
+      measured on the registered design, the guard binds exactly ONCE: CHEMBL4361_Ki at m=10 on fold 2,
+      cond 100.889 against COND_MAX 100. There are zero breaches in the other 574 ChEMBL fold cells and
+      none in all 370 MoleculeACE fold cells. On the full training split the highest value is 95.378,
+      which is why increment 12 saw no breach at all. The first draft said "on committed data this
+      never bound", which was true of the full split and false of the folds it evaluates on.
+  admissible_m_computed_in_advance:
+    note: >
+      stated here so the gate cannot surprise the increment, which is the lesson of increments 13 and
+      14. Both readings are given because the CV candidate sets and the final refit use different n.
+    full_training_split_for_the_final_refit:
+      chembl_40: {m_3: 40, m_5: 40, m_10: 31, m_20: 4, m_40: 0}
+      moleculeace_30: {m_3: 30, m_5: 30, m_10: 14, m_20: 0, m_40: 0}
+    fold_train_for_the_cv_candidate_sets:
+      chembl_40: {m_3: 40, m_5: 40, m_10: 24, m_20: 3, m_40: 0}
+      moleculeace_30: {m_3: 30, m_5: 30, m_10: 10, m_20: 0, m_40: 0}
+    consequence: >
+      no target is dropped for any arm, because m = 3 and m = 5 are admissible everywhere on both
+      readings. The fitted arm is confined to {3,5} on 9 ChEMBL and 16 MoleculeACE targets by the
+      refit reading, and CHEMBL3594_Ki is admissible at m=20 on the full split but on none of its own
+      folds. That is the honest cost of the fitted arm's parameter count, not a reason to drop a target.
+  the_matched_grid: >
+    defined as the fitted arm's FINAL-REFIT admissible set on that target, which is per-target and
+    therefore well defined. Both arms CV-select inside it independently.
+
+design_gates:
+  evaluated_before_any_outcome_is_read: true
+  gate_1_instrument_against_the_committed_artefact:
+    passes_iff: >
+      at m = 5 on all 40 ChEMBL and at m = 10 on all 31 retained ChEMBL targets, the recomputed
+      c_first, c_last, skill_mean, skill_rank and cond_C each reproduce results/local_weights.csv to
+      within 1e-12, AND no row's own index appears anywhere in its estimation-side anchor set.
+    why_these_columns: >
+      THE FIRST DRAFT'S GATE 1 WAS ALGEBRAICALLY BLIND and the review proved it. Its statistic was
+      max |uniform arm - knn_floor.predict|, a comparison of two computations of the same anchor-set
+      mean, invariant to the split, the standardisation, the estimation-side neighbourhood and the rank
+      order -- that is, to everything it claimed to tie and to the very thing this increment measures.
+      Measured with the diagonal deliberately unmasked, that statistic moves by 0.000e+00 and the old
+      drift reads 1.776e-15, while c_first moves by 2.515e-01, skill_rank by 1.072e-01, c_last by
+      2.271e-02 and cond_C by 2.805. c_first and c_last are estimation-side cross-moments at the first
+      and last rank, so they tie the mask and the column order; skill_rank ties the fitted arm end to
+      end; cond_C ties the second-moment matrix.
+    tolerance_justification: >
+      CHECKED, NOT HOPED. Recomputation reproduces all five columns at EXACTLY 0.000e+00 over all 40
+      targets at m=5 and all 31 at m=10, so 1e-12 has twelve orders of headroom while the smallest
+      discriminating movement is 2.271e-02, nine orders above it. The columns are stored at full
+      float64 repr (16 to 18 decimals). NOTE that c_profile is NOT usable for this: it is committed as
+      a 4-decimal STRING and a 1e-12 gate against it would fail on every target at a maximum error of
+      4.996e-5, which is increment 14's defect exactly.
+    the_index_check: >
+      an exact assertion, not a threshold: no estimation-side row may contain its own index anywhere in
+      its anchor set. Measured 0 of 6551 violations masked and 6551 of 6551 unmasked. A threshold on
+      c_1 would NOT work and was rejected on measurement: unmasked c_1 runs 0.8015 to 1.0024 across
+      targets and only 2 of 40 reach 1.0, because self-similarity 1.0 is shared with exact duplicates
+      and the tie-break puts self at rank 1 on only 85 to 100 % of rows.
+    if_it_fails: the increment stops and the discrepancy is the report
+  gate_2_instrument_alpha_zero:
+    passes_iff: >
+      the kernel arm at alpha = 0 reproduces the uniform arm to within 1e-15 at every m on every target
+    declared_weak: >
+      THIS GATE CANNOT FAIL FOR A CORRECT IMPLEMENTATION AND IS KEPT ANYWAY. j^0 = 1 for every j. It is
+      retained because it costs nothing and is the one thing that would catch a normalisation mismatch
+      between the two arms, which would make every comparison between them a comparison of scales. It
+      is NOT offered as evidence that the kernel arm is correct. Increment 15 deleted a gate of this
+      kind for being presented as more than it was; this one is labelled instead.
+  gate_3_selection_is_blind:
+    passes_iff: >
+      the recorded CV score of each arm's selected configuration is RE-COMPUTED from a training-split
+      copy sliced independently from the split rule itself, and matches bit for bit.
+    why_not_a_signature_check: >
+      the first draft checked that selection functions take no test argument. A signature constrains
+      the callee's parameters, not the arguments passed, so it cannot fail for the failure it names.
+      The recomputation can: an independent reslice of a correct run reproduced 0.67742675353798698
+      exactly, while an injected leak showed a gap of 4.70e-3 to 2.23e-2, four to five orders above any
+      float noise. The reslice must come from the split rule and not from the arrays the selection was
+      handed, or the check is a tautology. Bit-for-bit is correct only because the recomputation runs
+      the identical deterministic path; the signature test is kept as well, but is not the gate.
+    if_it_fails: the increment stops
+
+predictions_registered_in_advance:
+  prediction_1:
+    text: the CV-selected alpha concentrates near Gou's rank weight, alpha = 1, rather than at an edge
+    holds_iff: >
+      the KERNEL arm's selected alpha lies in {0.75, 1.0, 1.5} on at least 20 of the 40 ChEMBL targets
+    why_this_and_not_a_band_on_the_median: >
+      the first draft asked for a median in [0.5, 2.0], which contains 6 of the 8 grid points: an
+      i.i.d. uniform draw over the grid clears it 88.1 % of the time, so it tested almost nothing. This
+      clause is cleared by noise only 7.2 % of the time, by a distribution peaked at 1.0 100 % of the
+      time, and by a broad peak over 0.5 to 1.5 98 % of the time. It also has headroom on this data: the
+      alpha maximising cosine against each target's OWN committed fitted profile lies in {0.75, 1.0,
+      1.5} on 36 of 40 ChEMBL targets at m=5 and 31 of 31 at m=10.
+    reported_beside_it: the full alpha frequency table and the interquartile range, and the
+      kernel_scaled arm's selections, none of which enter the prediction
+    status: >
+      NOT blind; see disclosure (c). Registered because a family declared on a citation must still be
+      able to fail at the parameter the citation names.
+  prediction_2:
+    text: the one-parameter kernel beats uniform weights out of sample, each arm at its own selected m
+    holds_iff: mean(skill_kernel - skill_uniform) is positive with an interval excluding zero
+    status: >
+      confirmatory, and NOT blind: see disclosure (a), the primary outcome is already known. It is
+      registered anyway because the procedure, the arms and the instrument are fixed here and the
+      report must stand on them. Nobody in the kNN-QSAR line has measured this: the 2005 paper has no
+      uniform arm, and Bailey & Jain 1978 points the other way at fixed k asymptotically.
+  prediction_3:
+    text: the one-parameter kernel is not materially worse than the m-parameter fitted optimum
+    holds_iff: >
+      on the MATCHED grid, the lower end of the cluster-bootstrap interval on
+      mean(skill_kernel - skill_fitted) exceeds -0.01
+    status: >
+      confirmatory of a probe; see disclosure (b). It is a one-sided non-inferiority test and not a
+      point-estimate comparison, because the question is whether one parameter SUFFICES, and
+      sufficiency argued from a point estimate is a null claimed from a failure to reject.
+    the_margin: >
+      -0.01 is 65 % of increment 12's committed reshaping gain of +0.0155 [+0.0118, +0.0192]. It is
+      anchored to that committed figure and deliberately NOT to any quantity measured for this
+      increment, so the frozen plan does not contain its own primary result.
+  prediction_4:
+    text: >
+      the kernel arm selects a larger m than the fitted arm, because the fitted arm pays for m free
+      parameters and a kernel pays for one
+    holds_iff: >
+      on the OWN grids, the kernel arm's median selected m exceeds the fitted arm's over the 40 ChEMBL
+      targets, with ties in the medians reported and counted against the prediction
+    reported_twice: >
+      on the own grids, where the mechanism can act, AND on the matched grid, which is the fitted arm's
+      admissible set and therefore truncates the kernel harder than the fitted arm. The matched-grid
+      figure is DESCRIPTION, not the test: restricting to {3,5} on 9 targets and {3,5,10} on 27 deletes
+      precisely the grid region where a kernel's preference for larger m would live. Equally, a
+      difference on the own grids that arises only from the fitted arm's size cap is not evidence for
+      the parameter-count mechanism, and the report must say which it is by giving both.
+    status: >
+      registered AGAINST the project's only committed evidence, which is directional and points the
+      other way: increment 12's correction found uniform prefers m=5 to m=10 while fitted prefers 10 to
+      5, on two grid points and without CV. The first draft called this "genuinely unknown", which was
+      wrong.
+
+outcome_rule:
+  primary_statistic: >
+    mean(skill_kernel - skill_uniform) over the 40 ChEMBL targets, each arm at its own CV-selected
+    configuration, cluster bootstrap as declared
+  the_sufficiency_instrument: >
+    ONE instrument for all three branches: the cluster-bootstrap interval on
+    mean(skill_kernel - skill_fitted) on the MATCHED grid. The three branches below partition the
+    position of -0.01 relative to that interval, so exactly one fires.
+  branch_the_kernel_suffices:
+    iff: prediction 2 holds AND the interval's LOWER end is above -0.01
+    then: >
+      the paper states that the reshaping gain is a one-parameter effect; cites Itskowitz & Tropsha
+      2005 for both the optimum and the kernel form, with novelty claimed for neither; and reports the
+      fitted optimum as the upper bound the kernel attains.
+  branch_the_fit_is_needed:
+    iff: the interval's UPPER end is below -0.01
+    then: >
+      the paper states that the m-parameter fit buys what a one-parameter kernel does not, reports how
+      much, and names the parameter count as the price.
+  branch_not_established:
+    iff: the interval straddles -0.01
+    then: >
+      in increment 12's own wording, carried over deliberately: sufficiency is NOT ESTABLISHED and the
+      report says not established rather than claiming a null from a failure to reject. The report
+      gives the difference and the interval and claims neither branch.
+  the_reshaping_gain_does_not_survive_selection_iff: >
+    the interval on mean(skill_fitted - skill_uniform) on the MATCHED grid covers zero. Then increment
+    12's corrected +0.0155 does not survive symmetric CV selection, section 5.2 is downgraded a second
+    time, and the report says so in the form claim 4's withdrawal took.
+    WHY MATCHED AND WHY THIS STATISTIC: the first draft fired this branch on skill_kernel minus
+    skill_uniform, which is not the quantity section 5.2 claims; and increment 12's +0.0155 was itself
+    computed with both arms confined to a two-point matched grid, so the own-best version is not the
+    comparable number. On the own grids uniform may reach m=40 while the fitted arm is capped at 10 on
+    31 of 40 targets, so an own-grid downgrade could fire for a grid reason.
+  whatever_happens_the_report_gives: >
+    all four arms' skills per target, every arm's selected m and alpha with its CV score, both the
+    own-grid and matched-grid versions of every comparison, and the full per-target table
+
+reported_unconditionally:
+  - the per-target table in full, with each arm's selected m and alpha and its CV score
+  - the frequency tables of selected alpha and selected m, per arm, per collection
+  - the kernel_scaled arm beside the kernel arm, which is how a reader sees the scale channel is empty
+  - the fitted arm's selected m against its admissible set, so it is visible whether the size rule or
+    the data chose m, and the one cell where the conditioning guard binds
+  - gate 1's five residuals and the index-check count per target, and gate 2's residual
+  - how often each arm's CV-selected configuration was NOT the configuration that won on the test
+    split, which is the cost of honest selection and the quantity increment 14 wished it had reported
+  - the same statistics on the 30 MoleculeACE targets
+  - that this pre-registration is of procedure and not blind, with disclosure (a) named in the report
+
+forbidden:
+  - Selecting m or alpha on anything but the training split, or reading a test-split number before the
+    gates are evaluated.
+  - Renormalising the fitted arm's weights to sum to one.
+  - Leaving the estimation-side diagonal unmasked, or masking the scoring-side rectangular block.
+  - Adding a weighting family after seeing a result. The family is declared on Gou 2011 and the grid is
+    frozen here.
+  - Claiming novelty for the fitted optimum or for the tuned one-parameter kernel. Both are Itskowitz &
+    Tropsha 2005, cited above.
+  - Claiming anything about distance-weighted kernels, which are a different family; and stating Lenz
+    et al. more strongly than kernel-by-kernel within the NN classifier.
+  - Describing Bailey & Jain 1978 as the asymptotic form of this project's vacuity theorem.
+  - Reporting an own-grid comparison without its matched-grid counterpart beside it.
+  - Reporting the kernel arm without the uniform arm at its own CV-selected m, which is the error
+    increment 12 made and corrected.
+  - Treating gate 2 as evidence that the kernel arm is correct.
+  - Dropping a target, an m or an alpha after seeing a result.
+  - Re-opening increment 12's claim-6 verdict.
+  - Presenting this plan as a blind pre-registration.
