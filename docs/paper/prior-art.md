@@ -213,10 +213,140 @@ the pass found the paper that matters.**
   stronger, for the axis increment 16 does not test.
 
 **What survives as this project's own on the weighting axis**, after the pass: the comparison of a
-one-parameter rank kernel against the fitted optimum with both arms cross-validated on the training
-split, the uniform baseline neither 2005 nor 2011 provides, and the measurement that
-cross-validation selects Gou's α = 1 on 39 of 40 ChEMBL targets within the registered set. That is
-narrower than the draft claimed and it is real.
+one-parameter rank kernel against the **fitted** optimum with both arms cross-validated on the
+training split, and the measurement that cross-validation selects Gou's α = 1 on 39 of 40 ChEMBL
+targets within the registered set. That is narrower than the draft claimed and it is real.
+
+**CORRECTED 2026-10-25 by the pass in section 8, the same day this section was written.** This
+paragraph originally also claimed "the uniform baseline neither 2005 nor 2011 provides". That is
+false. Nigsch et al., JCIM 2006, 46(6):2412-2422, compared "arithmetic and geometric average, inverse
+distance weighting, and exponential weighting" on 4119 organic molecules under 25-fold Monte Carlo
+cross-validation. A uniform arm against weighting schemes exists in the kNN-QSAR line, in this
+paper's target journal, from 2006. See section 8.
+
+## 8. The fifth pass, remaining scope: Janela & Bajorath, locally weighted regression, closed-form MODI. Run 2026-10-25
+
+Blocking experiment 4 of the skeleton, and items 3 and 5 of "Required before drafting" below. Three
+lenses, every reported collision verified against the primary source by a second reader whose
+instruction was to refute it: **21 adjudicated, 16 survived, 5 refuted**. Full record in
+`results/results_increment17.md`. **No fatal collision. Claim 5 survives.**
+
+### Item 3 is discharged, and positively
+
+"One more pass specifically for closed-form or spectral treatments of MODI, which is the single
+collision that would cost claim 5." **Golbraikh, Muratov, Fourches & Tropsha, JCIM 2014, 54(1):1-4 was
+read in full** (open NIH deposit PMC3984298). Its only equation is `MODI = (1/K) Σ_i N_i^same /
+N_i^total`. No algebraic or closed-form expression, no autocorrelation, homophily, graph, Laplacian or
+spectral language anywhere, no formula for prediction error, and no analysis of dependence on dataset
+size. The originating lab's own package (`github.com/molecularmodelinglab/MODI`) adds only the
+equivalence to the uniform-class average of leave-one-out 1-NN accuracy. Claim 5's accounting is not
+pre-empted. Four corrections to its framing:
+
+- **`m1` is Moran's I.** Arthur, *EPJ Data Science* 2025, 14:1, eq. (2): `I = (N/|W|) · (z·z̃)/|z|²`
+  with `z̃_i` "the average value of `z` over the neighbours of `i`", and for a row-normalised adjacency
+  matrix `|W| = N` so the constant cancels. The paper also states that "unlike assortativity, the Moran
+  index does not include" the degree correction, so the two coincide only under that normalisation and
+  the skeleton's bare "`m1` *is* Newman's target assortativity" needs its condition. `1 − m1` is
+  Geary's C in the same family. The spatial-autocorrelation literature owns the object.
+- **The Dirichlet energy is the first-moment term, not the whole right-hand side.** The Heterophilic
+  Graph Learning Handbook (arXiv:2407.09618, §2.1) — the project's own citation here — defines
+  `E_D(x) = xᵀLx = ½ Σ_{(i,j)∈E}(x_i − x_j)²`. The identity's right-hand side also carries `ρ_nn`.
+- **The graph-average predictor is the harmonic energy minimiser, and that is 2003.** Zhu, Ghahramani
+  & Lafferty, ICML 2003: "the value of f at each unlabeled data point is the average of f at
+  neighboring points", `f(j) = (1/d_j) Σ_{i~j} w_ij f(i)`, and "the minimum energy function is
+  harmonic" with `Δ = D − W`. Adjacent — they minimise the energy to impute, the project measures the
+  average's error — and must be cited.
+- **The index enumeration is incomplete.** Cui et al.'s activity-cliff-aware graph learning paper
+  defines a **Label Incoherence Index**, `LII = (1/n) Σ_i (1/k) Σ_{j∈N_i} |y_j − y_i|`, on the kNN
+  graph at k = 10 with uniform weights and `x_i` excluded. Sections 1 and 3 must name it. Section 3's
+  claim that the **second** moment is absent from the published indices survives: LII is L1 and
+  first-moment, so it does not contain it either.
+
+Refuted here: kernel-target alignment (Cristianini, Shawe-Taylor, Elisseeff & Kandola, NIPS 14, 2001)
+as a closed-form modelability collision.
+
+### Item 5's remaining half: locally weighted regression. Seven collisions, none refuted
+
+- **Nigsch, Bender, van Buuren, Tissen, Nigsch & Mitchell, JCIM 2006, 46(6):2412-2422.** **OVERLAPS,
+  and corrects section 7 above.** "To compute the prediction on the basis of the melting temperatures
+  of the nearest neighbors, we used four different methods (arithmetic and geometric average, inverse
+  distance weighting, and exponential weighting), of which the exponential weighting scheme yielded
+  the best results", on 4119 organic molecules plus 277 drugs under 25-fold Monte Carlo
+  cross-validation with the neighbour count varied. Increment 16's prediction 2 is a **replication on
+  potency data of a melting-point result**.
+- **Cleveland & Devlin, JASA 1988, 83(403):596-610, §10.4**, whose heading is "Weight Functions and
+  the Poor Performance of the Uniform": "the uniform weight function, with the discontinuity at 1,
+  performs poorly", and "asymptotic results for nonparametric regression show that the overall form of
+  the weight function does not have an appreciable effect with respect to mean squa[red error]". Both
+  halves bear on section 5.2: the direction was known in 1988, and so was the insensitivity to the
+  kernel's form, which is the honest frame for increment 16's one-parameter result.
+- **Anava & Levy, k\*-Nearest Neighbors: From Global to Local, NIPS 2016** (arXiv:1701.07266). The
+  closest adjacent prior to increment 16's headline: "Our formulation enables us to phrase a notion of
+  optimal weights, and to efficiently find these weights as well as the optimal number of neighbors",
+  and §3, "the optimal weights depend on a **single parameter** `L/C`, namely the Lipschitz to noise
+  ratio". Adjacent and not pre-empting — their parameter is a derived ratio in an assumed
+  Lipschitz-plus-noise model, not a cross-validated exponent, and they neither measure molecular
+  neighbourhoods nor compare against a least-squares-fitted weight vector — but it is the paper a
+  reviewer raises, and section 5.2 must cite it and state the difference.
+- **Demirkaya, Fan, Gao, Lv, Vossler & Wang, JASA 2024, 119(545):297-307** (arXiv:1808.08469). The
+  rank-indexed analogue: the distributional-NN estimator "automatically assigns monotonic weights to
+  the nearest neighbors", fixed by a single subsampling scale `s`, with an L-statistic representation.
+- **Zhang, Golbraikh, Oloff, Kohn & Tropsha, ALL-QSAR.** A Gaussian **distance** kernel
+  `w = exp(−d²/2K²)` with the width optimised "from 0.01 to 1.00 with an increment of 0.01", and "no
+  fixed number of nearest neighbors". Adjacent: no uniform arm and no fitted weight vector.
+- **Gajewicz-Skretna, Kar, Piotrowska & Leszczynski, kernel-weighted local polynomial regression for
+  QSAR/QSAAR.** "However, the particular form of the function, K has only a relatively small effect on
+  estimation accuracy" — the Cleveland & Devlin insensitivity, restated in QSAR.
+- **Helman, Shah & Patlewicz, GenRA, Comput. Toxicol. 2018, 8:34-50.** Similarity-weighted read-across
+  with Jaccard similarity at a fixed k = 10: similarity-weighted averaging is standard practice in
+  read-across, and the only fitted parameters are in neighbour selection.
+
+**Clean, and specifically.** No source reports the rank-resolved cross-moment `c_j = E[z_v z_{u_j}]` as
+a function of `j` on molecular data, and none states that molecular neighbourhoods fail second-order
+exchangeability. Section 5.2's **measurement** is not pre-empted. Searched: locally weighted
+regression, lazy learning and local QSAR; the similarity-property-principle literature with
+rank-resolved framing; and the activity-cliff and activity-landscape geometry literature.
+
+### Blocking experiment 4's own target: Janela & Bajorath. Nine reported, four refuted
+
+- **Their metric is unnormalised MAE.** *Pharmaceuticals* 2023, 16(4):530 §4.5 defines exactly one
+  metric for all 376 activity classes: "the mean absolute error (MAE) was calculated by comparing
+  predicted and experimental test compound potency values." *Sci. Rep.* 2023 adds RMSE and squared
+  Pearson `r²` on eight classes. Neither reports a variance-normalised error as a performance value.
+  This project's skill is `1 − RMSE_arm/RMSE_baseline` against a train-mean baseline, so the two
+  literatures report on different scales. Their own paired figures give the conversion factor —
+  "~0.4 and ~0.5 for MAE and RMSE" and "generally smaller than 0.8 and 1.0", both ratios 1.25, the
+  Gaussian `√(π/2)` — under which a 0.1 MAE margin maps to 0.125 of skill at a potency standard
+  deviation of 1.0 and 0.084 at 1.5, bracketing increment 14's 0.0754 to 0.0949. **Same order.** Not
+  claimed: that this resolves the comparison, that skill equals sklearn's `r2_score` (it does not), or
+  any particular potency spread.
+- **Their 2022 control used Euclidean distance on binary fingerprints.** Their public code builds it
+  as `neighbors.KNeighborsRegressor()` with `{"n_neighbors": [1, 3, 5]}` only, under
+  `GridSearchCV(..., cv=10, scoring="neg_mean_absolute_error")`, on
+  `GetMorganFingerprintAsBitVect(mol, 2, nBits=2048)`. With no metric argument scikit-learn defaults
+  to `minkowski, p=2` with `weights='uniform'`. Their **2023** repository sets `metric='jaccard'`
+  explicitly. The control is at most five Euclidean-nearest neighbours against this project's uniform
+  mean over ten Tanimoto-nearest ones.
+- **Their model arm was done right**, so section 4a must not imply the field generally gets it wrong.
+  *Pharmaceuticals* 2023 §4.3.1: "the regularization hyper-parameter C was determined by testing
+  (0.001, ..., 10,000) values. SVR models were derived using the **Tanimoto kernel**", with a 54-point
+  deep-arm grid in the 2022 code.
+- **Their mechanism is label-marginal, not graph-structural**, so it touches neither section 2 nor
+  section 4: "in the intermediate potency sub-range, predictions yielded artificially low errors, due
+  to narrow local potency value distributions around the median."
+- **They run a sample-size sweep and read it the other way.** *Sci. Rep.* 2023: "nine training sets of
+  increasing size ... 6, 12, 18, 30, 48, 78, 126, 204, and 330 compounds" over ten trials, finding
+  errors "constantly small, independent of training set size" in the dominant sub-range. Section 6's
+  statement that nobody in the modelability line reports an **index** as a function of `n` stands, but
+  this is the second cited line that runs section 4's sweep with the opposite reading, after the Gamma
+  test's M-test. Section 4 should name both.
+- **Clean, and specifically.** The full text of both open-access papers contains **zero occurrences**
+  of "modelab", "MODI", "ROGI", "Golbraikh", "Tropsha", "assortativ", "homophil", "Dirichlet",
+  "roughness" or "activity cliff". Sections 1, 2, 3 and 5 are untouched by this line.
+
+Refuted here: that they report SVR ahead rather than a tie; that their `k` grid contains this
+project's CV choice; that their nearest-neighbour-removal intervention is unaddressed; and that the
+roles of their two 2023 papers are reversed in increment 14's pre-registration.
 
 ## Verdict on each claim in the skeleton
 
@@ -226,8 +356,8 @@ narrower than the draft claimed and it is real.
 | 2 | It beats ROGI incrementally | **Survives**, and MODI is now measured (increment 11). Assortativity over MODI covers zero on all three collections, so the honest statement is that the two are near-interchangeable rankers, not that ours wins. SARI still missing |
 | 3 | Not an artefact of one fingerprint | **Survives.** No collision found |
 | 4 | It also says which model class wins | **Survives and is strengthened**, because the field's own rankings put kNN near the bottom on average and this is the conditional exception |
-| 5 | Exact identity, equals a Dirichlet energy | **Object known, accounting new, and now measured against the published index.** 0.0083 to 0.0123 mean absolute error reproducing MODI_q2 on 80 targets. The second moment's own ranking contribution covers zero on all three collections, so it is necessary for the identity and empirically quiet here |
-| 6 | Equal weights are near-optimal locally | **Refuted by increment 12, and replaced.** Under exchangeability the statement is a theorem about calibration and says nothing about weighting; measured without the assumption, reweighting by neighbour rank is worth +0.038 to +0.050 skill out of sample against a rank-shuffled null of -0.002. The claim becomes "the neighbourhood mean is calibrated in total and wrong in shape". Needs a fresh pass against distance-weighted kNN in QSAR, which four passes never searched because the claim was not about weighting |
+| 5 | Exact identity, equals a Dirichlet energy | **Object known, accounting new, and the fifth pass cleared it — see section 8.** MODI's own paper was read in full and contains no closed form, no graph or spectral language and no error formula, so the single collision that would have cost this claim does not exist. 0.0083 to 0.0123 mean absolute error reproducing MODI_q2 on 80 targets. Four framing corrections stand: `m1` is **Moran's I** (Arthur 2025) and coincides with Newman's assortativity only under row normalisation; the Dirichlet energy is the **first-moment term**, not the whole right-hand side; the graph-average-as-harmonic-energy-minimiser is Zhu, Ghahramani & Lafferty 2003; and the index enumeration must add Cui et al.'s **Label Incoherence Index**. The second moment's own ranking contribution covers zero on all three collections, so it is necessary for the identity and empirically quiet here |
+| 6 | Equal weights are near-optimal locally | **Refuted by increment 12, corrected by its own audit, and measured to the end by increment 16.** Under exchangeability the statement is a theorem about calibration and says nothing about weighting. Without the assumption, reweighting by neighbour rank is worth **+0.0155 [+0.0118, +0.0192]** once each arm gets its better `m` — not the +0.038 to +0.050 first reported, 62 % of which was the effect of fixing `m` — and increment 16 showed the whole effect is bought by **one parameter**, `w_j ∝ j^-α` with α = 1 selected on 39 of 40 targets, non-inferior to the fitted `C^-1 c` optimum at a pre-registered margin. The claim becomes "the neighbourhood mean is calibrated in total and wrong in shape, and the shape has one degree of freedom". The weighting passes it asked for are **done**: sections 7 and 8. Prior art on the weighting axis is heavy — Itskowitz & Tropsha 2005 own both arms, Nigsch 2006 owns the uniform-against-kernel comparison in QSAR, Cleveland & Devlin 1988 own the direction, Anava & Levy 2016 own one-parameter optimal local weights — and what survives is the measurement on molecular neighbourhoods and the comparison against the fitted optimum |
 | 7 | The noise floor fails out of sample, with a diagnosis | **Replication.** Must cite Atkinson, Kim, Zimmerman and claim the graph transport, not the estimator |
 | 8 | A structural limit on the whole approach | **Survives**, and is sharper once framed as the graph version of Zimmerman's design problem |
 
@@ -252,16 +382,26 @@ needs a new baseline run before anything is written.
 2. ~~Relax exchangeability in claim 6~~ **done, increment 12**, and it reversed the claim. The hop
    profile turned out to be the wrong axis: the repository had no measured profile on real targets at
    all, and the axis that matters for the kNN mean is neighbour RANK, not hop count.
-3. One more pass specifically for closed-form or spectral treatments of MODI, which is the single
-   collision that would cost claim 5.
+3. ~~One more pass specifically for closed-form or spectral treatments of MODI~~ **DONE,
+   increment 17, section 8.** MODI's own paper read in full: no closed form, no graph or spectral
+   language, no error formula, no size analysis. **Claim 5 survives.** Four framing corrections, none
+   of them a refutation.
 4. **SARI** as a third baseline, nice to have rather than required.
-5. **A fifth pass on weighted kNN in QSAR** — distance-weighted, similarity-weighted and
-   locally-weighted regression variants. Claim 6's replacement is a weighting result and this is the
-   obvious place for a collision. Four passes never looked, because the claim was not about weighting
-   until increment 12 measured it.
+5. ~~A fifth pass on weighted kNN in QSAR~~ **DONE in two halves: sections 7 and 8.** The
+   distance- and rank-weighted half ran with increment 16 and found that three of this project's own
+   citations were wrong about what they cite. The similarity-weighted and locally-weighted-regression
+   half ran as increment 17 and found seven collisions, none refuted, including the one that corrects
+   section 7's own text: Nigsch 2006 compared a uniform arm against three weighting schemes in this
+   paper's target journal.
 6. **Re-examine claim 4 under the reshaped floor**, with its own frozen plan. Claim 4 attributes the
-   floor-against-fitted-model gap to information outside the neighbourhood; +0.04 skill of that gap is
-   now known to be weighting.
+   floor-against-fitted-model gap to information outside the neighbourhood; **+0.0155** of that gap is
+   now known to be weighting, and known to be reachable with one parameter (increment 16). Note the
+   figure: this entry originally said +0.04, from the pre-correction reading of increment 12.
+7. **Run Janela & Bajorath's protocol on their public data**, which section 8 has now specified: their
+   metric is MAE, their 2022 control is unweighted kNN over at most five **Euclidean**-nearest
+   neighbours on 2048-bit Morgan vectors, and their model arm is a CV-tuned **Tanimoto-kernel** SVR.
+   The run must report MAE beside skill so the comparison exists on their scale too. This is the only
+   thing that settles section 4a.
 
 ## What increment 11 did to the plan
 

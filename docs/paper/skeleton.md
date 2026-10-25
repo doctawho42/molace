@@ -77,13 +77,24 @@ between the activities of two compounds sharing a neighbour. Equivalently, with
   2.1, monotone, and expected: the identity is exact only on k-regular graphs, and union
   symmetrisation is further from regular when k is a larger fraction of n.
 
-**What is not ours.** The right-hand side is a Dirichlet energy, a standard homophily and smoothness
-measure in the heterophilic-graph literature (Heterophilic Graph Learning Handbook, arXiv 2407.09618).
-As a risk it is the Wiener filter and the kriging system. The paper says so in this section rather than
-leaving a reviewer to say it.
+**What is not ours**, stated more precisely after the fifth prior-art pass (increment 17). The
+**first-moment term** is a Dirichlet energy, `E_D(x) = xᵀLx = ½ Σ_{(i,j)∈E}(x_i − x_j)²`, a standard
+homophily and smoothness measure in the heterophilic-graph literature (Heterophilic Graph Learning
+Handbook, arXiv:2407.09618 §2.1); the right-hand side as a whole is not, because it also carries
+`ρ_nn`. That the kNN-mean predictor is the **harmonic** minimiser of that energy is Zhu, Ghahramani &
+Lafferty, ICML 2003, who state the harmonic property as "the value of f at each unlabeled data point
+is the average of f at neighboring points" — they minimise the energy to impute labels, this paper
+measures the average's error, and the paper cites them for the object. As a risk the expression is also
+the Wiener filter and the kriging system. All of this is said here rather than left to a reviewer.
 
-**What is ours.** The accounting. That `m1` *is* Newman's target assortativity, the statistic
-graph-learning benchmarks already report; that `m2` is the shared-neighbour correlation; and that the
+**What is ours.** The accounting. That `m1` is **Moran's I on the kNN graph** — Arthur,
+*EPJ Data Science* 2025, 14:1, eq. (2), `I = (N/|W|)(z·z̃)/|z|²` with `z̃_i` the neighbour average, and
+`|W| = N` for a row-normalised adjacency so the constant cancels — and that under that normalisation it
+is Newman's target assortativity, the statistic graph-learning benchmarks already report. The same
+source notes that the Moran index omits assortativity's degree correction, so the two coincide under
+that condition and not in general, and `1 − m1` is Geary's C in the same family; the
+spatial-autocorrelation literature owns the object and the paper cites it. What remains ours is that
+`m2` is the shared-neighbour correlation, that the two compose into the floor exactly, and that the
 published continuous modelability index is this expression. Measured against MODI_q2 on 80 targets
 under a plan frozen before any value existed (`prereg/increment11_modi.yaml`, blob
 `acdba0f77ff9c8fc9149dc9cd8ed39db94122ae1`):
@@ -104,7 +115,9 @@ sparse matrix products and no prediction.
 
 **Status: own contribution, with a stated limit.**
 
-`m1` alone is what the field reports. The second moment is absent from MODI, MODI_q2, RMODI, ROGI and
+`m1` alone is what the field reports. The second moment is absent from MODI, MODI_q2, RMODI, ROGI,
+Cui et al.'s Label Incoherence Index `LII = (1/n) Σ_i (1/k) Σ_{j∈N_i} |y_j − y_i|` — a first-moment L1
+index on the kNN graph at k=10, added to this enumeration by the fifth prior-art pass — and
 kernel target alignment alike. Dropping it costs a factor of 2.5 in level: reproducing MODI_q2 from
 `1 - r` alone gives mean absolute error 0.0257 against the full identity's 0.0103 on ChEMBL-40.
 
@@ -183,10 +196,15 @@ power law does, and the implied dimension swings from 9.5 to 94.8 under perturba
 between-chain spread of 0.0456 makes ordinary. It also claims nothing about a realistic
 medicinal-chemistry acquisition order; the subsampling here is uniform.
 
-**And the opposite reading exists.** The Gamma test line this paper already cites contains the
+**And the opposite reading exists, twice.** The Gamma test line this paper already cites contains the
 **M-test**, which recomputes the statistic over growing samples exactly as this section does, and reads
 the result as convergence towards a truth rather than as evidence that the quantity is not the data's.
-The paper states both readings and asserts that neither is settled here.
+Janela & Bajorath, *Sci. Rep.* 2023, 13:17816, run the same sweep on prediction error — "nine training
+sets of increasing size ... 6, 12, 18, 30, 48, 78, 126, 204, and 330 compounds" over ten trials — and
+report errors "constantly small, independent of training set size" in the sub-range that dominates
+their data. Neither reports an *index* as a function of `n`, which is what this section does, but both
+run the sweep and read it the other way. The paper states all three readings and asserts that none is
+settled here.
 
 ## 4a. A model arm is a choice, and this one was worth 0.10 skill
 
@@ -216,13 +234,31 @@ dominated the science, and nothing in the repository recorded that a choice had 
 still excluding zero, floor ahead on 1 of 31. Reported as a sensitivity because it was not
 pre-registered; a symmetric pre-registered version is owed.
 
-**What stays open.** Janela & Bajorath (*Nature Mach. Intell.* 2022, 4:1246) report the simple control
-meeting or exceeding complex ML. We do not reproduce that tie — but their control is 1-NN/kNN with their
-choices and ours is a uniform mean over 10 nearest training neighbours at fixed `m`, on a different
-selection and a single 80/20 split. The sensitivity shows `m` alone carries 0.023 of the 0.075. Settling
-it means running their protocol on their public data
-(`github.com/TiagoJanela/ML-for-compound-potency-prediction`), which is now the best-motivated experiment
-in the queue.
+**What stays open, with the differences now named** (increment 17's prior-art pass; see
+`results/results_increment17.md`). Janela & Bajorath (*Nature Mach. Intell.* 2022, 4:1246) report the
+simple control meeting or exceeding complex ML, and we do not reproduce that tie. Three concrete
+differences, from their own papers and public code:
+
+- **Their metric is unnormalised MAE**, the sole metric on all 376 activity classes
+  (*Pharmaceuticals* 2023, 16(4):530 §4.5); *Sci. Rep.* 2023 adds RMSE and squared Pearson on eight.
+  Neither reports a variance-normalised error as a performance value, and this paper's skill is a
+  baseline-normalised root-error ratio. Their own paired figures give the conversion factor (MAE ~0.4
+  against RMSE ~0.5, and <0.8 against <1.0, both ratios 1.25, the Gaussian `√(π/2)`), under which a
+  0.1 MAE margin maps to 0.125 of skill at a potency standard deviation of 1.0 and 0.084 at 1.5 —
+  bracketing the −0.0754 to −0.0949 above. **The two gaps are of the same order**; this is an
+  order-of-magnitude conversion under a stated assumption and it resolves nothing by itself.
+- **Their 2022 control used Euclidean distance.** Their code builds it as
+  `neighbors.KNeighborsRegressor()` with `{"n_neighbors": [1, 3, 5]}` and no metric argument, so
+  scikit-learn defaults to `minkowski, p=2` with uniform weights, on 2048-bit Morgan vectors. Their
+  2023 repository sets `metric='jaccard'` explicitly. Ours is a uniform mean over ten
+  **Tanimoto**-nearest neighbours.
+- **Their model arm was done right**, so nothing here implies the field generally gets it wrong: SVR
+  with a **Tanimoto kernel** and `C` swept over ten values, plus a 54-point deep-arm grid.
+
+Our own sensitivity shows `m` alone carries 0.023 of the 0.075. Settling it still means running their
+protocol on their public data (`github.com/TiagoJanela/ML-for-compound-potency-prediction`), and that
+run must now **report MAE beside skill** so the comparison exists on their scale as well as ours. It
+remains the best-motivated experiment in the queue.
 
 ---
 
@@ -309,6 +345,28 @@ the margin from zero. Cross-validation, given eight exponents and never shown a 
 [+0.0139, +0.0221]**, so the correction above survives. The two-parameter arm adds +0.0002, positive
 on 20 of 40: the scale channel is empty, shown rather than asserted.
 
+**Nor is the comparison against uniform weights ours, and the direction is 1988.** Nigsch, Bender,
+van Buuren, Tissen, Nigsch & Mitchell, *J. Chem. Inf. Model.* 2006, 46(6):2412-2422, compared
+"arithmetic and geometric average, inverse distance weighting, and exponential weighting" on 4119
+organic molecules under 25-fold Monte Carlo cross-validation — a uniform arm against three kernels, in
+this journal, on melting points. And Cleveland & Devlin, *JASA* 1988, 83(403):596-610, title §10.4
+"Weight Functions and the Poor Performance of the Uniform", reporting both that "the uniform weight
+function ... performs poorly" **and** that "the overall form of the weight function does not have an
+appreciable effect" — the second half being the honest frame for the one-parameter result above, and
+restated for QSAR by Gajewicz-Skretna et al.'s kernel-weighted local polynomial regression ("the
+particular form of the function, K has only a relatively small effect on estimation accuracy").
+**The closest adjacent prior to the one-parameter claim** is Anava & Levy, *k\*-Nearest Neighbors:
+From Global to Local*, NIPS 2016, who "phrase a notion of optimal weights" and prove "the optimal
+weights depend on a single parameter `L/C`, namely the Lipschitz to noise ratio"; the rank-indexed
+analogue is Demirkaya et al., *JASA* 2024, 119(545):297-307, whose weights are fixed by one subsampling
+scale. Both are adjacent and neither pre-empts: their one parameter is derived inside an assumed model
+rather than cross-validated, and neither measures molecular neighbourhoods nor compares against a
+least-squares-fitted weight vector.
+
+**What is left as ours on this axis**, after the fifth pass: the measurement of the rank profile on
+molecular similarity neighbourhoods, which nothing found reports; and the comparison of a
+one-parameter kernel against the **fitted** optimum, which no source on either side runs.
+
 **Neither arm is ours, and the section says so.** Itskowitz & Tropsha, *J. Chem. Inf. Model.* 2005,
 45(3):777-785, derived the optimality condition for kNN QSAR as their eq (17),
 `-2u_k + Σ_k' F_k' V_kk' - μ = 0`, "a system of linear equations with respect to `F_k`" built from
@@ -344,7 +402,7 @@ losing one.
 
 Every increment carries a YAML pre-registration committed and referenced by its **git blob hash**,
 frozen before any measurement and never edited afterwards; scripts carry the blob in a module constant
-and print it first. Design gates are evaluated before outcomes are read. 431 tests.
+and print it first. Design gates are evaluated before outcomes are read. 433 tests.
 
 The project has **six times refused a verdict its own frozen rule granted**, because the design could
 not earn it. Five were design gates on the decoupling of the two moments, with a proved structural
@@ -413,10 +471,22 @@ numbers, not as a footnote.
    movement is entirely the classical k/n rank-dilution channel, which the section now cites rather
    than claims. The confound was measured instead of declared, and the decomposition turned up a
    variance-normaliser term 4.7 times the residual and pointing the other way. See section 4 above.
-4. **The fifth prior-art pass**, which `prior-art.md` has listed as required since the weighted-kNN
-   result existed: Dudani 1976, Hechenbichler & Schliep 2004, Samworth 2012, locally weighted
-   regression in QSAR, and Janela & Bajorath's line (*Nature Mach. Intell.* 2022, 4:1246;
-   *Sci. Rep.* 2023, 13:17816; *Pharmaceuticals* 2023, 16(4):530) which is claim-4's prior.
+4. ~~The fifth prior-art pass~~ **DONE in two halves, increments 16 and 17.**
+   `docs/paper/prior-art.md` sections 7 and 8; `results/results_increment17.md`. **No fatal collision,
+   and claim 5 survives** — MODI's own paper was read in full and contains no closed form, no graph or
+   spectral language and no error formula, which was the single collision that would have cost it. The
+   cost is corrected attributions: `m1` is Moran's I, the Dirichlet energy is the first-moment term
+   only, the graph average's harmonic property is Zhu, Ghahramani & Lafferty 2003, the index
+   enumeration gains Cui et al.'s Label Incoherence Index, and on the weighting axis Nigsch 2006 owns
+   the uniform-against-kernel comparison in QSAR while Cleveland & Devlin 1988 own its direction and
+   Anava & Levy 2016 own one-parameter optimal local weights. Two sentences this project wrote on
+   2026-10-25 were wrong and are corrected in place. Janela & Bajorath's line touches sections 1, 2, 3
+   and 5 **not at all** — zero occurrences of modelability, MODI, ROGI, assortativity, homophily,
+   Dirichlet or activity cliff in either open-access paper — and section 4a's differences are now named.
+5. **Run Janela & Bajorath's protocol on their public data.** Now specified by increment 17: their
+   metric is MAE, their 2022 control is unweighted kNN over at most five **Euclidean**-nearest
+   neighbours on 2048-bit Morgan vectors, their model arm is a CV-tuned **Tanimoto-kernel** SVR, and
+   the run must report MAE beside skill. The only thing that settles section 4a.
 
 ## Dropped, with the reason
 

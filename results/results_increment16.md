@@ -220,3 +220,36 @@ with the fitted arm ahead on 37/40 masked and **0/40** unmasked. That is ten tim
 **in the direction that confirms the registered prediction**, so the increment would have reported that
 one parameter suffices because its competitor was crippled — and the first draft's gate 1 was blind to
 exactly that.
+
+---
+
+## Correction, 2026-10-25: prediction 2 is a replication, not a first measurement
+
+Found the same day by increment 17's prior-art pass — the half of the fifth pass that this increment's
+own review did not cover — and recorded here rather than by editing the text above.
+
+This document states under prediction 2 that "nobody in the kNN-QSAR line had measured this". **That is
+false.** Nigsch, Bender, van Buuren, Tissen, Nigsch & Mitchell, *J. Chem. Inf. Model.* 2006,
+46(6):2412-2422, report: "To compute the prediction on the basis of the melting temperatures of the
+nearest neighbors, we used four different methods (**arithmetic and geometric average**, inverse
+distance weighting, and exponential weighting), of which the exponential weighting scheme yielded the
+best results", on 4119 organic molecules plus 277 drugs under 25-fold Monte Carlo cross-validation with
+the neighbour count varied. That is a uniform arm against three weighting schemes, in the kNN-QSAR
+line, in this paper's target journal, in 2006.
+
+So prediction 2 is a **replication on potency data of a melting-point result**. The corrected statement
+is that nobody in the *modelability* line had measured it, and that nobody in either line had compared
+a one-parameter kernel against the **fitted** optimum — which is what prediction 3 does and what
+remains this increment's own.
+
+Two further attributions tighten rather than overturn. The direction of prediction 2 is Cleveland &
+Devlin, *JASA* 1988, 83(403):596-610, whose §10.4 is headed "Weight Functions and the Poor Performance
+of the Uniform"; the same section also reports that "the overall form of the weight function does not
+have an appreciable effect", which is the honest frame for this increment's one-parameter finding. And
+the closest adjacent prior to that finding is Anava & Levy, NIPS 2016, who prove that optimal local
+weights "depend on a single parameter `L/C`, namely the Lipschitz to noise ratio" — a derived ratio in
+an assumed model rather than a cross-validated exponent, and not compared against a fitted weight
+vector, so adjacent and not pre-empting.
+
+Nothing measured in this increment changes. See `results/results_increment17.md` and
+`docs/paper/prior-art.md` section 8.
