@@ -1,0 +1,119 @@
+pre-registration blob: 0ce65b307616a86cf0b565e854151096501d3f28
+
+====================================================================================================
+GATE 1. THE INSTRUMENT, AGAINST THE COMMITTED INCREMENT-12 ARTEFACT
+====================================================================================================
+  c_first @ m=5            max |recomputed - committed| = 0.000e+00
+  c_last @ m=5             max |recomputed - committed| = 0.000e+00
+  skill_mean @ m=5         max |recomputed - committed| = 0.000e+00
+  skill_rank @ m=5         max |recomputed - committed| = 0.000e+00
+  cond_C @ m=5             max |recomputed - committed| = 0.000e+00
+  c_first @ m=10           max |recomputed - committed| = 0.000e+00
+  c_last @ m=10            max |recomputed - committed| = 0.000e+00
+  skill_mean @ m=10        max |recomputed - committed| = 0.000e+00
+  skill_rank @ m=10        max |recomputed - committed| = 0.000e+00
+  cond_C @ m=10            max |recomputed - committed| = 0.000e+00
+
+  checked on 40 targets at m=5 and 31 at m=10
+  self-exclusion is asserted at every anchor call and would have raised, not been scored
+  GATE 1: PASS at tolerance 1e-12
+
+====================================================================================================
+GATE 2. ALPHA = 0 AGAINST THE UNIFORM ARM (DECLARED WEAK)
+====================================================================================================
+  max |kernel(alpha=0) - uniform| over every m and target = 0.000e+00
+  GATE 2: PASS at tolerance 1e-15
+  This gate cannot fail for a correct implementation and is NOT evidence the kernel arm
+  is right. It is kept because it would catch a normalisation mismatch between the arms.
+
+====================================================================================================
+GATE 3. SELECTION IS BLIND, BY RECOMPUTATION FROM THE SPLIT RULE
+====================================================================================================
+  max |recomputed CV score - recorded| over every arm and target = 0.000e+00
+  GATE 3: PASS, bit for bit
+
+====================================================================================================
+A. WHAT EACH ARM SELECTED, AND WHAT IT SCORED
+====================================================================================================
+  arm            params  median m  median alpha  mean skill  CV was test-best  mean regret
+  uniform             0       5.0         0.000      0.3658           23/40         0.0053
+  kernel              1      10.0         1.000      0.3839           10/40         0.0040
+  kernel_scaled       2      10.0         1.000      0.3841            4/40         0.0045
+  fitted              m      10.0         0.000      0.3823           32/40         0.0006
+
+====================================================================================================
+B. THE PRIMARY STATISTIC, AND PREDICTION 2
+====================================================================================================
+  mean(skill_kernel - skill_uniform), own grids = +0.0181 [+0.0146, +0.0218]
+  positive on 37/40 targets
+  PREDICTION 2: HOLDS
+  DISCLOSED: this statistic was measured during the pre-freeze review, so the plan is a
+  pre-registration of procedure and not a blind one. See disclosure (a) in the prereg.
+
+====================================================================================================
+C. PREDICTION 3 AND THE SUFFICIENCY INSTRUMENT
+====================================================================================================
+  matched grid: mean(skill_kernel - skill_fitted) = -0.0009 [-0.0048, +0.0025]
+  own grids   : mean(skill_kernel - skill_fitted) = +0.0016 [-0.0004, +0.0040]
+  margin = -0.01, which is 65 % of increment 12's committed +0.0155
+  PREDICTION 3: HOLDS (one-sided non-inferiority: lower end -0.0048 vs -0.01)
+
+====================================================================================================
+D. PREDICTION 1, WHERE ALPHA LANDED
+====================================================================================================
+     alpha    0.0   0.25    0.5   0.75    1.0    1.5    2.0    3.0
+     count      0      0      1      5     26      8      0      0
+  median 1.000, IQR [1.000, 1.000]
+  alpha in (0.75, 1.0, 1.5) on 39/40 targets, needs >= 20
+  PREDICTION 1: HOLDS
+  kernel_scaled, reported beside and not entering the prediction: median alpha 1.000, agrees with kernel on 30/40
+
+====================================================================================================
+E. PREDICTION 4, THE SELECTED NEIGHBOURHOOD SIZES
+====================================================================================================
+  own grids   : kernel median m 10.0 against fitted 10.0  -> FAILS  (this is the test)
+  matched grid: kernel median m 10.0 against fitted 10.0  (DESCRIPTION ONLY: the matched grid is the fitted arm's admissible set and truncates
+   the kernel harder, deleting the region where its preference for larger m would live)
+  PREDICTION 4: FAILS
+  Registered AGAINST the project's only committed evidence, which points the other way:
+  increment 12 found uniform prefers m=5 to m=10 while fitted prefers 10 to 5.
+
+====================================================================================================
+F. DID THE RESHAPING GAIN SURVIVE SYMMETRIC SELECTION
+====================================================================================================
+  matched grid: mean(skill_fitted - skill_uniform) = +0.0179 [+0.0139, +0.0221]
+  increment 12's committed figure, matched two-point grid: +0.0155 [+0.0118, +0.0192]
+  the gain SURVIVES selection
+
+====================================================================================================
+G. THE OUTCOME RULE, ONE INSTRUMENT AND THREE BRANCHES
+====================================================================================================
+  instrument: the matched-grid interval [-0.0048, +0.0025] against -0.01
+
+  THE KERNEL SUFFICES. The paper states the reshaping gain is a one-parameter effect,
+  cites Itskowitz & Tropsha 2005 for both the optimum (eq 17) and the kernel form
+  (eq 21) with novelty claimed for neither, and reports the fitted optimum as the
+  upper bound the kernel attains.
+
+====================================================================================================
+H. THE SAME ON MoleculeACE-30
+====================================================================================================
+  kernel - uniform  = +0.0211 [+0.0171, +0.0257], positive on 30/30
+  kernel - fitted (matched) = -0.0003 [-0.0038, +0.0034]
+  median selected alpha 1.000, alpha in (0.75, 1.0, 1.5) on 29/30
+
+====================================================================================================
+I. WHERE THE GUARDS BOUND
+====================================================================================================
+  the conditioning guard bound on 9 of 70 targets; highest cond(C) over all folds = 483.704 against 100.0
+    ChEMBL-40      CHEMBL4860_Ki            blocked m = 10 20 40, max cond 483.704
+    ChEMBL-40      CHEMBL245_Ki             blocked m = 40, max cond 115.540
+    ChEMBL-40      CHEMBL4361_Ki            blocked m = 10 20 40, max cond 346.159
+    ChEMBL-40      CHEMBL1784_EC50          blocked m = 40, max cond 154.411
+    MoleculeACE-30 CHEMBL1862_Ki            blocked m = 40, max cond 105.977
+    MoleculeACE-30 CHEMBL2147_Ki            blocked m = 20 40, max cond 238.284
+    MoleculeACE-30 CHEMBL244_Ki             blocked m = 40, max cond 120.062
+    MoleculeACE-30 CHEMBL2835_Ki            blocked m = 20 40, max cond 233.125
+    MoleculeACE-30 CHEMBL2971_Ki            blocked m = 40, max cond 205.717
+  fitted-arm CV-admissible sets: {'3 5': 36, '3 5 10': 31, '3 5 10 20': 3}
+  fitted-arm refit-admissible sets: {'3 5 10': 41, '3 5': 25, '3 5 10 20': 4}
