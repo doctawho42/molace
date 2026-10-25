@@ -1,0 +1,304 @@
+# Increment 18: what Janela & Bajorath's own predictions say on a normalised scale
+#
+# SECOND DRAFT. The first went through an adversarial pre-freeze review across three lenses -- gate and
+# prediction feasibility, inferential fairness to another research group, and statistical validity --
+# which raised 28 findings, of which 18 survived verification and THREE WERE FATAL. The review's own
+# proposed fixes were then adversarially checked and corrected in nine places. The first draft is not
+# in the repository; it was never frozen and never produced a number.
+#
+# WHY. The last blocking experiment, specified by results/results_increment17.md. Reconnaissance
+# changed its shape: THEIR PER-COMPOUND PREDICTIONS ARE PUBLISHED, at
+# github.com/TiagoJanela/Limitations-compound-potency-predictions, path
+# regression_models_50_50/ECFP4/Unbalanced/ -- predictions_test.csv (232650 rows),
+# predictions_train.csv (232400), performance_test.csv (1920 rows = 8 targets x 10 trials x 5
+# algorithms x 5 metrics), model_best_parameters.csv. So NOTHING IS RE-TRAINED. This is a reanalysis
+# of published artefacts: no reimplementation of someone else's method, hence no reimplementation
+# error can be mistaken for a disagreement. Its limit is that it holds their data, splits, controls and
+# models fixed, and that limit is in the limits block.
+#
+# THE DISAGREEMENT, in both parties' words.
+#   Them, Sci. Rep. 2023, 13:17816, Results: "differences in mean prediction errors of all methods were
+#   confined to ~ 0.1 units and thus essentially negligible"; Conclusion: "Increasingly complex machine
+#   learning methods and simple control calculations displayed similar performance." They report the
+#   direction too: "SVR predictions were overall slightly more accurate than RFR and 1-/3-NN
+#   calculations."
+#   Us, increment 14: the kNN floor loses to the cross-validated learner by -0.0754 [-0.0865, -0.0639]
+#   skill on ChEMBL-40.
+#   Increment 17 established the scales differ -- theirs unnormalised MAE, ours a baseline-normalised
+#   root-error ratio -- and put the two gaps at the same order under an assumed Gaussian conversion.
+#   This increment removes the assumption by computing the normalised statistic on their predictions.
+#
+# WHAT THE REVIEW KILLED, AND WHY IT MATTERS THAT IT DID.
+#   The first draft's pivot was a prediction that their two normalised columns disagree, with the one
+#   their text reports being the one that cannot see the effect. THAT PIVOT WAS DECIDED BY CONSTRUCTION.
+#   The exact identity, verified against their own published R2 column to better than 1e-15 on every
+#   non-constant cell, is
+#       R2 = r^2 - (r - b)^2 - d^2,   b = sd(pred)/sd(y),  d = (mean(y) - mean(pred))/sd(y)
+#   on the test set, so
+#       (R2_A - R2_B) - (r^2_A - r^2_B)  ==  penalty_B - penalty_A,   penalty = (r-b)^2 + d^2 >= 0.
+#   The comparison is therefore IDENTICALLY a claim about which arm is worse calibrated in spread or
+#   bias -- and an unweighted k<=3-NN regressor has b ~= 1 by construction, its predictions being
+#   individual training labels and so as dispersed as the labels, while a regularised kernel machine
+#   shrinks toward the mean and drives b toward r, which is exactly the penalty-minimising value. On
+#   synthetic data with the two arms given the IDENTICAL correlation, so that neither is more accurate
+#   and only their calibration differs, the first draft's "at least 6 of 8 targets" clause fired in
+#   100.0 % of replicates at r = 0.55, 0.65, 0.75 and 0.85; the correlations measured on their
+#   non-outcome arms run 0.507 to 0.839, squarely inside that range. Increment 16's first draft had a
+#   prediction cleared by noise 88 % of the time; this one was cleared by construction 100 % of the
+#   time, and it made the "no finding" branch unreachable.
+#   CONSEQUENCE: that comparison is ALGEBRA, not a measurement, and it is stated below as a theorem
+#   with its verification residual rather than registered as a prediction. The increment's pivot moves
+#   to the normalised gap itself.
+#
+#   AND THE METRIC LABEL WAS WRONG IN FIVE PLACES. Their published `r` column holds the UNSQUARED
+#   Pearson correlation: max |published r - recomputed r| is 5.551e-16, against max |published r -
+#   recomputed r^2| of 0.250, and the two readings are never within 0.13 of each other on these cells.
+#   Their Methods call it "the squared Pearson correlation coefficient (r2)", so the paper's quantity
+#   is obtained by squaring the column. The first draft asserted "squared Pearson" in the shared block,
+#   in prediction 3 and in the forbidden list -- while the pre-freeze check that reached 5.551e-16 had
+#   computed it UNSQUARED. A script following the draft's text would have failed gate 1 on all 320 r
+#   rows, and by the gate's own clause the increment would have stopped on the plan's error rather than
+#   on anything about their work.
+#
+# CHECKED BEFORE FREEZING, at full scope, because increments 13 and 14 froze gates that could not pass:
+#   * All 1920 published rows reproduce from their predictions. Max |recomputed - published| over MAE,
+#     MSE, RMSE, R2 and the unsquared r is 5.551e-16.
+#   * Their R2 column is 1 - MSE/var(y_test) with the population variance about the TEST mean, to
+#     2.22e-16 on all 400 cells including the constant arm.
+#   * The median-regressor arm is constant within all 80 cells, and its single value equals the
+#     training median exactly. 40 of the 80 training sets are even-sized, so the median convention is
+#     declared below.
+#   * The training compound set and its mean are identical across all five algorithms in all 80 cells,
+#     and test and training sets are disjoint in all 80 cells, not merely at trial 0 as the first draft
+#     claimed.
+#   * penalty = (r-b)^2 + d^2 is non-negative on all 320 non-constant cells, as it must be: minimum
+#     3.58e-05, median 0.0152, maximum 0.2476, zero violations.
+#   * mean |skill_MR| measured 0.006058 with the absolute value taken per cell, which is what sets
+#     prediction 3's threshold below. The first draft registered 0.05, ten times too loose.
+#   None of these touches the outcome statistic, which has NOT been computed.
+
+provenance:
+  claim_under_test: >
+    section 4a of docs/paper/skeleton.md, "What stays open", and the final blocking experiment as
+    specified by results/results_increment17.md
+  their_artefacts:
+    repository: github.com/TiagoJanela/Limitations-compound-potency-predictions
+    path: regression_models_50_50/ECFP4/Unbalanced/
+    retrieved: 2026-10-25
+    their_protocol_as_their_own_files_record_it: >
+      8 ChEMBL targets, 10 trials, test sizes 344 to 1137; five arms -- MR, a constant equal to the
+      training median; 1-NN; kNN with n_neighbors drawn from {1, 3} and metric='jaccard'; RFR; and SVR
+      with a Tanimoto kernel and C drawn from {10, 100, 10000} on these cells -- on ECFP4 features,
+      with a published metric table carrying MAE, MSE, RMSE, R2 and r.
+  what_is_not_claimed: >
+    No model is trained here, no code of theirs is executed, and no claim is made that their numbers
+    are wrong: their published table reproduces exactly from their own predictions. The question is
+    what the same predictions say on a variance-normalised scale.
+
+shared:
+  cells: the 80 (target, trial) cells of their Unbalanced 50/50 setting
+  arms_theirs: [MR, 1-NN, kNN, RFR, SVR]
+  controls: [MR, 1-NN, kNN]
+  complex: [RFR, SVR]
+  the_pair: >
+    SVR against kNN. Declared here and not changeable: SVR is their most accurate arm by their own
+    report and kNN their closest analogue to this project's floor, so this is the pair that bears on
+    section 4a.
+  skill: >
+    1 - RMSE_arm / RMSE_baseline per cell, the baseline predicting that cell's TRAINING MEAN on that
+    cell's test set. This is this project's metric in every pre-registration since increment 14 and is
+    not changed here, because changing it would make the comparison with increment 14 invalid.
+  their_metrics_recomputed:
+    MAE: mean |y - pred|
+    MSE: mean (y - pred)^2
+    RMSE: sqrt(MSE)
+    R2: 1 - MSE / var(y_test), population variance about the test mean
+    r: >
+      the UNSQUARED Pearson correlation between y and pred, which is what their published column holds.
+      Their paper's reported quantity is r^2, obtained by squaring it; wherever r^2 appears below it is
+      defined as the square of this column and never as the column itself.
+  median_convention: >
+    numpy.median, i.e. the mean of the two central order statistics on an even-sized set. Declared
+    because 40 of the 80 training sets are even-sized and gate 3 is an equality against it.
+  aggregation: >
+    per-cell statistics are averaged over the 10 trials WITHIN a target first, so each of the 8 targets
+    contributes exactly one value; absolute values, where a prediction takes one, are applied per cell
+    BEFORE trial-averaging. Fixed here because the order changes the third decimal.
+  uncertainty: >
+    the primary report is the 8 per-target values themselves. Beside them, a Student t interval on 7
+    degrees of freedom over those 8 values. NOT a percentile cluster bootstrap: simulation at 8
+    clusters puts its actual coverage of a nominal 95 % interval at about 0.87, and increment 14's use
+    of it was defensible at 40 clusters and is not here. The t interval was chosen over a bootstrap-t
+    which recovers coverage to 0.90-0.95 but whose 95th-percentile width blows out from 2.8 to 19.5
+    across the shapes simulated, against 2.4 to 4.6 for t(7); t(7) itself degrades to about 0.88 under
+    strong skew and that is stated wherever an interval is quoted.
+  seed: 0
+
+the_theorem_stated_rather_than_registered:
+  statement: >
+    On any test set, with b = sd(pred)/sd(y) and d = (mean(y) - mean(pred))/sd(y),
+    R2 = r^2 - (r - b)^2 - d^2. Hence r^2 = R2 + penalty with penalty = (r-b)^2 + d^2 >= 0: the squared
+    Pearson correlation is the coefficient of determination PLUS a non-negative calibration term, and
+    being invariant to any affine rescaling of the prediction it cannot see that term.
+  verified: >
+    to better than 1e-15 against their own published R2 column on every non-constant cell, with
+    penalty non-negative on all 320 of them.
+  why_it_is_not_a_prediction: >
+    it is an identity, it is true before any data are read, and registering it as a prediction would
+    have made this increment report a 100 %-certain algebraic consequence as though it were evidence.
+    It belongs in section 4a as two lines of algebra.
+  what_it_does_and_does_not_license: >
+    It licenses the statement that their reported r^2 cannot distinguish a well-calibrated predictor
+    from a badly calibrated one of equal correlation, and that the coefficient of determination, which
+    can, is in their repository and not in their text. It does NOT license any claim that their arms
+    differ in calibration for an interesting reason: an unweighted neighbour rule has b ~= 1 by
+    construction and a regularised kernel machine shrinks b toward r, so a calibration gap between
+    those two arms is expected from their construction alone and is reported as such.
+
+design_gates:
+  evaluated_before_any_outcome_is_read: true
+  gate_1_their_table_reproduces_from_their_predictions:
+    passes_iff: >
+      every one of the 1920 rows of performance_test.csv is reproduced from predictions_test.csv to
+      within 1e-12, under the five formulae in shared.their_metrics_recomputed, with r taken UNSQUARED
+    tolerance_justification: >
+      measured maximum 5.551e-16 at full scope before freezing, so 1e-12 has four orders of headroom,
+      while reading the wrong column or grouping wrongly moves a metric by order 0.1 and squaring r
+      moves it by 0.135 to 0.250.
+    why: >
+      it ties this increment's reading of a 232650-row file to their own published numbers. Without it
+      every statistic here could be a parsing error wearing their name.
+    if_it_fails: the increment stops and the discrepancy is the report
+  gate_2_the_baseline_is_well_defined:
+    passes_iff: >
+      in every one of the 80 cells the training compound set and its mean are identical across all five
+      algorithms, and the test and training compound sets are disjoint
+    checked_before_freezing: >
+      0 of 80 cells differ and overlap is 0 in all 80 cells. The first draft asserted this at trial 0
+      only, one tenth of the gate's scope, in two separate places.
+    declared_weak: >
+      cannot fail for a correct read of their files. Kept because it would catch the one thing that
+      would make a train-mean baseline meaningless, namely per-algorithm training sets. Not evidence
+      that the baseline is the right choice.
+  gate_3_the_constant_arm_is_the_training_median:
+    passes_iff: >
+      in every cell the MR arm has exactly one distinct predicted value AND that value equals
+      numpy.median of that cell's training labels to within 1e-12
+    why_the_equality_and_not_just_distinctness: >
+      the first draft gated on distinctness alone, which passes identically if the arm were the
+      training MEAN -- and in that case prediction 3 below would pass trivially with skill_MR exactly
+      zero, since the baseline is the train mean. The equality is what makes prediction 3 a test.
+    checked_before_freezing: holds exactly, residual 0.0, on all 80 cells
+
+predictions_registered_in_advance:
+  prediction_1:
+    text: their reported MAE margin reproduces for the pair this increment compares
+    holds_iff: mean over the 8 targets of (MAE_kNN - MAE_SVR) is <= 0.1
+    status: >
+      a reproduction of a published claim, not a prediction about the world, registered so a failure is
+      read as a reading error here rather than as a finding about their work. It reproduces the
+      SVR-against-kNN margin specifically; their sentence as published covers all five arms including
+      the median regressor, and that wider claim is NOT tested here.
+    if_it_fails: >
+      gate 1 has already passed, so a failure means the pair or the aggregation is misread; the
+      increment stops and reports that, not an outcome.
+  prediction_2:
+    text: >
+      on a variance-normalised scale their own predictions show a gap of the same order as this project
+      measured on its own data
+    holds_iff: >
+      the mean over the 8 targets of (skill_SVR - skill_kNN) lies in [0.025, 0.226], a factor of three
+      either side of increment 14's committed -0.0754
+    status: >
+      THE PIVOT, moved here from the first draft's prediction 3. Registered with a direction and a band
+      anchored to a committed figure. The band is wide on purpose: the quantity under test is an order
+      of magnitude, not a value, and their targets, splits and controls are not this project's.
+    reported_with_it: >
+      the 8 per-target values, the t(7) interval, and the position of the band's two edges relative to
+      it, so a reader sees whether the routing below rests on a point estimate near an edge.
+  prediction_3:
+    text: the constant arm's skill is near zero, as a train-mean baseline makes it by construction
+    holds_iff: mean over the 8 targets of |skill_MR| is <= 0.01, absolute value taken per cell
+    status: >
+      the one number here known from first principles rather than from their files, and this
+      increment's internal scale check. The threshold is DERIVED, not asserted: the measured value is
+      0.006058, so 0.01 is a factor of 1.65 of headroom. The first draft registered 0.05, ten times
+      the derived value and two thirds of the effect under test, which could not have failed.
+    note: >
+      skill_MR is signed and positive in roughly a quarter of cells, because the train median can sit
+      either side of the train mean relative to the test labels; the prediction is on the mean of
+      per-cell absolute values and nothing is claimed about its sign.
+
+outcome_rule:
+  primary_statistic: >
+    mean over the 8 targets of (skill_SVR - skill_kNN), trials averaged within target first
+  partition: >
+    THREE EXHAUSTIVE BRANCHES ON PREDICTION 2 ALONE. The first draft partitioned on two predictions and
+    left one state uncovered and one state double-covered with no precedence rule; dropping the
+    algebraic pivot removes that defect rather than patching it.
+  branch_scale_disagreement:
+    iff: the primary statistic lies inside [0.025, 0.226]
+    then: >
+      the two literatures' conclusions differ in SCALE and not in substance. Section 4a states that
+      their tie and this project's gap are the same comparison reported on an absolute and a normalised
+      scale; that their repository contains the coefficient of determination while their text reports
+      the affine-invariant correlation, with the theorem above as the reason that matters; and that from
+      here on this paper reports BOTH scales for every model-against-floor comparison. No claim is made
+      that their numbers are wrong.
+  branch_substantive_disagreement:
+    iff: the primary statistic is below 0.025
+    then: >
+      the disagreement is NOT a scale effect: on their data, their splits and their models the
+      normalised gap is small, so the difference from increment 14 lies in the data, the control or the
+      selection protocol. Section 4a says so, the scale explanation is withdrawn, and the next
+      increment isolates which -- starting with the control, since theirs is at most three
+      Jaccard-nearest neighbours and this project's a uniform mean over ten Tanimoto-nearest ones.
+  branch_larger_than_ours:
+    iff: the primary statistic is above 0.226
+    then: >
+      their own data shows a normalised gap more than three times this project's. That is a finding
+      about scale and not about their competence, and it is stated in exactly those terms: the absolute
+      margin they call negligible corresponds, on their own predictions, to a normalised gap larger
+      than the one this project reported on different data. The claim is reported WITH the t(7)
+      interval and with the per-target values, because at 8 targets a single outlying target can carry
+      it.
+  if_the_interval_straddles_an_edge: >
+    the branch still follows the point estimate, because the band is a factor-of-three order check and
+    not a hypothesis test, but the report must say that it straddles and give both edges. This is
+    declared here so that the disclosure is not a choice made after seeing the interval.
+
+limits_stated_in_advance:
+  - >
+    Eight targets, one 50/50 unbalanced setting. Their repository holds others -- the R2-cost variants,
+    the increasing-training-size designs, the balanced variants -- and those are secondary; the primary
+    is declared here so the choice cannot follow the result.
+  - >
+    Eight clusters is few. The t(7) interval's coverage is about 0.95 under symmetry and degrades to
+    about 0.88 under strong skew, and a percentile cluster bootstrap at this cluster count covers about
+    0.87, which is why it is not used. Every interval quoted carries this caveat.
+  - >
+    This is their protocol on their data, so it cannot separate their control from their data from
+    their splits. A gap of the same order as increment 14's is consistent with the scale explanation
+    and does not prove it.
+  - >
+    A calibration gap between an unweighted neighbour rule and a regularised kernel machine follows
+    from their construction, so the theorem's penalty term is not evidence of anything interesting
+    about their modelling choices and is not reported as though it were.
+  - >
+    Nothing is said about their deep-learning arm, which is in their 2022 repository and not in the
+    table reanalysed here, nor about their 1-NN and RFR arms beyond reporting their values.
+
+forbidden:
+  - Training any model, or executing any code from their repository. Their files are read as data.
+  - Treating their published `r` column as a squared correlation, or r^2 as the coefficient of
+    determination. The square is formed explicitly wherever r^2 is used.
+  - Registering the R2-against-r^2 comparison as a prediction. It is an identity and is stated as one.
+  - Changing the declared primary setting, the arm pair, the aggregation order, the median convention
+    or the band after seeing a value; and resolving any metric definition after freezing, which is the
+    free parameter the review found in the first draft.
+  - Quoting a percentile cluster bootstrap interval on these 8 targets.
+  - Claiming their published numbers are wrong. They reproduce exactly.
+  - Reporting the normalised scale without their MAE beside it, which is the error this increment
+    exists to name.
+  - Concluding anything about their control's merits, which this increment holds fixed at theirs.
+  - Reading the theorem's calibration term as evidence about their modelling choices.
