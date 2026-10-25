@@ -243,8 +243,20 @@ exchangeable**, `c = r 1` and `C = (1-rho) I + rho 11'`, so `1` is an eigenvecto
     MSE(best alpha * mean) = MSE*           exactly, for all k, r, rho
 
 Two independent derivations (Sherman–Morrison; permutation symmetry with a one-dimensional reduction)
-and a numerical sweep over 2000 random `(k, r, rho)` agreeing to 1.7e-15. An adversarial prior-art pass
-that killed six other proposals found no collision for this statement.
+and a numerical sweep over 2000 random `(k, r, rho)` agreeing to 1.7e-15.
+
+**A neighbouring 1978 result, found by the fifth prior-art pass and not by the four before it.**
+Bailey & Jain, *IEEE Trans. SMC* 1978, 8:311-313, proved that for **fixed k** the **asymptotic
+classification** error of the **unweighted** kNN rule is minimal among weighted kNN rules, for all
+distributions. The four earlier passes reported no collision for this section; that report was made
+without this paper and does not stand. What the two statements share is the conclusion that weighting
+cannot help; they differ in what is assumed and what is concluded. Bailey & Jain is asymptotic, is
+about classification error, and holds for all distributions at fixed k. The statement above is
+finite-sample, is about the squared error of a linear predictor, and holds under second-order
+exchangeability — which section 5.2 then measures to be materially false on molecular data. **The
+paper states both and does not assert that either subsumes the other**: establishing the relationship
+would be its own piece of work, and claiming the 1978 theorem as the asymptotic form of this one
+without that work would be a guess dressed as a citation.
 
 **Scope, stated because the paper will be attacked here.** The theorem bounds predictors that are
 **linear in the labels of a fixed neighbour set under a fixed metric**. It says nothing about a model
@@ -275,11 +287,54 @@ positive on **30 of 31** targets, against the best training-selected uniform `m`
 project first reported `+0.0379` against uniform at a fixed `m = 10`; 62 % of that was the effect of
 fixing `m`, since uniform at `m = 5` beats uniform at `m = 10` on 28 of 31 targets.
 
-**And the optimal profile is a 1976 rule.** Its cosine similarity with `w_j` proportional to `1/j` is
-**0.9946**, against 0.7002 with uniform. Dudani, *IEEE Trans. SMC* 1976, 6(4):325, is therefore the
-competitor this section is stated against, with Hechenbichler & Schliep 2004 and Samworth,
-*Annals of Statistics* 2012, as the theory. Whether the fitted `m`-parameter optimum beats the
-one-parameter inverse-rank kernel is **not settled** and is a blocking experiment.
+**And the whole effect is bought by ONE parameter.** Measured under
+`prereg/increment16_weighting_family.yaml`, blob `0ce65b307616a86cf0b565e854151096501d3f28`; see
+`results/results_increment16.md`. Four arms, every one of them selected by 5-fold cross-validation on
+the training split alone, with all three instrument gates reading exactly `0.000e+00`:
+
+| arm | parameters | median m | median α | mean skill |
+|---|---|---|---|---|
+| uniform | 0 | 5 | — | 0.3658 |
+| **`w_j ∝ j^-α`** | **1** | **10** | **1.000** | **0.3839** |
+| the same times a fitted scale | 2 | 10 | 1.000 | 0.3841 |
+| fitted `w = C^-1 c` | m | 10 | — | 0.3823 |
+
+The one-parameter kernel beats uniform weights by **+0.0181 [+0.0146, +0.0218]** on 37 of 40 ChEMBL
+targets and **+0.0211 [+0.0171, +0.0257]** on 30 of 30 MoleculeACE targets, and on a matched
+neighbourhood grid it gives up **0.0009 [-0.0048, +0.0025]** of skill to the `m`-parameter optimum, so
+a pre-registered non-inferiority margin of -0.01 holds with the interval's lower end less than half
+the margin from zero. Cross-validation, given eight exponents and never shown a test label, selects
+**α = 1 on 26 of 40 targets**, with α ∈ {0.75, 1, 1.5} on **39 of 40** and an interquartile range of
+[1.000, 1.000]. The reshaping gain re-measured under symmetric selection is **+0.0179
+[+0.0139, +0.0221]**, so the correction above survives. The two-parameter arm adds +0.0002, positive
+on 20 of 40: the scale channel is empty, shown rather than asserted.
+
+**Neither arm is ours, and the section says so.** Itskowitz & Tropsha, *J. Chem. Inf. Model.* 2005,
+45(3):777-785, derived the optimality condition for kNN QSAR as their eq (17),
+`-2u_k + Σ_k' F_k' V_kk' - μ = 0`, "a system of linear equations with respect to `F_k`" built from
+label second moments with a Lagrange multiplier for the normalisation — structurally the fitted arm
+above, twenty years earlier, in this paper's target venue. Their eq (21), a normalised
+`exp(-αd/D)` with α tuned for performance, is structurally the one-parameter arm. **What their paper
+does not do** is compare them: the sentence after eq (17) is future tense and the next section says
+"We chose the weighting function in the form" (21), so the optimum is derived and abandoned. Nor does
+it contain a uniform arm at all; its reference is its own kernel at α = 1. That comparison and that
+baseline are what this section adds, on a rank index over Tanimoto neighbourhoods rather than their
+Euclidean descriptor distances with k in 1..7.
+
+`w_j ∝ j^-α` is also **not Dudani's rule**, as this project previously wrote. Dudani, *IEEE Trans.
+SMC* 1976, 6(4):325, weights by distance, `w_i = (d_k - d_i)/(d_k - d_1)`; the rank reciprocal `1/j`
+is Gou, Xiong & Kuang, *J. Computers* 2011, 6(5):833-840, and the family is declared on that citation.
+Hechenbichler & Schliep 2004 contains no rank-indexed kernel of any kind and is cited for the
+distance-kernel family this section deliberately does not test. Lenz, Bollaert & Cornelis
+(arXiv:2311.16872) find distance-weights stronger than rank-weights kernel by kernel within the NN
+classifier over 85 datasets; that axis is left to a separate frozen plan.
+
+**Against this result.** The non-inferiority is an equivalence, not a win: the kernel leads on only 19
+of 40 targets on the matched grid, and its deficit exceeds the margin on 3, worst -0.0565 on
+`CHEMBL614358_EC50`. The prediction that a kernel would select a larger neighbourhood than the fit
+**failed**, on a tie of medians at 10. And the kernel pays a larger selection cost than its
+competitor, 0.0040 of regret against 0.0006, so the protocol charges the winning arm more than the
+losing one.
 
 ---
 
@@ -340,11 +395,16 @@ numbers, not as a footnote.
    The floor loses to the CV-selected learner by −0.0754 [−0.0865, −0.0639] on ChEMBL-40, ahead on 3 of
    40, and by −0.0949 [−0.1084, −0.0806] on MoleculeACE-30, ahead on 1 of 30. The arm choice was worth
    +0.1025 [+0.0899, +0.1156]. See the new section 4a below.
-2. **Weighted kNN against Dudani.** The inverse-rank-power family `w_j ∝ j^-alpha`, declared on the 1976
-   citation so the family is not chosen after seeing the profile, with `m` and `alpha` selected by
-   5-fold CV on the training split; against uniform-at-best-`m` and against the fitted `C^-1 c`
-   optimum. Instrument checks: `alpha = 0` must reproduce the uniform arm to machine precision, and the
-   uniform `m=10` arm must reproduce `knn_floor.predict` to the 3.553e-15 already measured.
+2. ~~Weighted kNN against Dudani~~ **DONE, increment 16.**
+   `prereg/increment16_weighting_family.yaml`, blob `0ce65b307616a86cf0b565e854151096501d3f28`;
+   `results/results_increment16.md`. **The kernel suffices.** One parameter attains the `m`-parameter
+   optimum to within 0.0009 at a pre-registered non-inferiority margin, cross-validation picks α = 1 on
+   39 of 40 targets within {0.75, 1, 1.5}, and all three instrument gates read exactly 0.0. The family
+   is Gou 2011 and not Dudani 1976, which weights by distance; and both arms turn out to be Itskowitz
+   & Tropsha 2005, who derived the optimum and the kernel and never compared them. The instrument
+   checks this entry proposed were replaced: `alpha = 0` against the uniform arm cannot fail and is
+   labelled weak, and the `knn_floor` check was **algebraically blind** to the estimation-side
+   neighbourhood it claimed to tie. See section 5.2 above.
 3. ~~The size dependence, pre-registered~~ **DONE, increment 15.**
    `prereg/increment15_size_dependence.yaml`, blob `3d941919c5aeb34e2749cc820e8e3ae55d5ff725`;
    `results/results_increment15.md`. **Section 4 survives and is rewritten.** The index moves by
