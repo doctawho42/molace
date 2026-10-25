@@ -157,6 +157,67 @@ predictable in closed form, and that the 2014 binary criterion crosses its own p
 46 % of cells by growing alone. Nobody in the modelability line reports an index as a function of n,
 and four prior-art passes before this one did not find anyone who does.
 
+## 7. The fifth pass: weighted kNN. Run 2026-10-25, owed since the weighted-kNN result existed
+
+Items 1 and 5 of "Required before drafting" and blocking experiment 2 of the skeleton both scheduled
+a pass on weighted kNN, and four earlier passes had not run it. It was run as part of increment 16's
+pre-freeze review. **Every citation in that increment's draft plan was wrong about what it cites, and
+the pass found the paper that matters.**
+
+- **Itskowitz, P.; Tropsha, A. k Nearest Neighbors QSAR Modeling as a Variational Problem: Theory and
+  Applications. J. Chem. Inf. Model. 2005, 45(3), 777-785** (doi 10.1021/ci049628+). **PRE-EMPTS BOTH
+  OF INCREMENT 16'S ARMS.** Their eq (3) predicts `y_i = Σ_j y_j F(d_ij)` with "a weighting function
+  dependent only on distance", normalised by eq (4). Their eq (17) is the discrete variational
+  optimum, `-2u_k + Σ_k' F_k' V_kk' - μ = 0`, "a system of linear equations with respect to `F_k`"
+  with `u_k = Σ_i (ȳφ)_ik` and `V_kk' = Σ_i (ȳφ)_ik (ȳφ)_ik'` — a linear system on the weights built
+  from label second moments with a Lagrange multiplier for the normalisation, which is structurally
+  this project's fitted arm `w = C^-1 c`, twenty years earlier, in this paper's target venue, by the
+  group whose modelability index this whole line is built on. Their eq (21),
+  `F(d_ij) = exp(-α d_ij/D) / Σ_j exp(-α d_ij/D)`, is a normalised one-parameter kernel with α tuned
+  for performance: structurally increment 16's kernel arm. **No novelty is claimed for either.**
+  What the paper does NOT do, and this is the opening increment 16 occupies: the sentence after eq
+  (17) is future tense — "Solution of the system of equations (17) ... WILL define the values of `F_k`"
+  — and the next section says "We chose the weighting function in the form" (21). The optimum is
+  derived and abandoned, and the two are never compared. Nor is there a uniform arm anywhere in the
+  paper: the reference is q² at α = 1, its own kernel at a fixed parameter (Table 1 reports q²(α)
+  against q²(α=1); mean improvement 6.7 % in q² and 5.9 % in R², maximum 28.4 % and 44.9 %). Their k
+  runs over 1 to 7 and their distances are Euclidean in a descriptor subspace.
+- **Gou, J.; Xiong, T.; Kuang, Y. A Novel Weighted Voting for K-Nearest Neighbor Rule. J. Computers
+  2011, 6(5), 833-840.** The correct citation for `w_j` proportional to `1/j`. Increment 16's family
+  is declared on it.
+- **Dudani, S. A. IEEE Trans. SMC 1976, 6(4), 325-327.** The origin of distance-weighted kNN, and
+  **not** the rank family this project had been attributing to it: Dudani's weight is
+  `w_i = (d_k - d_i)/(d_k - d_1)`, linear in DISTANCE. The misattribution mattered, because the
+  defence "the family was declared on a 1976 citation so it was not chosen after seeing the fitted
+  profile" is only valid against a citation that contains the family.
+- **Bailey, T.; Jain, A. K. A note on distance-weighted k-nearest neighbor rules. IEEE Trans. SMC
+  1978, 8, 311-313.** For **fixed k** the **asymptotic classification** error of the **unweighted**
+  kNN rule is minimal among weighted kNN rules, for all distributions. **This is a collision with
+  section 5.1**, whose "no collision found" claim rested on four passes that did not have this paper
+  and has been withdrawn from the skeleton. The two statements share the conclusion that weighting
+  cannot help and differ in assumptions and conclusion: Bailey & Jain is asymptotic, about
+  classification, distribution-free at fixed k; section 5.1 is finite-sample, about the squared error
+  of a linear predictor, under second-order exchangeability. The skeleton now states both and
+  explicitly declines to assert that either subsumes the other. Claiming the 1978 theorem as the
+  asymptotic form of section 5.1 without doing that work would be a guess dressed as a citation.
+- **Hechenbichler, K.; Schliep, K. Weighted k-Nearest-Neighbor Techniques and Ordinal Classification.
+  Discussion Paper 399, SFB 386, LMU Munich, 2004.** **Contains no rank-indexed kernel of any kind**:
+  every kernel in it is a function of the standardised distance `D(x, x_(i)) = d(x, x_(i)) /
+  d(x, x_(k+1))` — rectangular, triangular, Epanechnikov, quartic, triweight, cosine, Gauss,
+  inversion. This project had cited it as theory for a rank family. It is now cited for the
+  distance-kernel family increment 16 deliberately does not test.
+- **Lenz, O. U.; Bollaert, D.; Cornelis, C. arXiv:2311.16872.** The rank-weight and distance-weight
+  taxonomy, and the largest published comparison, 85 classification datasets. Its section 5.1 finds
+  distance-weights better than rank-weights **kernel by kernel within the NN classifier**, with
+  exceptions, while its overall verdict for NN keeps rank weights. Cited at that strength and no
+  stronger, for the axis increment 16 does not test.
+
+**What survives as this project's own on the weighting axis**, after the pass: the comparison of a
+one-parameter rank kernel against the fitted optimum with both arms cross-validated on the training
+split, the uniform baseline neither 2005 nor 2011 provides, and the measurement that
+cross-validation selects Gou's α = 1 on 39 of 40 ChEMBL targets within the registered set. That is
+narrower than the draft claimed and it is real.
+
 ## Verdict on each claim in the skeleton
 
 | # | Claim | Verdict after the pass |
