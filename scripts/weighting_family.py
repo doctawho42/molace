@@ -365,8 +365,22 @@ def boot(x, clusters):
     return r.mean, r.lo, r.hi
 
 
+def as_bool(s: pd.Series) -> pd.Series:
+    """A checkpoint round-trips through CSV, where True becomes the string 'True'.
+
+    pandas usually infers bool back, but not if a column ever picks up a NaN, and the failure would
+    only appear on a RESUMED run: the guard counts in section I would silently read every row as
+    truthy. Coerced explicitly so a resumed report equals a fresh one.
+    """
+    return s.map(lambda v: v if isinstance(v, (bool, np.bool_)) else str(v).strip().lower() == "true")
+
+
 def report(t: pd.DataFrame) -> None:
     line = "=" * 100
+    t = t.copy()
+    for col in ["cond_guard_bound"] + [f"{a}_cv_was_test_best" for a in ALL_ARMS]:
+        t[col] = as_bool(t[col])
+    t["cond_guard_blocked_m"] = t.cond_guard_blocked_m.fillna("")
     ch = t[t.collection == "ChEMBL-40"]
 
     print(line); print("GATE 1. THE INSTRUMENT, AGAINST THE COMMITTED INCREMENT-12 ARTEFACT"); print(line)
