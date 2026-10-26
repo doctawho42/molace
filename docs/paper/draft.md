@@ -41,9 +41,10 @@ ranking contribution is unresolved here.
 
 Third, and this is the consequence for practice: the quantity these indices estimate is not a property
 of a dataset but of a dataset **and its size**. Over an eightfold change in sample size the floor's
-relative error moves by +0.2698 [+0.2477, +0.2922] and assortativity by +0.2599 [+0.2385, +0.2807], on
-40 of 40 targets, and the 2014 binary index crosses its own published threshold on 46 % of cells by
-growing alone. The sample dependence of a roughness index is **not news to this literature** — the
+relative error moves by +0.2698 [+0.2477, +0.2922] and assortativity by +0.2599 [+0.2385, +0.2807] on
+40 of 40 ChEMBL targets, and on the 30 MoleculeACE targets — the only collection here carrying an
+activity-class flag, and so the only one on which the 2014 binary index can be evaluated — that index
+crosses its own published threshold on 46 % of cells by growing alone. The sample dependence of a roughness index is **not news to this literature** — the
 ROGI authors devote a supplementary figure to its convergence and bootstrap an interval on it — and we
 say so rather than claim otherwise. What is new is that the movement is the classical `k/n`
 rank-dilution channel, reproducible from the full-sample neighbour ordering alone rather than only
@@ -136,6 +137,18 @@ dataset, and the 2014 binary index's threshold of 0.65 is still applied to it.
 This paper takes one estimator and writes its error exactly. The point is not that the estimator is
 good — it is not the best predictor available, and we measure by how much it loses — but that writing
 it down exactly makes three things visible that the indices' own form hides.
+
+**What is ours, net of everything this paper concedes, in one sentence.** The Dirichlet energy, the
+harmonic minimiser, the Wiener and kriging forms, the Moran index and Geary's C, the `k/n`
+rank-dilution channel, Murphy's skill-score decomposition, Bailey & Jain's 1978 theorem and both
+weighting arms are all prior work, cited in place. What remains is an accounting and three
+measurements made under it: that the published continuous modelability index equals a two-moment
+expression on the kNN graph, to about one percent on 80 targets; that the second of those moments is
+absent from every index in the neighbour-averaging family, costing a factor of 2.5 in reproduced level
+and nothing resolvable in ranking; and that the index moves by 0.27 over an eightfold change in sample
+size, enough to cross the field's own threshold, by a mechanism the closed form predicts without
+resampling. A reader who finds that thin should say so; we think it is a methods paper and we have
+tried not to dress it as more.
 
 ---
 
@@ -246,8 +259,14 @@ at a sequence of distance thresholds and integrates a dispersion over that seque
 neither moment, so "omits the second" is the wrong criticism of it, and the comparison in section 1.1
 is between indices of different construction.
 
-Dropping it costs a **factor of 2.5 in level**: reproducing MODI_q2 from `1 − r` alone gives a mean
-absolute error of 0.0257 against the full identity's 0.0103 on ChEMBL-40.
+**Two different comparisons bear on this and an earlier version of this paper labelled one as the
+other.** Setting `ρ_nn = 0` in equation (1) — literally dropping the second moment — gives a mean
+absolute error against the in-sample floor of **0.4329**, against the full identity's 0.0103: a factor
+of 42, which says the term is structurally essential and is not a claim about any published index,
+since no index is the identity with one term deleted. What the first-moment indices actually resemble
+is `1 − r`, a different estimator with its own coefficient on `r` and no `1/k` term, and that
+reproduces the floor to **0.0257** against 0.0103 — **a factor of 2.5**. The second comparison speaks
+to the field and the first to the algebra, and they are reported separately here.
 
 **The limit, stated here and not buried.** On ECFP4/Tanimoto graphs the two moments are nearly
 collinear, at a Pearson correlation of +0.9895 across the 40 ChEMBL targets, so this design cannot
@@ -410,8 +429,14 @@ chooses its learner — recovers half the gap and does not close it:
 | recovered, of which choosing the weighting | +0.0181 [+0.0146, +0.0218] | +0.0205 | 37 / 40 |
 
 On MoleculeACE-30, −0.0949 becomes −0.0474 [−0.0586, −0.0360] in skill and −0.1171 becomes −0.0596
-[−0.0741, −0.0453] in absolute RMSE, with the floor ahead on 3 of 30. **48 % and 50 % of the gap
-recovered**
+[−0.0741, −0.0453] in absolute RMSE, with the floor ahead on 3 of 30.
+
+**Several figures in this subsection were derivable before the measurement and carry no evidential
+weight**, which the plan that produced them says in those words: the point estimates, the even split
+between the two terms and the zero decomposition residual all follow from marginal means already
+published in this project's tables. What the registration adds is the paired intervals, which depend
+on a per-target covariance the marginal means do not carry, and the sign counts. **48 % and 50 % of
+the gap recovered**
 on two collections of different size and framing, and the recovery splits almost exactly evenly between
 the two freedoms — 0.0002 apart, with a decomposition residual of exactly zero.
 
@@ -459,8 +484,13 @@ on both sides should take 0.0757 against 0.0394 and conclude only that the two a
 
     R² = r² − (r − b)² − d²                                                          (3)
 
-identically — verified against their own published R² column to 1.9 × 10⁻¹⁵ on all 379 non-constant
-cells. So `r² = R² + penalty` with `penalty ≥ 0`: the squared Pearson correlation is the coefficient of
+identically — verified against their own published R² column to 1.0 × 10⁻¹⁵ on all **320**
+non-constant cells, with the calibration penalty running from 3.6 × 10⁻⁵ to 0.2476, median 0.0152, and
+non-negative on every one as the identity requires. (An earlier version of this paper said 379, which
+is the count of rows carrying a finite correlation: 320 genuinely non-constant cells plus 59 of the 80
+median-regressor cells, where floating-point noise gave a constant prediction a non-zero computed
+standard deviation and so a meaningless correlation. The same noise is why this project's own gate on
+that arm counts distinct values rather than thresholding a standard deviation.) So `r² = R² + penalty` with `penalty ≥ 0`: the squared Pearson correlation is the coefficient of
 determination plus a non-negative calibration term, and being invariant to affine rescaling of the
 prediction it cannot see that term.
 
@@ -483,6 +513,15 @@ answers which question: if a 0.1 log-unit margin sits below assay error, the abs
 right one for "should a medicinal chemist prefer the complex model", and a normalised restatement
 answers something else. **What is established is that the two scales give different-looking answers on
 identical predictions**, and we therefore report both for every model-against-floor comparison above.
+
+Three limits travel with this reanalysis, and the plan that produced it declined to drop them. It
+holds their control, their data and their splits all fixed at theirs, so it cannot separate those
+three: a gap of the same order as ours is *consistent* with the scale explanation and does not prove
+it, their control being at most three Jaccard-nearest neighbours against our uniform mean over ten
+Tanimoto-nearest. It rests on eight activity classes, so the per-target values matter more than the
+mean, and they are +0.0806, +0.0583, +0.0812, +0.0663, +0.0493, +0.0729, +0.0871 and +0.1098. And
+nothing here speaks to their deep-learning arm, which is in their 2022 repository and not in the
+table reanalysed.
 
 ---
 
@@ -524,7 +563,9 @@ question "should nearer neighbours get more weight" cannot be posed, because the
 ### 6.2 Neighbourhoods are not exchangeable
 
 Measured on molecular data, the second moment between a compound's activity and its `j`-th nearest
-neighbour's, averaged over 31 ChEMBL targets at `k = 10`:
+neighbour's, averaged over the 31 of 40 ChEMBL targets that a pre-registered estimability gate retains
+at `k = 10` — the gate requires twenty training observations per distinct entry of the `m × m`
+second-moment matrix, which at `m = 10` means `n_train ≥ 1100`:
 
 | rank | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
 |---|---|---|---|---|---|---|---|---|---|---|
@@ -597,6 +638,40 @@ assumed model rather than cross-validated, and they compare against no fitted we
 **What survives as ours on this axis** is narrower than we first wrote and still real: the measurement
 of the rank profile on molecular similarity neighbourhoods, and the comparison of a one-parameter
 kernel against the *fitted* optimum, which no source on either side runs.
+
+---
+
+## 6a. Figures this draft still needs
+
+This draft carries eight tables and **no figures**, which for this venue is a defect rather than a
+style. We state what is needed and why nothing existing serves.
+
+The repository holds four figures, but all four belong to a programme this paper no longer makes
+claims about: two concern a pointwise-against-pairwise comparison on a 30-task collection, and two
+concern a Hodge decomposition of trained edge flows that the project dropped as pre-empted. They were
+produced under a different pre-registration and a different collection and are not reused.
+
+Four figures would carry the argument, and each is a plot of a committed table rather than a new
+measurement:
+
+1. **The identity against the index.** MODI_q2 on the abscissa, the right-hand side of equation (1) on
+   the ordinate, one point per target, 80 points, three collections by marker, with the diagonal drawn
+   and the 0.05 pre-registered band shaded. This is the paper's first claim in one panel.
+2. **The size dependence.** Assortativity and the floor's relative error against the fraction of data,
+   five chains per fraction, one line per target, with the between-chain spread visible. The crossing
+   of the 0.65 threshold should be drawn on the MoleculeACE panel as a horizontal line, because that
+   is where the practical consequence is legible.
+3. **The rank profile and what one parameter buys.** The measured `c_j` against `j` with its interval,
+   and beside it the four weighting arms' skills with the matched-grid comparison, so that the
+   equivalence rather than a win is what the eye takes away.
+4. **The two scales on identical predictions.** For the reanalysed eight activity classes, mean
+   absolute error against baseline-normalised skill, one point per arm per class, with their reported
+   "negligible" band and this paper's effect sizes marked on the two axes. This is section 5.3 in one
+   panel and it is the figure a reader will remember.
+
+A fifth panel, showing the calibration penalty against the spread ratio `b` per arm, would make
+equation (3) concrete, but it risks implying a claim about their modelling choices that section 5.3
+explicitly declines, so we would put it in supporting information if anywhere.
 
 ---
 
@@ -710,6 +785,102 @@ disagreement in this literature is a disagreement about which scale to report ra
 the data say. We report those as results because they were produced by the same frozen-plan procedure
 as everything else, and because a methods paper whose method only ever confirms its author is not
 demonstrating a method.
+
+---
+
+## References
+
+The draft above cited sources inline and carried **no reference list**, which made several of its
+citations unresolvable. They are collected here. Three are marked because they are not yet resolved to
+a verifiable record, and one of those is this paper's most load-bearing citation.
+
+**The modelability line**
+
+1. Golbraikh, A.; Muratov, E.; Fourches, D.; Tropsha, A. Data Set Modelability by QSAR. *J. Chem. Inf.
+   Model.* **2014**, *54*(1), 1–4. DOI 10.1021/ci400572x.
+2. **UNRESOLVED.** MODI_q2 and MODI_ssR2, the continuous forms. Cited in this project's notes as
+   Golbraikh et al., Springer 2014 and 2021, without chapter, volume or editors. **This is the
+   paper's single most load-bearing citation** — the abstract's first result is that "the published
+   continuous modelability index is this expression", and this is the only pointer to what that index
+   is. It must be resolved to a specific chapter with page numbers, or the claim must be restated
+   against the implementation this project actually reproduced.
+3. Luque Ruiz, I.; Gómez-Nieto, M. Á. Regression Modelability Index. *J. Chem. Inf. Model.* **2018**,
+   *58*(10), 2069–2084. DOI 10.1021/acs.jcim.8b00313.
+4. Aldeghi, M.; Graff, D. E.; et al. Roughness of Molecular Property Landscapes and Its Impact on
+   Modellability. *J. Chem. Inf. Model.* **2022**, *62*(19), 4660–4671. Preprint arXiv:2207.09250.
+5. Graff, D. E.; et al. ROGI-XD. *Digital Discovery* **2023**, *2*(5), 1452.
+6. Marcou, G.; Horvath, D.; Varnek, A. Kernel Target Alignment Parameter. *J. Chem. Inf. Model.*
+   **2016**, *56*(1), 6–11.
+7. Peltason, J.; Bajorath, J. SAR Index: Quantifying the Nature of Structure–Activity Relationships.
+   *J. Med. Chem.* **2007**, *50*(23), 5571–5578. DOI 10.1021/jm0705713. **Not read by us**; the raw
+   scores used here are the originating group's later restatement (Balfer & Bajorath, *PLoS One*
+   **2015**, PMC4350943) and the combination is taken from three independent restatements, among them
+   Guha, *Methods Mol. Biol.* **2011** (PMC3159128) and Guha, *WIREs Comput. Mol. Sci.* **2012**
+   (PMC3807878).
+8. Cui, C.; et al. Activity-cliff awareness for robust graph learning in molecular property
+   prediction. **Label Incoherence Index.** *Full record to be completed.*
+
+**The floor-against-model comparison**
+
+9. Janela, T.; Bajorath, J. Simple nearest-neighbour analysis meets the accuracy of compound potency
+   predictions using complex machine learning models. *Nature Mach. Intell.* **2022**, *4*, 1246–1255.
+   DOI 10.1038/s42256-022-00581-6.
+10. Janela, T.; Bajorath, J. Rationalizing general limitations in assessing and comparing methods for
+    compound potency prediction. *Sci. Rep.* **2023**, *13*, 17816. DOI 10.1038/s41598-023-45086-3.
+    Artefacts reanalysed in section 5.3 from the authors' public repository.
+
+**Nearest-neighbour theory and weighting**
+
+11. Samworth, R. J. Optimal Weighted Nearest Neighbour Classifiers. *Ann. Statist.* **2012**, *40*(5),
+    2733–2763. Preprint arXiv:1101.5783. Cited as an analogy; its loss is 0–1 classification.
+12. Evans, D.; Jones, A. J.; Schmidt, W. M. Asymptotic moments of near-neighbour distance
+    distributions. *Proc. R. Soc. A* **2002**, *458*, 2839–2849.
+13. Bailey, T.; Jain, A. K. A note on distance-weighted k-nearest neighbor rules. *IEEE Trans. Syst.
+    Man Cybern.* **1978**, *8*, 311–313.
+14. Dudani, S. A. The Distance-Weighted k-Nearest-Neighbor Rule. *IEEE Trans. Syst. Man Cybern.*
+    **1976**, *6*(4), 325–327.
+15. Gou, J.; Xiong, T.; Kuang, Y. A Novel Weighted Voting for K-Nearest Neighbor Rule. *J. Computers*
+    **2011**, *6*(5), 833–840.
+16. Hechenbichler, K.; Schliep, K. Weighted k-Nearest-Neighbor Techniques and Ordinal Classification.
+    Discussion Paper 399, SFB 386, LMU Munich, **2004**. Cited for the distance-kernel family this
+    paper does not test.
+17. Itskowitz, P.; Tropsha, A. k Nearest Neighbors QSAR Modeling as a Variational Problem: Theory and
+    Applications. *J. Chem. Inf. Model.* **2005**, *45*(3), 777–785. DOI 10.1021/ci049628+.
+18. Cleveland, W. S.; Devlin, S. J. Locally Weighted Regression. *J. Amer. Statist. Assoc.* **1988**,
+    *83*(403), 596–610.
+19. Nigsch, F.; Bender, A.; van Buuren, B.; Tissen, J.; Nigsch, E.; Mitchell, J. B. O. Melting point
+    prediction employing k-nearest neighbor algorithms and genetic parameter optimization. *J. Chem.
+    Inf. Model.* **2006**, *46*(6), 2412–2422.
+20. Anava, O.; Levy, K. Y. k\*-Nearest Neighbors: From Global to Local. *NIPS* **2016**. Preprint
+    arXiv:1701.07266.
+21. Demirkaya, E.; Fan, Y.; Gao, L.; Lv, J.; Vossler, P.; Wang, J. Optimal Nonparametric Inference
+    with Two-Scale Distributional Nearest Neighbors. *J. Amer. Statist. Assoc.* **2024**, *119*(545),
+    297–307.
+
+**Graph statistics, smoothness and verification**
+
+22. Arthur, R. Correlation and Autocorrelation of Data on Complex Networks. *EPJ Data Science*
+    **2025**, *14*, 1. Preprint arXiv:2405.05125.
+23. Zhu, X.; Ghahramani, Z.; Lafferty, J. Semi-Supervised Learning Using Gaussian Fields and Harmonic
+    Functions. *ICML* **2003**, 912–919.
+24. **TO BE COMPLETED.** Heterophilic Graph Learning Handbook, arXiv:2407.09618, cited for the
+    Dirichlet-energy definition. A survey is a weak citation for a definition and should be replaced
+    by a primary source.
+25. Murphy, A. H. Skill scores based on the mean square error and their relationships to the
+    correlation coefficient. *Mon. Weather Rev.* **1988**, *116*, 2417–2424. The decomposition used as
+    equation (3). *Record to be verified against the original.*
+26. **UNRESOLVED.** The Gamma test and its M-test, cited in sections 4.3 and 8 as one of the readings
+    opposite to this paper's and as the training-free noise-floor route. The project's notes point to
+    Stefánsson, Končar & Jones **1997** and to Evans & Jones, *Proc. R. Soc. A* **2002**, and the
+    M-test to the `sr` R package documentation crediting A. J. Jones. Both need resolving to citable
+    records.
+
+**Benchmark collections**
+
+27. van Tilborg, D.; Alenicheva, A.; Grisoni, F. Exposing the Limitations of Molecular Machine
+    Learning with Activity Cliffs. *J. Chem. Inf. Model.* **2022**, *62*(23), 5938–5951. The
+    MoleculeACE collection. *An erratum exists and must be checked before submission.*
+28. The DeepDelta benchmark collection. *Full record to be completed.*
 
 ---
 
