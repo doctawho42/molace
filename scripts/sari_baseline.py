@@ -135,8 +135,10 @@ def main() -> int:
     t["sari"] = t[f"sari_{T_PRIMARY}"]
 
     mb = pd.read_csv("results/modi_baseline.csv", float_precision="round_trip")
+    # receptor_class is carried because incremental_contribution clusters on it internally
+    # (src/molace/analysis/correlate.py:154); dropping it crashed the first run.
     mb = mb.rename(columns={"n": "n_mb"})[["collection", "dataset", PREDICTOR, "modi_q2", TARGET,
-                                           "cluster", "n_mb"]]
+                                           "cluster", "receptor_class", "n_mb"]]
     f = mb.merge(t.drop(columns=["collection"]), on="dataset", how="left") \
           .merge(covariate_frame(), on="dataset", how="left")
     f.to_csv(OUT, index=False)
