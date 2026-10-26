@@ -1,0 +1,240 @@
+# Increment 20: claim 4 under a reweighted floor, with selection symmetric on both sides
+#
+# SECOND DRAFT. The first went through an adversarial pre-freeze review which, across both this draft
+# and increment 19's, raised 47 findings; 32 survived verification and 8 were fatal, of which 3 were
+# this draft's. The review's own fixes were then adversarially checked, and in several places
+# corrected. Every constant this plan quotes was RE-DERIVED here rather than copied, because the
+# review's replacement figures for two of them did not reproduce: it offered 2.776e-16 over the 70
+# shared targets and 1.943e-16 on ChEMBL-40 where direct measurement gives 3.331e-16 and 1.110e-16.
+# The review's diagnosis was right -- state the constant with its merge keys and its subset -- and its
+# numbers were not, which is why they are measured below rather than pasted.
+#
+# WHY. Item 6 of prior-art.md's "Required before drafting", and the debt section 4a records in its own
+# words: "The audit fixed the model arm and left the floor at a fixed m = 10. Giving the floor its
+# better m narrows the gap from -0.0824 to -0.0596 [-0.0708, -0.0482], still excluding zero, floor
+# ahead on 1 of 31. Reported as a sensitivity because it was not pre-registered; a symmetric
+# pre-registered version is owed." This is that version, with a better floor arm than m alone:
+# increment 16 established that the floor's whole reshaping gain is bought by one parameter.
+#
+# NO MODEL IS FITTED. Increments 14 and 16 use the identical split rule, default_rng(0).random(n) < 0.8,
+# and their floor columns agree to 3.331e-16, so this is a reanalysis of this project's own two
+# committed tables, in the shape increment 18 took for someone else's.
+#
+# TWO PREDICTIONS ARE DERIVABLE IN ADVANCE AND BOTH SAY SO. Both committed tables carry PER-TARGET
+# columns, so a reader can pair them directly: nothing here is unobtainable from the repository, and an
+# earlier draft that claimed otherwise was wrong. What this increment adds is that the pairing,
+# the interval, the sign count and the decomposition are REGISTERED before being read, in a plan whose
+# gates tie the two tables to each other rather than trusting that they share a split. The point
+# estimates are arithmetic on published columns and carry no evidential weight; predictions 1 and 3 are
+# labelled accordingly, and the evidential weight sits on prediction 2's interval and prediction 4's
+# count.
+#
+# RE-DERIVED BEFORE FREEZING, with the merge stated as (collection, dataset) over the 70 shared targets:
+#   * baseline_audit.skill_floor against weighting_family.g1_skill_mean_m10: max |difference|
+#     3.331e-16 over all 70, 1.110e-16 on ChEMBL-40, 3.331e-16 on MoleculeACE-30.
+#   * n_molecules and n_train: 0 disagreements of 70 on each.
+#   * the decomposition is exact to 0.0e+00: on ChEMBL-40 the m-term
+#     (skill_uniform - g1_skill_mean_m10) is +0.0179 and the weighting term
+#     (skill_kernel - skill_uniform) is +0.0181, summing to the total +0.0361; on MoleculeACE-30
+#     +0.0263 and +0.0211 summing to +0.0474.
+#   * the weighting term +0.0181 equals increment 16's committed primary statistic to four decimals,
+#     which is an independent check that the two tables are on one split.
+#   * marginal means on ChEMBL-40: skill_kernel +0.3839, skill_cv +0.4232, skill_floor +0.3478.
+#   * increment 16's committed kernel selection regret: 0.0040 on ChEMBL-40, 0.0050 on MoleculeACE-30.
+# None of these is the blinded statistic, which is the PAIRED difference, its interval and its sign
+# count. Those have not been computed.
+#
+# WHAT SYMMETRY MEANS HERE, and what it does not. Both arms select on the TRAINING SPLIT ALONE and
+# neither sees a test label before selection: the floor picks (m, alpha) from increment 16's frozen
+# grid, the model arm picks a learner from increment 14's registered set by the same cross-validation.
+# That is symmetry OF SELECTION. It is NOT symmetry of capacity -- a one-parameter rank kernel over m
+# neighbours and a choice among three learners are not matched families -- and the asymmetry of
+# capacity is the question, not a defect. NOR IS IT SYMMETRY OF SEARCH COST: the floor arm searches 40
+# cross-validation cells (5 values of m times 8 of alpha) against the model arm's 3, and increment 16's
+# committed selection regret for the floor arm is 0.0040 on ChEMBL-40. That residual asymmetry points
+# AGAINST the floor arm, which is the direction that keeps claim 4 alive, so it is stated here rather
+# than left for a reader to find.
+
+provenance:
+  claim_under_test: >
+    claim 4 of docs/paper/prior-art.md and section 4a of the skeleton. Claim 4 attributes the
+    floor-against-fitted-model gap to information outside the neighbourhood; increment 16 showed part
+    of that gap is weighting and reachable with one parameter.
+  inputs:
+    baseline_audit:
+      file: results/baseline_audit.csv
+      increment: 14
+      prereg_blob: 179b8bf128302f9c266dd7af9e2815c9049f18f2
+      data_blob: e7a666011e710de2cbf444a585d7e1658cb086ec
+      columns_used: >
+        skill_floor (uniform at fixed m = 10), skill_cv (the CV-selected learner), selected,
+        n_molecules, n_train, cluster, collection, dataset
+    weighting_family:
+      file: results/weighting_family.csv
+      increment: 16
+      prereg_blob: 0ce65b307616a86cf0b565e854151096501d3f28
+      data_blob: 1b136f001844eef17dc57639661e40b0e7a05521
+      columns_used: >
+        skill_kernel with its kernel_m and kernel_alpha and kernel_regret, skill_uniform,
+        g1_skill_mean_m10, n_molecules, n_train, cluster, collection, dataset
+    labels_for_the_absolute_scale: >
+      data/raw/chembl_targets/<dataset>.csv for ChEMBL-40 and molace.data.moleculeace.load_target for
+      MoleculeACE-30, with the split re-derived from the deterministic rule. Reading committed labels
+      and re-deriving a deterministic split is NOT recomputing an arm, and it is what lets this
+      increment report the absolute scale beside the normalised one.
+  the_data_blobs_are_asserted_by_the_script: >
+    both, by git hash-object, so a silently regenerated input stops the increment instead of changing
+    its numbers
+  what_is_not_claimed: >
+    no new measurement of either arm, no claim that either committed table is wrong, and no claim about
+    model families beyond the three increment 14 registered.
+
+shared:
+  collections: >
+    ChEMBL-40 primary, MoleculeACE-30 secondary. DeepDelta-10 is absent from increment 16 and from
+    increment 14's audit frame and is therefore OUT OF SCOPE, stated rather than silently dropped.
+  the_floor_arm: >
+    skill_kernel from increment 16: w_j proportional to j^-alpha normalised, with m and alpha chosen by
+    5-fold cross-validation on the training split
+  the_model_arm: >
+    skill_cv from increment 14: the learner chosen by 5-fold cross-validation on the training split
+  pairing: >
+    on (collection, dataset); both tables carry all 70 shared targets and gate 1 is what licenses it
+  both_scales: >
+    every difference is reported in skill AND in the absolute RMSE units increment 18 established the
+    paper must carry: RMSE_arm = base * (1 - skill) with base the RMSE of predicting the training mean
+    on the test split, so the absolute difference follows from the committed skills and base alone
+  statistic: mean over targets of the paired per-target difference
+  uncertainty: >
+    cluster bootstrap, molace.analysis.correlate.cluster_bootstrap_mean, 10000 draws, seed 0, each
+    target its own cluster, which is how every committed increment in this project has clustered these
+    two collections. 40 and 30 clusters, not increment 18's 8, where the plan forbade a percentile
+    cluster bootstrap on measured coverage grounds.
+  seed: 0
+
+design_gates:
+  evaluated_before_any_outcome_is_read: true
+  gate_1_the_two_tables_share_one_split:
+    passes_iff: >
+      merging on (collection, dataset), baseline_audit.skill_floor equals
+      weighting_family.g1_skill_mean_m10 to within 1e-12 on all 70 shared targets, and n_molecules and
+      n_train agree exactly on all 70
+    re_derived_before_freezing: >
+      max |difference| 3.331e-16 over all 70, 1.110e-16 on ChEMBL-40, 3.331e-16 on MoleculeACE-30;
+      0 of 70 disagreements in each of n_molecules and n_train. The subset and the two column names
+      are stated because an earlier draft quoted one figure for a comparison it had not specified.
+    why: >
+      this is the ONLY thing that licenses pairing per-target values across two separately run
+      increments. If the splits differed, every paired difference below would mix two populations.
+    if_it_fails: the increment stops and the discrepancy is the report
+  gate_2_the_committed_tables_are_the_declared_ones:
+    passes_iff: >
+      the two input files' git blob hashes equal the values in provenance; AND increment 14's
+      `selected` contains only members of its registered learner set; AND increment 16's kernel_m lies
+      in {3,5,10,20,40} and kernel_alpha in {0,0.25,0.5,0.75,1,1.5,2,3} on every target with
+      kernel_alpha > 0 on every target; AND the three ChEMBL-40 marginal means reproduce their
+      committed values to 1e-4: skill_kernel +0.3839, skill_cv +0.4232, skill_floor +0.3478
+    why_it_is_not_declared_weak: >
+      the first draft declared a version of this gate unable to fail, which is the defect that has cost
+      this project three fatal findings in three increments. The marginal-mean clause CAN fail: it
+      stops the increment if either table is regenerated, if a column is misread, or if the kernel arm
+      has collapsed to uniform (alpha = 0), which would make the whole comparison a restatement of
+      increment 14.
+    if_it_fails: the increment stops and the discrepancy is the report
+
+predictions_registered_in_advance:
+  prediction_1:
+    text: the gap narrows when the floor is reweighted
+    holds_iff: >
+      mean(skill_kernel - skill_cv) exceeds increment 14's committed mean(skill_floor - skill_cv) of
+      -0.0754 on ChEMBL-40
+    status: >
+      DERIVABLE IN ADVANCE from the two tables' marginal means and CARRIES NO EVIDENTIAL WEIGHT.
+      Registered only so a failure is read as a reading error here rather than as a result.
+    if_it_fails: >
+      gate 2 has already pinned the marginal means, so a failure means the pairing or the aggregation
+      is misread. The increment stops and reports that, not an outcome.
+  prediction_2:
+    text: the gap narrows but does not close
+    holds_iff: >
+      the cluster-bootstrap interval on the paired mean(skill_kernel - skill_cv) excludes zero and lies
+      below zero on ChEMBL-40
+    status: >
+      THE PIVOT, and the one quantity here a reader cannot get from marginal means: the paired interval
+      depends on the per-target covariance of the two arms. Registered in the direction that keeps
+      claim 4 alive, because section 4a's unregistered sensitivity already found -0.0596
+      [-0.0708, -0.0482] with m alone and the kernel adds one parameter on top of that.
+    reported_with_it: the 40 per-target values and the sign count, which a mean can hide
+  prediction_3:
+    text: the two halves of the floor's improvement are of the same size
+    holds_iff: >
+      on ChEMBL-40 the m-term mean(skill_uniform - g1_skill_mean_m10) and the weighting term
+      mean(skill_kernel - skill_uniform) differ by less than 0.01
+    status: >
+      ALSO DERIVABLE IN ADVANCE and also carrying no evidential weight: both terms are differences of
+      committed marginal means, measured above at +0.0179 and +0.0181. Registered because the TWO-TERM
+      form is what the increment must report, and the first draft registered a single term against a
+      threshold anchored to the wrong baseline -- it compared the kernel's gain over FIXED-m uniform to
+      increment 16's +0.0155, which was measured against BEST-m uniform. The evidential content is the
+      interval on each term, not the point.
+    note: the decomposition is exact by construction and the report states its residual
+  prediction_4:
+    text: the reweighted floor still loses on the large majority of targets
+    holds_iff: the reweighted floor is ahead on fewer than 8 of the 40 ChEMBL targets
+    status: >
+      a count, because a mean can be carried by a few targets. Increment 14 reported the uniform floor
+      ahead on 3 of 40 and section 4a's sensitivity on 1 of 31, so the threshold of 8 is loose against
+      the committed history by design: it is there to catch a reversal, not to certify the status quo.
+      Not derivable from marginal means.
+
+outcome_rule:
+  primary_statistic: >
+    the paired mean(skill_kernel - skill_cv) on ChEMBL-40 with its cluster-bootstrap interval
+  branch_claim_4_survives_reduced:
+    iff: prediction 2 holds
+    then: >
+      claim 4 survives with its magnitude revised. The paper states the gap as the reweighted figure,
+      reports the two-term decomposition of what the floor's own selection recovers, and drops any
+      implication that the whole gap is information outside the neighbourhood. Section 4a's
+      unregistered sensitivity is replaced by this registered measurement.
+  branch_claim_4_closes:
+    iff: the interval covers zero
+    then: >
+      the gap does not survive giving the floor its own one-parameter weighting, so claim 4's effect was
+      substantially a weighting artefact. Stated plainly with the per-target values, and claim 4 is
+      withdrawn in the form increment 14's own reversal took.
+  branch_the_floor_wins:
+    iff: the interval excludes zero and lies above zero
+    then: >
+      the reweighted floor beats the cross-validated learner, reversing increment 14's reversal. The
+      plan requires this be reported with maximum suspicion of itself: the per-target values, the
+      selected (m, alpha) distribution, a restatement that the model arm is the committed column, and
+      the search-cost asymmetry above, which points the other way and so cannot explain it.
+  whatever_happens: >
+    the per-target table of both arms with their selections; all of (kernel - cv), (kernel - floor),
+    (floor - cv), the m-term and the weighting term, each with an interval and a sign count, in skill
+    AND in absolute RMSE units; and the same on MoleculeACE-30
+
+limits_stated_in_advance:
+  - >
+    A reanalysis of two committed tables, so it inherits every limitation of both: one 80/20 split per
+    target, one seed, and increment 14's three-learner family.
+  - >
+    Symmetry here is symmetry of SELECTION. It is not symmetry of capacity, and it is not symmetry of
+    search cost: the floor arm searches 40 cross-validation cells against the model arm's 3, with a
+    committed floor-arm regret of 0.0040 on ChEMBL-40, pointing against the floor arm.
+  - >
+    DeepDelta-10 is out of scope, being absent from both input frames.
+  - >
+    Every point estimate here was derivable from committed marginal means before this plan was written.
+    Only the paired intervals, the sign counts and the registration are new.
+
+forbidden:
+  - Fitting any model, or recomputing either arm. Both come from committed columns.
+  - Changing the arms, the pairing, the collections or the thresholds after seeing a value.
+  - Presenting any point estimate as a new finding, when it is arithmetic on published columns.
+  - Describing the design as symmetric in capacity or in search cost.
+  - Reporting the primary without the sign count and the per-target values beside it.
+  - Reporting the normalised scale without the absolute scale beside it, which is what increment 18
+    established the paper must do from here on.
+  - Declaring any gate unable to fail.
