@@ -62,8 +62,11 @@ PRIMARY, SECONDARY = "ChEMBL-40", "MoleculeACE-30"
 
 
 def blob(p: Path) -> str:
+    # encoding is explicit because text=True otherwise decodes by the LOCALE, which
+    # tests/test_text_io_is_utf8.py flags by name. A blob hash is ASCII hex so nothing here would
+    # have broken, but the convention exists to catch the pattern rather than the live failure.
     return subprocess.run(["git", "hash-object", str(p)], capture_output=True,
-                          text=True, check=True).stdout.strip()
+                          text=True, encoding="utf-8", check=True).stdout.strip()
 
 
 def labels_of(coll: str, dataset: str) -> np.ndarray:
