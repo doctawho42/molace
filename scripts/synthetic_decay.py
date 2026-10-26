@@ -207,8 +207,13 @@ def main() -> int:
     obs2 = rank["low"] - rank["high"]
     draws2 = []
     for _ in range(DRAWS):
-        pick = set(rng.choice(cells, len(cells), replace=True))
-        s = t[t.cell.isin(pick)]
+        # Was `set(rng.choice(cells, ...))` with `cells` never defined in this scope: dead code from
+        # before the cluster_groups/cluster_resample refactor, sitting behind a gate that failed in
+        # the committed run, so it never executed and no published number is affected. The pattern it
+        # used is the one correlate.cluster_groups documents as the bug that refactor replaced -- a
+        # set() drops the multiplicity a bootstrap depends on and turns each draw into a
+        # without-replacement subsample of about 1 - 1/e of the clusters. Found by the F821 guard.
+        s = t.iloc[cluster_resample(groups, rng)]
         a, b = s[s["lambda"] <= med], s[s["lambda"] > med]
         if len(a) > 20 and len(b) > 20:
             v = (stats.spearmanr(1 - a.assortativity, a.measured_rel_mse).statistic

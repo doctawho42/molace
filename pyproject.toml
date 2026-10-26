@@ -28,6 +28,9 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "pytest>=9.1.1",
+    # tests/test_no_undefined_names.py shells out to ruff for F821. It is a declared dependency
+    # rather than an optional convenience so the guard is reproducible and cannot silently skip.
+    "ruff>=0.15",
 ]
 
 [tool.pytest.ini_options]
