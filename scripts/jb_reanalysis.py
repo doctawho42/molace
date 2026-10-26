@@ -87,6 +87,13 @@ def cell_metrics(y: np.ndarray, p: np.ndarray, base_pred: float) -> dict:
         "sd_test": sy,
         "pred_mean": float(p.mean()),   # for a constant arm this IS the constant, which gate 3 needs
         "pred_sd": sp,
+        # Gate 3's test, EXACTLY as the frozen plan words it: "exactly one distinct predicted value".
+        # Not a threshold on pred_sd. numpy's ndarray.std on a constant array of magnitude ~8 returns
+        # a few times 1e-15, because sum/n need not return the value itself, so a 1e-15 threshold
+        # fails on 25 of 80 cells that are in fact exactly constant. pandas' groupby.std returns 0.0
+        # on the same data, which is how the pre-freeze check missed it. A distinct-value count is
+        # exact and has no tolerance to get wrong.
+        "pred_nunique": int(np.unique(p).size),
     }
     out["r2"] = out["r"] ** 2 if np.isfinite(out["r"]) else np.nan
     base_rmse = float(np.sqrt(np.mean((y - base_pred) ** 2)))
@@ -237,10 +244,13 @@ def report(cells: pd.DataFrame, pf: pd.DataFrame, tr: pd.DataFrame,
     # ---- GATE 3 -------------------------------------------------------------------------------
     print(); print(line); print("GATE 3. THEIR CONSTANT ARM IS THE TRAINING MEDIAN"); print(line)
     mr = cells[cells.arm == "MR"]
-    const = int((mr.pred_sd.abs() < 1e-15).sum())
+    const = int((mr.pred_nunique == 1).sum())
     resid = (mr.pred_mean - mr.train_median).abs()
-    print(f"  cells whose MR predictions have zero spread: {const} of {len(mr)}")
+    print(f"  cells with exactly one distinct MR prediction: {const} of {len(mr)}")
     print(f"  max |MR constant - numpy.median(train labels)| = {resid.max():.3e}  over {len(mr)} cells")
+    print(f"  (the computed sd of those constant arrays runs up to {mr.pred_sd.max():.3e}, which is")
+    print(f"   float noise at pPot magnitudes and is why this gate counts values rather than")
+    print(f"   thresholding a standard deviation)")
     g3 = const == len(mr) and float(resid.max()) <= TOL
     print(f"  GATE 3: {'PASS' if g3 else 'FAIL'} at tolerance {TOL:.0e}")
     print("  An equality, not a distinctness test: distinctness alone passes if the arm were the")
