@@ -25,22 +25,31 @@ under a plan frozen in advance.
 
 First, the published continuous modelability index is this expression. MODI_q2 is reproduced to a mean
 absolute difference of 0.0083–0.0123 across 80 targets in three collections, at a Pearson correlation
-of 0.996–0.998, from two sparse matrix products instead of one leave-one-out prediction per compound.
+of 0.996–0.998. The gain is interpretive rather than computational — we withdraw an earlier claim that
+the closed form is the cheaper route, which timing shows to be wrong in the opposite direction — and
+it consists in naming the two graph statistics the index is a function of, so that one can ask what
+happens when either moves.
 
 Second, every published index in the line reports the first moment and omits the second. Dropping it
 costs a factor of 2.5 in the reproduced level — mean absolute error 0.0257 against 0.0103 — while
-adding nothing to the ranking, whose incremental contribution covers zero on all three collections.
-The honest statement is that the second moment is necessary for the level and quiet for the ranking.
+adding **nothing detectable** to the ranking: the incremental contribution's point estimate is positive
+on all three collections (+0.0156, +0.0120, +0.0485) and every interval covers zero, with upper ends
+wide enough to contain effects larger than this paper's other gains. On these data the two moments
+correlate at +0.9895, so this design cannot separate their contributions to ranking and we do not
+claim a null. The honest statement is that the second moment is necessary for the level and that its
+ranking contribution is unresolved here.
 
 Third, and this is the consequence for practice: the quantity these indices estimate is not a property
 of a dataset but of a dataset **and its size**. Over an eightfold change in sample size the floor's
 relative error moves by +0.2698 [+0.2477, +0.2922] and assortativity by +0.2599 [+0.2385, +0.2807], on
 40 of 40 targets, and the 2014 binary index crosses its own published threshold on 46 % of cells by
-growing alone. The movement is entirely the classical `k/n` rank-dilution channel of nonparametric
-nearest-neighbour theory, which we cite rather than claim. What we claim is the accounting and its
-consequence: an index whose sample dependence is predictable in closed form from the full-sample
-neighbour ordering is nevertheless published, throughout the line, as a bare point estimate with no
-`n` beside it.
+growing alone. The sample dependence of a roughness index is **not news to this literature** — the
+ROGI authors devote a supplementary figure to its convergence and bootstrap an interval on it — and we
+say so rather than claim otherwise. What is new is that the movement is the classical `k/n`
+rank-dilution channel, reproducible from the full-sample neighbour ordering alone rather than only
+observable by resampling; that it has not been reported for the MODI family, nor at the sizes real
+activity datasets reach; and that the literature reads it as convergence towards a true value while
+continuing to tabulate one number per dataset and to apply a fixed threshold to it.
 
 We also report two negative results about our own earlier claims, and one reanalysis of another
 group's published predictions which shows that a prominent disagreement in this literature is a
@@ -86,10 +95,32 @@ mean and report the product as that package's defect.
 
 ### 1.2 What no index in the line reports
 
-Every one of these is published as a **bare point estimate per dataset**. The ROGI authors say so
-plainly: *"While we do not provide a statistical estimator of ROGI uncertainty..."*, adding that their
-bootstrap *"generally correlates with, but also underestimates, the ROGI error"*. No index in the line
-carries an interval, and none reports how it moves with the amount of data.
+Every one of these is published, in practice, as a **bare point estimate per dataset** — but it is
+important to state precisely what the literature does and does not say, because an earlier version of
+this paragraph got it wrong in a way its own citation refutes.
+
+The ROGI authors address both uncertainty and sample size directly. On uncertainty: *"While we do not
+provide a statistical estimator of ROGI uncertainty, a general approach to estimate uncertainty is by
+bootstrap. Indeed, we find that bootstrap estimates of ROGI uncertainty correlate with its error,
+despite a general tendency to"* underestimate it — and their Figure S15 reports bootstrapped 95 %
+confidence intervals on subsets of size 10, 100, 1000, 2000 and 5000. On sample size: their Figure S2
+is titled *"Convergence of ROGI values with respect to dataset size on toy surfaces"*, their
+Discussion states that *"rougher landscapes are expected to require larger datasets for ROGI to
+converge to its true value"*, and their Figures S13 and S14 report that *"1000 molecules were
+sufficient to accurately estimate ROGI, while 100 were enough only for some properties"*.
+
+So the field is not unaware, and this paper does not claim it is. What goes unreported is narrower and,
+we think, more damning. First, the dependence is read throughout as **convergence towards a
+well-defined value** — ROGI's own phrase is that the index *"has a well-defined value, even though the
+ROGI computed from a small sample is only an estimate"* — rather than as a reason a published point
+estimate is uninterpretable without its `n`. Second, nothing in the line reports it for the **MODI
+family**, which is the index this paper shows equals the closed form, nor at the sizes real activity
+datasets have; ROGI's own sweep stops at 5000 molecules on curated libraries, where the largest target
+here carries 8205. Third, and this is what the closed form adds: the movement is not merely empirical
+convergence but the **classical `k/n` rank-dilution channel**, reproducible from the full-sample
+neighbour ordering alone. And fourth, the practice has not changed: the dependence lives in a
+supplementary figure and a discussion sentence, while the index is still tabulated as one number per
+dataset, and the 2014 binary index's threshold of 0.65 is still applied to it.
 
 This paper takes one estimator and writes its error exactly. The point is not that the estimator is
 good — it is not the best predictor available, and we measure by how much it loses — but that writing
@@ -105,10 +136,19 @@ neighbours on a similarity graph,
     MSE / σ²  =  1 + 1/k + ((k−1)/k)·ρ_nn  −  2r                                    (1)
 
 with `r` the target assortativity of the activity across graph edges and `ρ_nn` the correlation
-between the activities of two compounds that share a neighbour. Equivalently, writing
-`A_norm = D⁻¹A` and `m_j = yᵀA_normʲ y / yᵀy`,
+between the activities of two compounds that share a neighbour. Equivalently, writing `A_norm = D⁻¹A` for the row-normalised adjacency and standardising `y` to `z`,
 
-    ‖(I − A_norm)y‖² / ‖y‖²  =  1 − 2m₁ + m₂ ,          m₁ = r exactly.              (2)
+    ‖(I − A_norm)z‖² / ‖z‖²  =  1 − 2m₁ + m₂ ,
+       m₁ = zᵀA_norm z / zᵀz ,      m₂ = ‖A_norm z‖² / zᵀz                           (2)
+
+**Both terms must be written carefully, and an earlier version of this paper wrote both wrongly.**
+`A_norm` is not symmetric on a union-symmetrised kNN graph — on a mid-sized target here its asymmetry
+reaches 9.5 × 10⁻² and its degrees run from 1 to 45 — so `A_normᵀA_norm ≠ A_norm²` and the second term
+is the **Gram form** `‖A_norm z‖²`, not `zᵀA_norm²z`. With the Gram form equation (2) reproduces its
+own left-hand side to 0.0 × 10⁰ on that target; with the square form it misses by 6.7 × 10⁻³. For the
+same reason `m₁` equals Newman's target assortativity **only on regular graphs**: on that target
+`m₁ = 0.661339` against `r = 0.653292`, a gap of 8.0 × 10⁻³. This is the degree correction that
+section 2.2 discusses, and the two statements must agree.
 
 ### 2.1 Where it is exact, where it is an approximation, and where it decays
 
@@ -116,15 +156,19 @@ Equation (1) is **exact on k-regular graphs**. We verify it to 3.58 × 10⁻¹�
 circulants, and the suite pins it at an absolute tolerance of 10⁻¹², so a broken derivation fails the
 tests rather than producing a plausible number.
 
-On the union-symmetrised k-nearest-neighbour graphs real data produce, it is an approximation. As a
-point prediction of the measured floor over 40 ChEMBL targets it has a mean absolute error of 0.0256 at
-`k = 10`, with a maximum of 0.0837, and it is stable in `k`: 0.0269, 0.0252, 0.0256, 0.0286 and 0.0306
-at `k = 3, 5, 10, 20, 40`.
+On the union-symmetrised k-nearest-neighbour graphs real data produce, it is an approximation — and
+**against which measured floor matters, because there are two and an earlier version of this paper
+called both by one name.** The *out-of-sample* floor is the relative MSE of the kNN mean on a held-out
+20 % split; the *in-sample* floor is its leave-one-out relative MSE over every compound, which is
+MODI_q2 by construction, that index being the leave-one-out q² of similarity search. The identity
+misses the first by a mean absolute 0.0256 at `k = 10`, maximum 0.0837, stable in `k` at 0.0269,
+0.0252, 0.0256, 0.0286 and 0.0306 for `k = 3, 5, 10, 20, 40`; it reproduces the second to 0.0103,
+maximum 0.0436. The factor of 2.5 between those two numbers is a difference of target, not of
+accuracy, and section 2.3's table is against the second.
 
-It also **degrades as the sample shrinks**, which bounds where it may be used and which we measured
-for the first time here. The mean absolute difference against the measured floor runs 0.0103, 0.0133,
-0.0168 and 0.0221 at the full set, a half, a quarter and an eighth of each target: a factor of 2.1,
-monotone. The reason is structural rather than mysterious — the identity is exact only on k-regular
+Against the in-sample floor the identity also **degrades as the sample shrinks**, which bounds where it
+may be used and which we measured for the first time here: 0.0103, 0.0133, 0.0168 and 0.0221 at the
+full set, a half, a quarter and an eighth of each target, a factor of 2.1, monotone. The reason is structural rather than mysterious — the identity is exact only on k-regular
 graphs, and union symmetrisation is further from regular when `k` is a larger fraction of `n`.
 
 ### 2.2 What is not ours
@@ -155,10 +199,21 @@ expression**. Measured against MODI_q2 on 80 targets under a plan frozen before 
 | MoleculeACE-30 | 30 | 0.0083 | 0.0238 | 0.9960 |
 | DeepDelta-10 | 10 | 0.0123 | 0.0362 | 0.9975 |
 
-The frozen threshold was 0.05 and it held everywhere with a factor of four to spare. The cost
-difference is the practical point: MODI_q2 requires one leave-one-out prediction per compound, 8205 of
-them on the largest target here, while the right-hand side of (1) requires two sparse matrix products
-and no prediction at all.
+The frozen threshold was 0.05 and it held everywhere with a factor of four to spare.
+
+**The closed form is not the cheap route, and an earlier version of this paper claimed it was.** A
+leave-one-out prediction for the kNN *mean* refits nothing: given the neighbour ordering it is one
+gather and one row mean. Timed on this project's own code at `n = 2272`, all 1813 leave-one-out
+predictions take **0.2 ms**, against **130 ms** for two dense products of the normalised adjacency —
+the "expensive" route is some six hundred times faster, and a sparse implementation of the closed form
+would narrow that gap without closing it, because 0.2 ms is already the cost of a single gather. The
+claim was wrong by nearly three orders of magnitude and in the opposite direction, it was never timed
+before being made, and it is withdrawn.
+
+What the closed form buys is therefore **interpretive, not computational**: it says which two graph
+statistics the index is a function of, which lets one ask what happens when either moves — the
+question sections 3 and 4 are about — and it supplies the `k`-dependence and the sample dependence in
+a form that can be reasoned about rather than only measured.
 
 ---
 
@@ -172,14 +227,21 @@ Dropping it costs a **factor of 2.5 in level**: reproducing MODI_q2 from `1 − 
 absolute error of 0.0257 against the full identity's 0.0103 on ChEMBL-40.
 
 **The limit, stated here and not buried.** On ECFP4/Tanimoto graphs the two moments are nearly
-collinear, at a Pearson correlation of +0.9895 across the 40 ChEMBL targets. As a **ranker** the second
-moment therefore adds little: Spearman against the measured floor is +0.9345 for `1 − r` and +0.9497
-for the full identity, and the incremental ranking contribution covers zero on all three collections
-(+0.0156 [−0.0171, +0.0600]; +0.0120 [−0.0542, +0.0849]; +0.0485 [−0.1132, +0.3376]).
+collinear, at a Pearson correlation of +0.9895 across the 40 ChEMBL targets, so this design cannot
+separate their contributions to ranking.
 
-So the claim is precise, and narrower than a reader might expect from the factor of 2.5: **the second
-moment is necessary for the level and quiet for the ranking.** A paper claiming it improves ranking
-would be refuted by its own numbers.
+Two measurements bear on it, and they are **not** the same statistic, which an earlier version of this
+paper presented as though they were. Against the out-of-sample floor, Spearman is +0.9345 for `1 − r`
+and +0.9497 for the full identity, a difference of +0.0152 with no interval attached. Separately, the
+incremental ranking contribution of the second moment — a rank-residual statistic against attained
+accuracy, with a cluster bootstrap — has point estimates +0.0156, +0.0120 and +0.0485 on the three
+collections, with intervals [−0.0171, +0.0600], [−0.0542, +0.0849] and [−0.1132, +0.3376]. Every
+interval covers zero and every point estimate is positive, and the upper ends are wide enough to
+contain effects larger than this paper's other gains.
+
+So the claim is narrower than the factor of 2.5 suggests, and narrower than a null: **the second
+moment is necessary for the level, and its ranking contribution is unresolved at this collinearity and
+this sample size.** We do not claim it adds nothing; we claim this design cannot tell.
 
 ---
 
@@ -233,18 +295,25 @@ crosses by growing alone. On ChEMBL the same monotonicity holds at all eight thr
 grid, and we report it inside that grid rather than at 0.65 alone, because 0.65 is the binary index's
 threshold and not the continuous one's.
 
-So the claim is exactly this. An index whose sample dependence is predictable in closed form from the
-full-`n` neighbour ordering alone was nevertheless published, by every paper in the line, as a bare
-point estimate with no `n` beside it. Reporting it that way reports a point on a curve whose position
-was never in doubt.
+So the claim is exactly this, and it is deliberately not the claim that the field is unaware. The
+sample dependence of a roughness index is documented in the literature that introduced one: ROGI's own
+Figure S2 is titled "Convergence of ROGI values with respect to dataset size", its Discussion says
+rougher landscapes need larger datasets to converge, and its Figure S15 bootstraps a 95 % confidence
+interval on subsets from 10 to 5000 molecules. What this section adds is that the movement is the
+**classical `k/n` channel** rather than only empirical convergence, so it is predictable from the
+full-sample neighbour ordering without resampling; that it is of a size — 0.27 in relative error — that
+crosses the field's own published threshold; that it has not been reported for the MODI family; and
+that despite all of the above, the practice of tabulating one number per dataset and comparing it to a
+fixed cut-off is unchanged. **The gap is between what the literature knows and what it reports.**
 
-**And the opposite reading exists, twice.** The Gamma-test line contains an **M-test** that recomputes
-the statistic over growing samples exactly as this section does and reads the result as convergence
-towards a truth. Janela & Bajorath (*Sci. Rep.* 2023, 13:17816) run the same sweep on prediction error
+**And the reading of that dependence is contested, three ways.** ROGI's authors read it as convergence
+towards a value the landscape genuinely has. The Gamma-test line contains an **M-test** that recomputes
+the statistic over growing samples exactly as this section does and likewise reads the result as
+convergence towards a truth. Janela & Bajorath (*Sci. Rep.* 2023, 13:17816) run the same sweep on prediction error
 over nine training-set sizes and report errors "constantly small, independent of training set size" in
-the sub-range that dominates their data. Neither reports an *index* as a function of `n`, which is what
-this section does, but both run the sweep and read it the other way. We state all three readings and
-assert that none is settled here.
+the sub-range that dominates their data. Of the three, only ROGI reports an index as a function of `n`, and on
+synthetic surfaces and curated libraries rather than on activity data at the sizes measured here. We
+state all the readings and assert that none is settled by this measurement.
 
 ### 4.4 What we deliberately did not do
 
@@ -275,10 +344,14 @@ reports** — and nothing in the repository recorded that a choice had been made
 Against the corrected arm, with an instrument gate confirming the floor reproduces our earlier numbers
 to 5.6 × 10⁻¹⁷:
 
-| | mean | interval | floor ahead on |
+| | skill | absolute RMSE | floor ahead on |
 |---|---|---|---|
-| ChEMBL-40, floor − cross-validated learner | −0.0754 | [−0.0865, −0.0639] | 3 / 40 |
-| MoleculeACE-30 | −0.0949 | [−0.1084, −0.0806] | 1 / 30 |
+| ChEMBL-40, floor − cross-validated learner | −0.0754 [−0.0865, −0.0639] | −0.0852 | 3 / 40 |
+| MoleculeACE-30 | −0.0949 [−0.1084, −0.0806] | −0.1171 | 1 / 30 |
+
+Both scales appear because the pre-registration that produced section 5.2 forbids reporting the
+normalised scale without the absolute one beside it, and because section 5.3 is about exactly that
+choice.
 
 ### 5.2 Half of that gap was the floor's own unexercised freedom
 
@@ -294,7 +367,9 @@ chooses its learner — recovers half the gap and does not close it:
 | recovered, of which choosing `m` | +0.0179 [+0.0114, +0.0242] | +0.0197 | 31 / 40 |
 | recovered, of which choosing the weighting | +0.0181 [+0.0146, +0.0218] | +0.0205 | 37 / 40 |
 
-On MoleculeACE-30, −0.0949 becomes −0.0474 [−0.0586, −0.0360]. **48 % and 50 % of the gap recovered**
+On MoleculeACE-30, −0.0949 becomes −0.0474 [−0.0586, −0.0360] in skill and −0.1171 becomes −0.0596
+[−0.0741, −0.0453] in absolute RMSE, with the floor ahead on 3 of 30. **48 % and 50 % of the gap
+recovered**
 on two collections of different size and framing, and the recovery splits almost exactly evenly between
 the two freedoms — 0.0002 apart, with a decomposition residual of exactly zero.
 
@@ -320,10 +395,15 @@ reproduce to 5.6 × 10⁻¹⁶ — and then computed a variance-normalised error
 
 For the pair we compare, their claim reproduces with room to spare: 0.0516 is about half their stated
 bound. The same 0.0516 of mean absolute error is 0.0757 of normalised skill — larger than every
-scientific effect in this paper. Our own independently measured gap on 40 different targets with a
-different control and a different model arm was −0.0754; the magnitudes agree to three decimal places
-and the signs differ only by direction convention. That agreement was **not pre-registered** and we
-report it as an observation, not a confirmed hypothesis.
+scientific effect in this paper. Our own gap on 40 different targets with a different control and a different model arm, **as section
+5.1 measured it with the floor at a fixed `m = 10`**, was −0.0754; the magnitudes agree to three
+decimal places and the signs differ only by direction convention. Two cautions attach to that
+coincidence. It was **not pre-registered**, so we report it as an observation rather than a confirmed
+hypothesis. And −0.0754 is the figure section 5.2 has just **superseded**: our current estimate, with
+the floor given the same selection freedom as the model arm, is −0.0394, and against that the
+magnitudes no longer coincide. The comparable quantity is theirs with a fixed control against ours
+with a fixed control, which is what is tabulated above; a reader who prefers the symmetric comparison
+on both sides should take 0.0757 against 0.0394 and conclude only that the two are of the same order.
 
 **Why the metric choice has teeth.** On any test set, with `b = sd(pred)/sd(y)` and
 `d = (mean y − mean pred)/sd(y)`,
@@ -413,10 +493,19 @@ instrument gates reading exactly zero:
 | fitted `w = C⁻¹c` | *m* | 10 | — | 0.3823 |
 
 The one-parameter kernel beats uniform weights by +0.0181 [+0.0146, +0.0218] on 37 of 40 ChEMBL targets
-and +0.0211 [+0.0171, +0.0257] on 30 of 30 MoleculeACE targets, and on a matched neighbourhood grid it
-gives up 0.0009 [−0.0048, +0.0025] of skill to the `m`-parameter optimum, so a pre-registered
-non-inferiority margin of −0.01 holds with the interval's lower end less than half the margin from
-zero. Cross-validation, given eight exponents and never shown a test label, selects **α = 1 on 26 of 40
+and +0.0211 [+0.0171, +0.0257] on 30 of 30 MoleculeACE targets when each arm selects on its own grid,
+and by +0.0170 on 39 of 40 and +0.0185 on 28 of 30 on the matched grid; the pre-registration requires
+both, because a comparison on each arm's own grid can reward the arm with the larger grid.
+
+Against the `m`-parameter fitted optimum on the matched grid the kernel gives up 0.0009
+[−0.0048, +0.0025] of skill, so a pre-registered non-inferiority margin of −0.01 holds with the
+interval's lower end less than half the margin from zero. **Three qualifications belong with that, and
+an earlier version of this paper carried none of them.** The result is an equivalence, not a win: the
+kernel leads on only 19 of 40 targets on the matched grid and 23 of 40 on the own grids, a coin flip.
+The deficit exceeds the margin on 3 of 40 targets, worst −0.0565 on `CHEMBL614358_EC50`. And the kernel
+pays a larger selection cost than its competitor — 40 cross-validation cells against the fitted arm's
+admissible set, with a measured regret of 0.0040 against 0.0006 — so the protocol charges the arm we
+report as sufficient more than the one it is compared against. Cross-validation, given eight exponents and never shown a test label, selects **α = 1 on 26 of 40
 targets**, with α ∈ {0.75, 1, 1.5} on **39 of 40** and an interquartile range of [1.000, 1.000]. The
 two-parameter arm adds +0.0002, positive on 20 of 40: the scale channel is empty, shown rather than
 asserted.
@@ -509,11 +598,15 @@ the phenomenon involved models outside the theorem's class, or the extension lan
 question was already answered inside the class. We state this because it bounds what a reader should
 expect, and it is the honest reason this is a methods paper.
 
-**One domain, one representation family.** Everything is ECFP4/Tanimoto on molecular activity. The
-ranking survives on genuinely different representations, and on two of three it is at least as good as
-on the primary one: Spearman of rank assortativity against attained skill is +0.9154 on atom pairs and
-+0.8934 on MACCS against +0.8889 on ECFP4 itself, falling to +0.7255 on RDKit physicochemical
-descriptors. So the result is not an artefact of one fingerprint, but the domain is still one.
+**One domain, one representation, and the check is weaker than it looks.** Everything is
+ECFP4/Tanimoto on molecular activity, and **the index itself was never recomputed on another
+representation**: in the one check we ran, the graph and the statistic stay on ECFP4/Tanimoto
+throughout and only the *model's* features change, so what varies is the accuracy the index is
+correlated against, not the index. Spearman of rank assortativity against attained skill is +0.9154
+when the model uses atom pairs, +0.8934 on MACCS and +0.7255 on RDKit physicochemical descriptors,
+against +0.8889 on ECFP4 — so the index predicts accuracy for models built on other features, which is
+one more than zero and **does not make the claim representation-free**. An earlier version of this
+paper stated this more strongly than its own artefact supports, and the artefact's own verdict says so.
 
 **The size result uses random subsampling**, not a realistic acquisition order. Real datasets grow by
 medicinal-chemistry series, which plausibly grows homophily less than random growth does. Under uniform
@@ -541,14 +634,18 @@ that collection of 10 from the reference set and from every conclusion, and repo
 The error of the k-nearest-neighbour mean on a molecular similarity graph has an exact closed form in
 two graph statistics, and the published continuous modelability index is that form to within about one
 percent. One of the two statistics is reported throughout the field and the other is reported nowhere;
-omitting it costs a factor of 2.5 in level and nothing in ranking.
+omitting it costs a factor of 2.5 in level, and whether it costs anything in ranking is a question this
+data cannot answer, the two moments correlating at +0.9895 here.
 
 The quantity all of these indices estimate is not a property of a dataset. It moves by roughly 0.26 in
 both statistics over an eightfold change in sample size, on every target we measured, and the 2014
-binary index crosses its own published threshold on nearly half of its cells by growing alone. The
-movement is the classical `k/n` rank-dilution channel and we claim nothing for the mechanism. What we
-claim is that an index whose sample dependence is this predictable should not be published as a bare
-point estimate, and that the line has done so throughout.
+binary index crosses its own published threshold on nearly half of its cells by growing alone. That a
+roughness index depends on sample size is documented in the literature that introduced one, which
+reports a convergence figure and a bootstrapped interval; the movement here is the classical `k/n`
+rank-dilution channel, for which we claim nothing. What we claim is the gap between knowing and
+reporting: the dependence is of a size that crosses the field's own threshold, it is predictable from
+the full-sample ordering without resampling, it has not been reported for the MODI family, and the
+practice of tabulating one number per dataset against a fixed cut-off is unchanged.
 
 Along the way we withdrew one of our own claims entirely, halved another, and found that a prominent
 disagreement in this literature is a disagreement about which scale to report rather than about what
