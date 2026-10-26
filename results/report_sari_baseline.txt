@@ -1,0 +1,186 @@
+pre-registration blob: b62cb36b3eb92b6b960040e54c1fd1bb78aaa194
+
+  ChEMBL-40       CHEMBL217_Ki             n= 8205 cont=0.8315 disc=0.3644 [41s]
+  ChEMBL-40       CHEMBL205_Ki             n= 7636 cont=0.8152 disc=0.4458 [32s]
+  ChEMBL-40       CHEMBL261_Ki             n= 7082 cont=0.8180 disc=0.4195 [28s]
+  ChEMBL-40       CHEMBL3594_Ki            n= 5779 cont=0.8302 disc=0.4215 [19s]
+  ChEMBL-40       CHEMBL251_Ki             n= 5286 cont=0.8500 disc=0.4540 [17s]
+  ChEMBL-40       CHEMBL224_Ki             n= 4653 cont=0.8403 disc=0.3398 [17s]
+  ChEMBL-40       CHEMBL1628481_EC50       n= 3215 cont=0.7501 disc=0.5488 [8s]
+  ChEMBL-40       CHEMBL256_Ki             n= 4276 cont=0.8372 disc=0.6015 [13s]
+  ChEMBL-40       CHEMBL3242_Ki            n= 4624 cont=0.8316 disc=0.3818 [14s]
+  ChEMBL-40       CHEMBL226_Ki             n= 4386 cont=0.8545 disc=0.4471 [13s]
+  ChEMBL-40       CHEMBL253_Ki             n= 4063 cont=0.8543 disc=0.5510 [11s]
+  ChEMBL-40       CHEMBL3371_Ki            n= 3904 cont=0.8357 disc=0.4546 [10s]
+  ChEMBL-40       CHEMBL5113_Ki            n= 2272 cont=0.7786 disc=0.4146 [4s]
+  ChEMBL-40       CHEMBL2292_EC50          n= 1857 cont=0.7354 disc=0.3644 [3s]
+  ChEMBL-40       CHEMBL1163125_Ki         n= 1296 cont=0.7527 disc=0.3597 [2s]
+  ChEMBL-40       CHEMBL3155_Ki            n= 2657 cont=0.8273 disc=0.4564 [5s]
+  ChEMBL-40       CHEMBL225_Ki             n= 2584 cont=0.8683 disc=0.4454 [5s]
+  ChEMBL-40       CHEMBL4422_EC50          n= 2272 cont=0.7918 disc=0.4403 [4s]
+  ChEMBL-40       CHEMBL614358_EC50        n= 1243 cont=0.8815 disc=0.2993 [1s]
+  ChEMBL-40       CHEMBL4860_Ki            n= 1243 cont=0.6416 disc=0.6162 [2s]
+  ChEMBL-40       CHEMBL5024_Ki            n= 1011 cont=0.6656 disc=0.1079 [1s]
+  ChEMBL-40       CHEMBL2000_Ki            n= 1080 cont=0.7721 disc=0.4926 [1s]
+  ChEMBL-40       CHEMBL4333_EC50          n= 2464 cont=0.8250 disc=0.4895 [4s]
+  ChEMBL-40       CHEMBL4550_Ki            n= 1513 cont=0.7410 disc=0.5565 [2s]
+  ChEMBL-40       CHEMBL259_Ki             n= 1982 cont=0.7787 disc=0.7359 [3s]
+  ChEMBL-40       CHEMBL4822_Ki            n= 2217 cont=0.7871 disc=0.5276 [4s]
+  ChEMBL-40       CHEMBL222_Ki             n= 1987 cont=0.8591 disc=0.4012 [3s]
+  ChEMBL-40       CHEMBL245_Ki             n= 1777 cont=0.8181 disc=0.4533 [3s]
+  ChEMBL-40       CHEMBL2014_Ki            n= 2108 cont=0.7981 disc=0.4483 [3s]
+  ChEMBL-40       CHEMBL255_Ki             n= 1843 cont=0.8122 disc=0.4140 [3s]
+  ChEMBL-40       CHEMBL4361_Ki            n= 1617 cont=0.7514 disc=0.3783 [2s]
+  ChEMBL-40       CHEMBL4805_Ki            n=  583 cont=0.6983 disc=0.4021 [0s]
+  ChEMBL-40       CHEMBL1784_EC50          n= 1464 cont=0.7193 disc=0.7384 [3s]
+  ChEMBL-40       CHEMBL1833_Ki            n= 1655 cont=0.8758 disc=0.4324 [2s]
+  ChEMBL-40       CHEMBL4227_EC50          n= 1332 cont=0.7841 disc=0.6852 [1s]
+  ChEMBL-40       CHEMBL211_Ki             n= 1564 cont=0.8439 disc=0.6572 [2s]
+  ChEMBL-40       CHEMBL344_Ki             n= 1593 cont=0.8158 disc=0.4800 [2s]
+  ChEMBL-40       CHEMBL240_Ki             n= 1485 cont=0.8642 disc=0.2743 [2s]
+  ChEMBL-40       CHEMBL3759_Ki            n= 1342 cont=0.8391 disc=0.4824 [2s]
+  ChEMBL-40       CHEMBL2056_Ki            n= 1265 cont=0.8382 disc=0.5019 [1s]
+  MoleculeACE-30  CHEMBL1862_Ki            n=  794 cont=0.7427 disc=0.5491 [1s]
+  MoleculeACE-30  CHEMBL1871_Ki            n=  659 cont=0.8443 disc=0.4028 [1s]
+  MoleculeACE-30  CHEMBL2034_Ki            n=  750 cont=0.8470 disc=0.4051 [1s]
+  MoleculeACE-30  CHEMBL2047_EC50          n=  631 cont=0.8372 disc=0.4431 [0s]
+  MoleculeACE-30  CHEMBL204_Ki             n= 2754 cont=0.8348 disc=0.5985 [6s]
+  MoleculeACE-30  CHEMBL2147_Ki            n= 1456 cont=0.8030 disc=0.5202 [2s]
+  MoleculeACE-30  CHEMBL214_Ki             n= 3317 cont=0.8277 disc=0.4615 [8s]
+  MoleculeACE-30  CHEMBL218_EC50           n= 1031 cont=0.8457 disc=0.4953 [1s]
+  MoleculeACE-30  CHEMBL219_Ki             n= 1865 cont=0.8085 disc=0.4738 [3s]
+  MoleculeACE-30  CHEMBL228_Ki             n= 1704 cont=0.8624 disc=0.4555 [2s]
+  MoleculeACE-30  CHEMBL231_Ki             n=  973 cont=0.8363 disc=0.4341 [1s]
+  MoleculeACE-30  CHEMBL233_Ki             n= 3142 cont=0.8323 disc=0.5338 [7s]
+  MoleculeACE-30  CHEMBL234_Ki             n= 3657 cont=0.8179 disc=0.4002 [9s]
+  MoleculeACE-30  CHEMBL235_EC50           n= 2349 cont=0.8159 disc=0.5100 [4s]
+  MoleculeACE-30  CHEMBL236_Ki             n= 2598 cont=0.8215 disc=0.5336 [5s]
+  MoleculeACE-30  CHEMBL237_EC50           n=  955 cont=0.8085 disc=0.7275 [1s]
+  MoleculeACE-30  CHEMBL237_Ki             n= 2603 cont=0.8221 disc=0.5804 [5s]
+  MoleculeACE-30  CHEMBL238_Ki             n= 1052 cont=0.8596 disc=0.4223 [1s]
+  MoleculeACE-30  CHEMBL239_EC50           n= 1721 cont=0.7935 disc=0.5135 [2s]
+  MoleculeACE-30  CHEMBL244_Ki             n= 3097 cont=0.8342 disc=0.5721 [7s]
+  MoleculeACE-30  CHEMBL262_Ki             n=  856 cont=0.8588 disc=0.5311 [1s]
+  MoleculeACE-30  CHEMBL264_Ki             n= 2862 cont=0.8223 disc=0.4255 [6s]
+  MoleculeACE-30  CHEMBL2835_Ki            n=  615 cont=0.5402 disc=0.2092 [1s]
+  MoleculeACE-30  CHEMBL287_Ki             n= 1328 cont=0.8329 disc=0.4922 [2s]
+  MoleculeACE-30  CHEMBL2971_Ki            n=  976 cont=0.6733 disc=0.2512 [1s]
+  MoleculeACE-30  CHEMBL3979_EC50          n= 1125 cont=0.7791 disc=0.4915 [1s]
+  MoleculeACE-30  CHEMBL4005_Ki            n=  960 cont=0.8091 disc=0.4273 [1s]
+  MoleculeACE-30  CHEMBL4203_Ki            n=  731 cont=0.8636 disc=0.3810 [1s]
+  MoleculeACE-30  CHEMBL4616_EC50          n=  682 cont=0.8088 disc=0.5253 [0s]
+  MoleculeACE-30  CHEMBL4792_Ki            n= 1471 cont=0.7809 disc=0.5079 [2s]
+  DeepDelta-10    Caco2                    n=  910 cont=0.8890 disc=0.2747 [1s]
+  DeepDelta-10    FUBrain                  n=  253 cont=0.8820 disc=0.3221 [0s]
+  DeepDelta-10    FreeSolv                 n=  642 cont=0.9085 disc=1.1191 [0s]
+  DeepDelta-10    HalfLife                 n= 1321 cont=0.8981 disc=0.2531 [2s]
+  DeepDelta-10    HemoTox                  n=  828 cont=0.8599 disc=0.3812 [1s]
+  DeepDelta-10    HepClear                 n=  881 cont=0.8764 disc=0.2474 [1s]
+  DeepDelta-10    MicroClear               n=  731 cont=0.8715 disc=0.2351 [1s]
+  DeepDelta-10    RenClear                 n=  636 cont=0.8949 disc=0.1175 [0s]
+  DeepDelta-10    Sol                      n= 1128 cont=0.9088 disc=1.0305 [1s]
+  DeepDelta-10    VDss                     n= 1130 cont=0.8768 disc=0.2195 [1s]
+
+====================================================================================================
+INSTRUMENT. THIS SCRIPT'S raw_disc AGAINST THE REFERENCE AT 0.6
+====================================================================================================
+  max |this script - rogi.SARI.compute_raw_scores()| = 1.799e-14 over 80 targets
+  raw_cont comes from the reference directly and carries no threshold
+  The frozen plan declares 0.56 primary AND names compute_raw_scores(), which hardcodes
+  0.6. Both cannot be obeyed literally; this check is what makes computing raw_disc here
+  legitimate, and it is reported whatever it says.
+  INSTRUMENT: PASS at 1e-12
+
+====================================================================================================
+GATE 1. THE JOIN IS COMPLETE, AND THIS GATE IS A HARD STOP
+====================================================================================================
+  rows 80; collections {'ChEMBL-40': 40, 'MoleculeACE-30': 30, 'DeepDelta-10': 10}
+  missing best_skill           0
+  missing modi_q2              0
+  missing rank_assortativity   0
+  missing sari                 0
+  missing rogi                 0
+  missing mean_degree          0
+  missing n_molecules          0
+  GATE 1: PASS
+
+====================================================================================================
+GATE 2. THE THRESHOLD LEAVES PAIRS (ALREADY MEASURED)
+====================================================================================================
+  targets with zero qualifying pairs at 0.56: 0 of 80
+  targets with zero qualifying pairs at 0.6: 0 of 80
+  GATE 2: PASS  (the 1e8 sentinel never fires on this data)
+
+====================================================================================================
+GATE 3. THE DOMAIN VIOLATION IS CONFINED
+====================================================================================================
+  potency targets with a non-positive label: 0 of 70
+  out-of-domain targets overall: 8  (Caco2, FUBrain, FreeSolv, HalfLife, HemoTox, RenClear, Sol, VDss)
+  label minimum over all targets: -25.470
+  GATE 3: PASS
+  SARI's weight y_i*y_j/(1+|y_i-y_j|) presumes positive log-potency; where a label is
+  non-positive the weight goes negative and raw_cont is not a weighted mean.
+
+====================================================================================================
+A. THE INDEX, AND THE PACKAGE'S DEFECT BESIDE IT
+====================================================================================================
+  collection          SARI (published mean)     rogi 0.1 product
+  ChEMBL-40        0.0395 .. 0.9191       0.0001 .. 0.4222
+  MoleculeACE-30   0.1877 .. 0.8113       0.0000 .. 0.3287
+  DeepDelta-10     0.4801 .. 0.9677       0.0000 .. 0.4677  OUT OF DOMAIN
+
+  Spearman(published mean, rogi 0.1 product) over all 80 = 0.9464
+  DISCLOSED: this value was measured before freezing, which is why the plan registers no
+  prediction on it. The product is bounded above by 0.5 and published SARI values exceed
+  that, so it is this package's defect and not a convention.
+  Spearman(threshold 0.56, threshold 0.6) = 0.9974
+
+====================================================================================================
+B. PREDICTION 1. DOES SARI RANK ATTAINABLE ACCURACY
+====================================================================================================
+  ChEMBL-40        rho=-0.2224 [-0.5367, +0.1313]  covers 0 
+  MoleculeACE-30   rho=-0.5026 [-0.7172, -0.1995]  EXCLUDES 0
+  DeepDelta-10     rho=-0.5515 [-0.9630, +0.2000]  covers 0   (out of domain, descriptive)
+  PREDICTION 1: FAILS (ChEMBL-40, the primary collection)
+
+====================================================================================================
+C. PREDICTION 2, THE PRIMARY. DOES ASSORTATIVITY ADD ANYTHING
+====================================================================================================
+  ChEMBL-40        over {rogi, modi_q2, SARI, mean_degree, n_molecules}: rho=+0.1749 [-0.1172, +0.4379]  covers 0 
+                   with SARI absent from the covariate set: rho=+0.1700 [-0.1220, +0.4350]  covers 0 
+  MoleculeACE-30   over {rogi, modi_q2, SARI, mean_degree, n_molecules}: rho=+0.0638 [-0.3169, +0.4114]  covers 0 
+                   with SARI absent from the covariate set: rho=+0.0937 [-0.2876, +0.4325]  covers 0 
+  PREDICTION 2: HOLDS (covers zero on both potency collections)
+
+====================================================================================================
+D. PREDICTION 3. ARE THE FOUR INDICES MUTUALLY REDUNDANT
+====================================================================================================
+  pairwise |Spearman| on ChEMBL-40, floor 0.3
+    rank_assortativity   rogi                 0.3405
+    rank_assortativity   modi_q2              0.9448
+    rank_assortativity   sari                 0.1732  <- below the floor
+    rogi                 modi_q2              0.4163
+    rogi                 sari                 0.6358
+    modi_q2              sari                 0.1467  <- below the floor
+  PREDICTION 3: FAILS (weakest pair 0.1467)
+
+====================================================================================================
+E. THE OUTCOME RULE
+====================================================================================================
+  NEAR-INTERCHANGEABLE RANKERS. Claim 2's row is completed with all three published
+  indices named, and the paper stops claiming an incremental win over the baseline
+  line. The row's 'SARI still missing' clause is removed.
+
+====================================================================================================
+F. EVERY INDEX AGAINST EVERY OTHER, REPORTED UNCONDITIONALLY
+====================================================================================================
+  ChEMBL-40:
+    rank_assortativity   alone +0.8956 [+0.7428, +0.9711]   incremental +0.1749 [-0.1172, +0.4379]  covers 0
+    rogi                 alone -0.3071 [-0.6140, +0.0440]   incremental +0.0407 [-0.2738, +0.3523]  covers 0
+    modi_q2              alone +0.9233 [+0.8070, +0.9756]   incremental +0.2161 [-0.0836, +0.4657]  covers 0
+    sari                 alone -0.2224 [-0.5367, +0.1313]   incremental -0.0265 [-0.3190, +0.2754]  covers 0
+  MoleculeACE-30:
+    rank_assortativity   alone +0.8096 [+0.5393, +0.9508]   incremental +0.0638 [-0.3169, +0.4114]  covers 0
+    rogi                 alone -0.2369 [-0.5787, +0.1811]   incremental -0.1711 [-0.5628, +0.2591]  covers 0
+    modi_q2              alone +0.8563 [+0.6294, +0.9656]   incremental +0.1315 [-0.2420, +0.4541]  covers 0
+    sari                 alone -0.5026 [-0.7172, -0.1995]   incremental -0.2832 [-0.6362, +0.1442]  covers 0
