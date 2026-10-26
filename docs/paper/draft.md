@@ -84,9 +84,20 @@ and correlated each against the accuracy actually attained. Two rank it and two 
 | SARI | −0.2224 [−0.5367, +0.1313] | −0.0265 [−0.3190, +0.2754] |
 
 Assortativity and MODI_q2 sit at 0.9448 mutual Spearman and are, for this purpose, nearly the same
-statistic. **No index adds anything over the other three on either potency collection.** SARI is not
-redundant with them — its mutual Spearman with MODI_q2 is 0.1467 — so it measures something else,
-which on these targets does not predict attained accuracy; its association is negative, and its
+statistic. **No index adds anything over the other three on either potency collection.**
+
+**ROGI's weak showing here replicates its authors' own result.** They report that on these same 30
+van Tilborg ChEMBL activity classes "ROGI displayed moderate-to-strong (r = 0.56–0.89) correlations
+with model error when representing molecules with physico-chemical descriptors, but only **weak
+correlations (r = 0.15–0.39) when representing molecules with fingerprints**", explaining it by "the
+much smaller range of both ROGI values and model errors obtained". Our ECFP4 figure of −0.3071 against
+attained accuracy is +0.31 against error and sits inside their reported fingerprint range. We
+reproduce their result on their data, and the right reading is theirs.
+
+SARI is not redundant with these — its mutual Spearman with MODI_q2 is 0.1467 — so it measures
+something else. On ChEMBL-40 that something does not predict attained accuracy, but **on
+MoleculeACE-30 it does**: its standalone Spearman there is −0.5026 [−0.7172, −0.1995], excluding zero,
+so the failure is on the primary collection and not on both. Its association is negative, and its
 discontinuity component is positively associated with accuracy, which we report and do not resolve,
 the 2007 source being paywalled and unread by us. We note in passing that the `rogi` package's SARI
 combines the two component scores as a product where three independent restatements give a mean, and
@@ -181,11 +192,17 @@ of f at each unlabeled data point is the average of f at neighboring points"; th
 to impute labels, we measure the average's error. As a risk the expression is also the Wiener filter
 and the kriging system, and we say so here rather than leave it to a reviewer.
 
-Further, `m₁` **is Moran's I on the kNN graph** (Arthur, *EPJ Data Science* 2025, 14:1, eq. 2), which
-for a row-normalised adjacency coincides with Newman's target assortativity — the same source notes
-that the Moran index omits assortativity's degree correction, so the two agree under that
-normalisation and not in general, and `1 − m₁` is Geary's C in the same family. The
-spatial-autocorrelation literature owns the object.
+Further, `m₁` **is the network Moran index** (Arthur, *EPJ Data Science* 2025, 14:1), and the
+relationship to Newman's target assortativity is not identity. Arthur's own statement is that "unlike
+assortativity, the Moran index does not incorporate the null model into its definition": written out
+for unbinned real-valued data, assortativity subtracts the configuration-null expectation
+`k_i k_j / 2E` of each adjacency entry, and the Moran index does not. He adds that the Moran index "is
+normalised by the variance of the data rather than the variance of the node degree". Those two
+differences are why `m₁` and `r` separate on an irregular graph — measured 0.661339 against 0.653292,
+a gap of 8.0 × 10⁻³, on the target used above — and why equation (2) must say *Moran index* where
+equation (1) says *assortativity*. An earlier version of this paper glossed Arthur's statement as a
+"degree correction" and asserted an agreement he does not claim. The spatial-autocorrelation
+literature owns the object either way, and `1 − m₁` is Geary's C in the same family.
 
 ### 2.3 What is ours: the published index is this expression
 
@@ -219,9 +236,15 @@ a form that can be reasoned about rather than only measured.
 
 ## 3. The term every published index omits
 
-`m₁` alone is what the field reports. The second moment is absent from MODI, MODI_q2, RMODI, ROGI,
-kernel target alignment, and from Cui et al.'s Label Incoherence Index
+`m₁` alone is what the neighbour-averaging family reports. The second moment is absent from MODI,
+MODI_q2, RMODI, kernel target alignment, and from Cui et al.'s Label Incoherence Index
 `LII = (1/n)Σ_i(1/k)Σ_{j∈N_i}|y_j − y_i|`, a first-moment L1 index on the same kNN graph.
+
+**ROGI is not in that list, and an earlier version of this paper wrongly put it there.** ROGI is not a
+moment of labels over graph edges at all: it coarse-grains the dataset by complete-linkage clustering
+at a sequence of distance thresholds and integrates a dispersion over that sequence. It reports
+neither moment, so "omits the second" is the wrong criticism of it, and the comparison in section 1.1
+is between indices of different construction.
 
 Dropping it costs a **factor of 2.5 in level**: reproducing MODI_q2 from `1 − r` alone gives a mean
 absolute error of 0.0257 against the full identity's 0.0103 on ChEMBL-40.
@@ -274,10 +297,20 @@ molecule reads, reproduces the measured movement at every fraction: ratios 1.006
 against a two-sided band of [0.90, 1.10] declared in advance.
 
 That `n` enters a kNN estimator only through `k/n`, by way of neighbour-rank order statistics, is
-published. Samworth (*Ann. Statist.* 2012, 40(5):2733, Theorem 1) gives a squared-bias factor for the
-unweighted rule of exactly `(k/n)^{2/d}`; the companion statement on near-neighbour distance moments,
-`E[ε_k^a] ≤ C(k/n)^{a/D}`, is in Evans, Jones & Schmidt (*Proc. R. Soc. A* 2002, 458:2839). **We claim
-no novelty for the mechanism.**
+published — and the right citation for a *regression* estimator is not the one an earlier version of
+this paper gave. Samworth (*Ann. Statist.* 2012, 40(5):2733) is titled "Optimal weighted nearest
+neighbour **classifiers**", and its Theorem 1 decomposes the excess risk of a weighted
+nearest-neighbour **classifier** under 0–1 loss; the paper itself remarks that "although the 0–1
+classification loss function is quite different from the squared error loss often used in regression
+problems, we nevertheless obtain such an asymptotic decomposition". So it is an **analogy** here, not
+an authority, and we cite it as one. Within it, the bias term carries the factor `(k/n)^{2/d}` — for
+the unweighted rule the weighted sum of `α_i = i^{1+2/d} − (i−1)^{1+2/d}` telescopes to `k^{2/d}` — so
+the *squared*-bias term carries `(k/n)^{4/d}`; an earlier version of this paper called `(k/n)^{2/d}`
+the squared-bias factor, dropping the square.
+
+The statement that applies to squared error directly, and is loss-agnostic, is the near-neighbour
+distance moment bound `E[ε_k^a] ≤ C(k/n)^{a/D}` of Evans, Jones & Schmidt (*Proc. R. Soc. A* 2002,
+458:2839), and that is what the regression claim rests on. **We claim no novelty for the mechanism.**
 
 One accounting detail is worth stating because it would otherwise be misreported. The residual between
 the measured arm and the null decomposes exactly, to 8.7 × 10⁻¹⁹, into a variance-normaliser term and a
@@ -291,7 +324,11 @@ this section. It is not.
 On MoleculeACE, the one collection carrying an activity-class flag, the 2014 binary MODI with the 2014
 threshold of 0.65 declares **all 30 targets modelable at full `n` and only 54 % of (target, chain)
 cells at `n/8`** (mean 0.7592 against 0.6514). Same targets, same chemistry; the published criterion
-crosses by growing alone. On ChEMBL the same monotonicity holds at all eight thresholds of a declared
+crosses by growing alone. One caveat belongs directly under that row, where the measuring plan placed
+it: at an eighth of the data 8 of the 150 cells rest on fewer than ten molecules in one activity
+class, the thinnest on four, and a value resting on four molecules is quantised in steps of 0.125 in
+that class's term. No class emptied on any of the 480 cells, and both per-class counts travel with
+every value in the artefact. On ChEMBL the same monotonicity holds at all eight thresholds of a declared
 grid, and we report it inside that grid rather than at 0.65 alone, because 0.65 is the binary index's
 threshold and not the continuous one's.
 
@@ -330,8 +367,10 @@ exponent comparison would have manufactured a confirmation.
 ### 5.1 A baseline audit on our own claim, which reversed it
 
 We had claimed the kNN floor beats fitted models. It does not, and the audit that showed this is
-reported here rather than quietly dropped, because the subject is the one Janela & Bajorath's 2023
-title names.
+reported here rather than quietly dropped, because the subject is the one Janela & Bajorath's **2022**
+title names: "Simple nearest-neighbour analysis meets the accuracy of compound potency predictions
+using complex machine learning models" (*Nature Mach. Intell.* 4:1246–1255). Their 2023 *Sci. Rep.*
+paper, which section 5.3 reanalyses, is titled differently and concludes something different.
 
 The model arm we had used averaged histogram gradient boosting with a multilayer perceptron and
 **excluded the support-vector machine** that our own code comments called the real bar. Per-learner
@@ -341,8 +380,11 @@ averaged the second-best learner with the worst and left out the one that wins. 
 baseline was worth +0.1025 [+0.0899, +0.1156] of skill — larger than every scientific effect this paper
 reports** — and nothing in the repository recorded that a choice had been made.
 
-Against the corrected arm, with an instrument gate confirming the floor reproduces our earlier numbers
-to 5.6 × 10⁻¹⁷:
+Against the corrected arm. The instrument gate confirming that the floor reproduces our earlier
+numbers has **two rows, not one**: on the 12 targets whose earlier values were computed it agrees to
+5.6 × 10⁻¹⁷, and on the 28 whose values were recoverable only at three stored decimals it agrees to
+4.3 × 10⁻⁴ against a tolerance of 5 × 10⁻⁴ — the looser row a limit of what the earlier artefact
+stored, not of the recomputation. An earlier version of this paper quoted only the tighter row.
 
 | | skill | absolute RMSE | floor ahead on |
 |---|---|---|---|
@@ -379,11 +421,18 @@ Selection is symmetric in *form* here but not in *search cost* — the floor arm
 cross-validation cells against the model arm's 3, with a measured selection regret of 0.0040 — and that
 residual asymmetry points against the floor arm, so it cannot explain what survives.
 
-### 5.3 The prominent disagreement in this literature is about scale
+### 5.3 Their own conclusion and ours agree, once the scale is named
 
 Janela & Bajorath report that "differences in mean prediction errors of all methods were confined to
-~ 0.1 units and thus essentially negligible", concluding that increasingly complex machine learning and
-simple controls perform similarly. We do not reproduce that tie. Their per-compound predictions are
+~ 0.1 units and thus essentially negligible". **Their conclusion is not that the methods are
+equivalent**, and an earlier version of this paper attributed that to them wrongly: they conclude that
+"conventional benchmark settings do not provide a realistic assessment of compound potency prediction
+methods", and they attribute the flatness to the intermediate-potency compounds near each dataset's
+median, whose errors are small for every method and which dominate the aggregate.
+
+That is a claim about benchmark design, and it points the same way as what follows. They say the
+benchmark hides differences between methods; we show one scale on which a difference is visible in
+their own predictions. We do not reproduce their numerical tie on that scale. Their per-compound predictions are
 published, so we recomputed their own table from their own predictions — all 1920 published rows
 reproduce to 5.6 × 10⁻¹⁶ — and then computed a variance-normalised error on the same predictions:
 
@@ -405,7 +454,7 @@ magnitudes no longer coincide. The comparable quantity is theirs with a fixed co
 with a fixed control, which is what is tabulated above; a reader who prefers the symmetric comparison
 on both sides should take 0.0757 against 0.0394 and conclude only that the two are of the same order.
 
-**Why the metric choice has teeth.** On any test set, with `b = sd(pred)/sd(y)` and
+**Why the metric choice matters.** On any test set, with `b = sd(pred)/sd(y)` and
 `d = (mean y − mean pred)/sd(y)`,
 
     R² = r² − (r − b)² − d²                                                          (3)
@@ -413,9 +462,18 @@ on both sides should take 0.0757 against 0.0394 and conclude only that the two a
 identically — verified against their own published R² column to 1.9 × 10⁻¹⁵ on all 379 non-constant
 cells. So `r² = R² + penalty` with `penalty ≥ 0`: the squared Pearson correlation is the coefficient of
 determination plus a non-negative calibration term, and being invariant to affine rescaling of the
-prediction it cannot see that term. Their results report that correlation did not separate the models
-further; the coefficient of determination, which would, sits in their repository on all 400 cells and
-not in their text.
+prediction it cannot see that term.
+
+This decomposition is **not ours**: it is Murphy's mean-square-error skill-score decomposition, long
+standard in forecast verification, and we cite it as such rather than present it as apparatus.
+
+Their Results report that `r²` — which their Methods define as the squared Pearson coefficient — "did
+not lead to a larger separation between the performance of different models". The coefficient of
+determination, which can see the calibration term, **does appear in their Results, but as an
+alternative training cost function** whose outcome they report as nearly identical, not as a reported
+performance value; it is also in their repository on all 400 cells. An earlier version of this paper
+said it was absent from their text, which is wrong. The narrower and correct statement is that the
+quantity reported as *performance* throughout is the affine-invariant one.
 
 **None of this says their numbers are wrong** — they reproduce exactly — nor is the calibration spread
 across their arms evidence about their modelling choices: an unweighted neighbour rule has `b ≈ 1` by
@@ -479,8 +537,8 @@ hypothesis is materially false, and nothing we found reports this profile on mol
 
 Reweighting by rank is worth +0.0155 [+0.0118, +0.0192] out of sample against the best
 training-selected uniform `m` in each arm, positive on 30 of 31 targets. We first reported +0.0379
-against uniform at a fixed `m = 10`; 62 % of that was the effect of fixing `m`, since uniform at `m = 5`
-beats uniform at `m = 10` on 28 of 31 targets. The corrected figure is the one above.
+against uniform at a fixed `m = 10`; **59 %** of that was the effect of fixing `m` — a difference of
+0.0224 in 0.0379 — since uniform at `m = 5` beats uniform at `m = 10` on 28 of 31 targets. The corrected figure is the one above.
 
 Four arms, each selected by five-fold cross-validation on the training split alone, with all three
 instrument gates reading exactly zero:
