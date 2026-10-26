@@ -234,33 +234,51 @@ dominated the science, and nothing in the repository recorded that a choice had 
 still excluding zero, floor ahead on 1 of 31. Reported as a sensitivity because it was not
 pre-registered; a symmetric pre-registered version is owed.
 
-**What stays open, with the differences now named** (increment 17's prior-art pass; see
-`results/results_increment17.md`). Janela & Bajorath (*Nature Mach. Intell.* 2022, 4:1246) report the
-simple control meeting or exceeding complex ML, and we do not reproduce that tie. Three concrete
-differences, from their own papers and public code:
+**The open question is closed: it was a disagreement about scale** (increment 18;
+`prereg/increment18_jb_reanalysis.yaml`, blob `07c64acc2d48b320b1366b3e5a6251b1b4993a9f`;
+`results/results_increment18.md`). Janela & Bajorath's per-compound predictions are published, so
+nothing was re-trained: their own table was recomputed from their own predictions, all 1920 rows
+reproducing to **5.551e-16**, and this paper's metric was then computed on the same predictions.
 
-- **Their metric is unnormalised MAE**, the sole metric on all 376 activity classes
-  (*Pharmaceuticals* 2023, 16(4):530 §4.5); *Sci. Rep.* 2023 adds RMSE and squared Pearson on eight.
-  Neither reports a variance-normalised error as a performance value, and this paper's skill is a
-  baseline-normalised root-error ratio. Their own paired figures give the conversion factor (MAE ~0.4
-  against RMSE ~0.5, and <0.8 against <1.0, both ratios 1.25, the Gaussian `√(π/2)`), under which a
-  0.1 MAE margin maps to 0.125 of skill at a potency standard deviation of 1.0 and 0.084 at 1.5 —
-  bracketing the −0.0754 to −0.0949 above. **The two gaps are of the same order**; this is an
-  order-of-magnitude conversion under a stated assumption and it resolves nothing by itself.
-- **Their 2022 control used Euclidean distance.** Their code builds it as
-  `neighbors.KNeighborsRegressor()` with `{"n_neighbors": [1, 3, 5]}` and no metric argument, so
-  scikit-learn defaults to `minkowski, p=2` with uniform weights, on 2048-bit Morgan vectors. Their
-  2023 repository sets `metric='jaccard'` explicitly. Ours is a uniform mean over ten
-  **Tanimoto**-nearest neighbours.
-- **Their model arm was done right**, so nothing here implies the field generally gets it wrong: SVR
-  with a **Tanimoto kernel** and `C` swept over ten values, plus a 54-point deep-arm grid.
+| pair, on their 8 targets and 10 splits | their MAE | this paper's skill |
+|---|---|---|
+| **SVR − kNN** | **+0.0516** | **+0.0757** [+0.0601, +0.0913], 8/8 targets |
+| SVR − 1-NN | +0.1088 | +0.1594 |
+| SVR − MR | +0.4677 | +0.3974 |
 
-Our own sensitivity shows `m` alone carries 0.023 of the 0.075. Settling it still means running their
-protocol on their public data (`github.com/TiagoJanela/ML-for-compound-potency-prediction`), and that
-run must now **report MAE beside skill** so the comparison exists on their scale as well as ours. It
-remains the best-motivated experiment in the queue.
+Their claim is that "differences in mean prediction errors of all methods were confined to ~ 0.1 units
+and thus essentially negligible" (*Sci. Rep.* 2023, 13:17816). For this pair it reproduces with room to
+spare — 0.0516 is about half their bound — and the same predictions give 0.0757 of skill, **larger than
+every effect this paper reports**. Increment 14 measured −0.0754 [−0.0865, −0.0639] on 40 different
+ChEMBL targets with a different control and model arm; the magnitudes agree to three decimals and the
+signs differ only by direction convention. That agreement was **not pre-registered** — the plan
+registered a factor-of-three band — and is reported as an observation, not a confirmed hypothesis.
 
----
+**Why the metric choice has teeth, as algebra.** With `b = sd(pred)/sd(y)` and
+`d = (mean y − mean pred)/sd(y)`, `R² = r² − (r − b)² − d²` identically, verified against their own
+published R² column to 1.887e-15 on all 379 non-constant cells. So `r² = R² + penalty` with
+`penalty ≥ 0`: the squared Pearson correlation is the coefficient of determination plus a calibration
+term, and being invariant to affine rescaling it cannot see that term. Their Results report that "r2
+calculations did not lead to a larger separation"; here the R² separation is 0.0993 against r²'s
+0.0836, and the difference 0.0157 is exactly their kNN arm's calibration penalty minus their SVR arm's.
+The coefficient of determination sits in their repository on all 400 cells; their text reports the
+affine-invariant one.
+
+**None of this is a claim that their numbers are wrong** — they reproduce exactly — nor evidence about
+their modelling choices: an unweighted neighbour rule has `b ≈ 1` by construction (measured 0.9864) and
+a regularised kernel machine shrinks `b` toward `r`, so the 26-fold calibration spread across their
+arms was certain before the data were read. Nor does this paper claim which scale answers which
+question: if a 0.1 log-unit margin sits below assay error, the absolute scale is the right one for
+"should a medicinal chemist prefer the complex model", and a normalised restatement answers something
+else. **What is established is that the two scales give different-looking answers on identical
+predictions, so from here this paper reports both** for every model-against-floor comparison.
+
+Three limits, all in the increment's own record. Eight targets is few, so the eight per-target values
+(+0.0806, +0.0583, +0.0812, +0.0663, +0.0493, +0.0729, +0.0871, +0.1098) are the primary report and no
+percentile cluster bootstrap is quoted, its coverage at that cluster count being about 0.87. The
+reanalysis holds their control, their data and their splits all fixed at theirs, so it cannot separate
+those three. And nothing is said about their deep-learning arm, which is in their 2022 repository and
+not in the table reanalysed here.
 
 ## 5. What the neighbourhood's internal structure buys
 
@@ -483,10 +501,18 @@ numbers, not as a footnote.
    2026-10-25 were wrong and are corrected in place. Janela & Bajorath's line touches sections 1, 2, 3
    and 5 **not at all** — zero occurrences of modelability, MODI, ROGI, assortativity, homophily,
    Dirichlet or activity cliff in either open-access paper — and section 4a's differences are now named.
-5. **Run Janela & Bajorath's protocol on their public data.** Now specified by increment 17: their
-   metric is MAE, their 2022 control is unweighted kNN over at most five **Euclidean**-nearest
-   neighbours on 2048-bit Morgan vectors, their model arm is a CV-tuned **Tanimoto-kernel** SVR, and
-   the run must report MAE beside skill. The only thing that settles section 4a.
+5. ~~Run Janela & Bajorath's protocol on their public data~~ **DONE, increment 18.**
+   `prereg/increment18_jb_reanalysis.yaml`, blob `07c64acc2d48b320b1366b3e5a6251b1b4993a9f`;
+   `results/results_increment18.md`. Reconnaissance made it stronger than planned: their per-compound
+   predictions are published, so nothing was re-trained and no reimplementation error could be
+   mistaken for a disagreement. **It was a disagreement about scale.** Their 0.0516 MAE margin for SVR
+   against kNN — about half the ~0.1 they call negligible — is +0.0757 [+0.0601, +0.0913] of skill on
+   8 of 8 targets, against increment 14's −0.0754 on 40 different targets. All three gates passed, the
+   first reproducing all 1920 rows of their published table to 5.551e-16. See section 4a above.
+
+**The queue is empty.** All five blocking experiments are discharged: the baseline audit (14), the
+weighting family (16), the size dependence (15), the fifth prior-art pass (16 and 17), and this
+reanalysis (18).
 
 ## Dropped, with the reason
 
