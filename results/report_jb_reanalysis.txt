@@ -1,0 +1,127 @@
+wrote results/jb_reanalysis.csv (400 cells)
+
+pre-registration blob: 07c64acc2d48b320b1366b3e5a6251b1b4993a9f
+
+====================================================================================================
+GATE 1. THEIR PUBLISHED TABLE, REPRODUCED FROM THEIR OWN PREDICTIONS
+====================================================================================================
+  joined 1920 of 1920 published rows
+  MAE   n= 400  max |recomputed - published| = 2.220e-16
+  MSE   n= 400  max |recomputed - published| = 3.331e-16
+  R2    n= 400  max |recomputed - published| = 2.875e-16
+  RMSE  n= 400  max |recomputed - published| = 2.220e-16
+  r     n= 320  max |recomputed - published| = 5.551e-16
+
+  r is taken UNSQUARED, which is what their column holds; the paper's r2 is its square.
+  GATE 1: PASS at tolerance 1e-12
+
+====================================================================================================
+GATE 2. THE BASELINE IS WELL DEFINED (DECLARED WEAK)
+====================================================================================================
+  cells where the training set differs across their five arms: 0 of 80
+  cells where test and training compounds overlap:             0 of 80
+  GATE 2: PASS   (both at full scope, not at trial 0 only)
+  This cannot fail for a correct read and is NOT evidence the train-mean baseline is the
+  right normaliser. It is kept because per-algorithm training sets would make it meaningless.
+
+====================================================================================================
+GATE 3. THEIR CONSTANT ARM IS THE TRAINING MEDIAN
+====================================================================================================
+  cells with exactly one distinct MR prediction: 80 of 80
+  max |MR constant - numpy.median(train labels)| = 3.553e-15  over 80 cells
+  (the computed sd of those constant arrays runs up to 3.553e-15, which is
+   float noise at pPot magnitudes and is why this gate counts values rather than
+   thresholding a standard deviation)
+  GATE 3: PASS at tolerance 1e-12
+  An equality, not a distinctness test: distinctness alone passes if the arm were the
+  training MEAN, and then prediction 3 would pass trivially with skill exactly zero.
+
+====================================================================================================
+THE IDENTITY, STATED AND NOT TESTED
+====================================================================================================
+  R2 = r^2 - (r - b)^2 - d^2, with b = sd(pred)/sd(y) and d = (mean y - mean pred)/sd(y)
+  max residual over the 379 non-constant cells: 1.887e-15
+  calibration penalty (r-b)^2 + d^2: min 3.369e-05, median 0.0139, max 0.2476, negative on 0 cells
+  So r2 = R2 + penalty with penalty >= 0: the squared Pearson correlation is the
+  coefficient of determination plus a non-negative calibration term, and being invariant to
+  affine rescaling of the prediction it cannot see that term. This is algebra, true before
+  the data were read, and it is NOT offered as a measurement.
+
+  per-arm mean penalty: MR 0.0153  1-NN 0.0921  kNN 0.0192  RFR 0.0145  SVR 0.0035
+  A neighbour rule has b near 1 by construction and a regularised kernel machine shrinks b
+  toward r, so a penalty gap between those arms follows from their construction and is NOT
+  evidence about their modelling choices.
+
+====================================================================================================
+A. THEIR SCALE, WHICH THE PLAN FORBIDS OMITTING
+====================================================================================================
+  arm        mean MAE  mean RMSE   mean R2   mean r   mean b   mean d
+  MR           1.0255     1.2258   -0.0136  -0.0000   0.0000  -0.0502
+  1-NN         0.6666     0.9331    0.4041   0.7017   0.9864  -0.0707
+  kNN          0.6094     0.8314    0.5282   0.7380   0.8398  -0.0752
+  RFR          0.5905     0.7691    0.5967   0.7807   0.6787  -0.0329
+  SVR          0.5578     0.7396    0.6276   0.7936   0.7786  -0.0275
+
+  PREDICTION 1, their margin for the pair we compare:
+    mean(MAE_kNN - MAE_SVR) = +0.0516  [+0.0365, +0.0667]  needs <= 0.1
+    per target: +0.056 +0.041 +0.054 +0.043 +0.020 +0.054 +0.064 +0.082
+    PREDICTION 1: HOLDS
+    A reproduction of a published claim for THIS PAIR; their sentence covers all five arms
+    including the median regressor and that wider claim is not tested here.
+
+====================================================================================================
+B. THE SAME PREDICTIONS ON A VARIANCE-NORMALISED SCALE
+====================================================================================================
+  skill = 1 - RMSE_arm / RMSE_baseline, the baseline predicting each cell's TRAINING MEAN
+  arm       mean skill   per-target means
+  MR           -0.0051   -0.000 -0.002 +0.000 -0.001 +0.000 -0.023 -0.002 -0.012
+  1-NN          0.2330   +0.274 +0.329 +0.228 +0.178 +0.288 +0.243 +0.224 +0.101
+  kNN           0.3167   +0.356 +0.385 +0.288 +0.282 +0.366 +0.333 +0.311 +0.212
+  RFR           0.3680   +0.423 +0.421 +0.328 +0.339 +0.405 +0.390 +0.362 +0.276
+  SVR           0.3924   +0.437 +0.443 +0.369 +0.349 +0.415 +0.406 +0.398 +0.322
+
+  PRIMARY STATISTIC  mean(skill_SVR - skill_kNN) = +0.0757  [+0.0601, +0.0913]
+    per target: +0.0806 +0.0583 +0.0812 +0.0663 +0.0493 +0.0729 +0.0871 +0.1098
+    positive on 8/8 targets
+    band [0.025, 0.226], a factor of three either side of increment 14's -0.0754
+    PREDICTION 2: HOLDS
+    t(7) coverage is about 0.95 under symmetry and about 0.88 under strong skew; 8 targets is few, and the per-target values above are the primary report
+
+====================================================================================================
+C. PREDICTION 3, THE CONSTANT ARM AS AN INTERNAL SCALE CHECK
+====================================================================================================
+  mean |skill_MR| = 0.005981  [-0.000655, 0.012617]  needs <= 0.01
+  per target: 0.0013 0.0029 0.0017 0.0013 0.0013 0.0231 0.0034 0.0128
+  signed skill_MR is positive on 23 of 80 cells; nothing is claimed about its sign
+  PREDICTION 3: HOLDS
+  The threshold is derived, not asserted: the train median and the train mean differ, so
+  this is the one number here known from first principles rather than from their files.
+
+====================================================================================================
+D. THE OUTCOME RULE, THREE EXHAUSTIVE BRANCHES ON ONE STATISTIC
+====================================================================================================
+  the statistic is +0.0757 against the band [0.025, 0.226]
+
+  SCALE DISAGREEMENT. The two literatures' conclusions differ in SCALE and not in
+  substance: their tie and this project's gap are the same comparison on an absolute
+  and a normalised scale. Their repository contains the coefficient of determination
+  while their text reports the affine-invariant correlation, and the identity above is
+  why that matters. From here on this paper reports BOTH scales for every
+  model-against-floor comparison. No claim is made that their numbers are wrong.
+
+  Their published numbers reproduce exactly (gate 1). Nothing here says they are wrong.
+
+====================================================================================================
+E. ALL PAIRWISE ARM DIFFERENCES, BOTH SCALES
+====================================================================================================
+  pair                 MAE diff  skill diff   R2 diff   r2 diff
+  RFR vs MR             +0.4351     +0.3731   +0.6104 n/a (r undefined for a constant arm)
+  RFR vs 1-NN           +0.0761     +0.1350   +0.1927   +0.1151
+  RFR vs kNN            +0.0190     +0.0513   +0.0685   +0.0638
+  SVR vs MR             +0.4677     +0.3974   +0.6412 n/a (r undefined for a constant arm)
+  SVR vs 1-NN           +0.1088     +0.1594   +0.2235   +0.1349
+  SVR vs kNN            +0.0516     +0.0757   +0.0993   +0.0836
+
+  r2 is the SQUARE of their published r column. It has no value against MR, because a
+  correlation is undefined for a predictor that is constant by construction -- which is why
+  their own published table carries 320 r rows against 400 for every other metric.
