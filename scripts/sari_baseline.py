@@ -234,7 +234,7 @@ def report(f: pd.DataFrame, t: pd.DataFrame) -> None:
         b = incremental_contribution(s, TARGET, COVARS, predictor=PREDICTOR,
                                      n_resamples=DRAWS, seed=SEED)
         covered.append(not b.excludes_zero)
-        print(f"  {c:16s} over {rogi, modi_q2, SARI, mean_degree, n_molecules}: "
+        print(f"  {c:16s} over {{rogi, modi_q2, SARI, mean_degree, n_molecules}}: "
               f"rho={b.rho:+.4f} [{b.lo:+.4f}, {b.hi:+.4f}]  "
               f"{'EXCLUDES 0' if b.excludes_zero else 'covers 0 '}")
         # the same contribution with SARI removed, which the plan requires so a reader can see
