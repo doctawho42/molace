@@ -1,0 +1,90 @@
+
+wrote results/claim4_reweighted.csv (70 targets)
+pre-registration blob: 4e60cc1e95f3d3777311ba47317dc2c84933f847
+
+====================================================================================================
+GATE 1. THE TWO COMMITTED TABLES SIT ON ONE SPLIT
+====================================================================================================
+  merged on (collection, dataset): 70 shared targets
+  baseline_audit.skill_floor against weighting_family.g1_skill_mean_m10:
+    all 70 targets   max |difference| = 3.331e-16
+    ChEMBL-40        (40)  max |difference| = 1.110e-16
+    MoleculeACE-30   (30)  max |difference| = 3.331e-16
+  n_molecules disagreements 0 of 70; n_train disagreements 0 of 70
+  GATE 1: PASS at tolerance 1e-12
+
+====================================================================================================
+GATE 2. THE INPUTS ARE THE DECLARED ONES, AND THIS GATE CAN FAIL
+====================================================================================================
+  results/baseline_audit.csv         blob matches  e7a666011e71
+  results/weighting_family.csv       blob matches  1b136f001844
+  increment 14 selected learners outside its registered set: none
+  kernel_m outside its frozen grid: 0; kernel_alpha outside: 0; alpha == 0 on 0 targets
+  ChEMBL-40 mean skill_kernel  = +0.3839 against committed +0.3839  ok
+  ChEMBL-40 mean skill_cv      = +0.4232 against committed +0.4232  ok
+  ChEMBL-40 mean skill_floor   = +0.3478 against committed +0.3478  ok
+  GATE 2: PASS
+  An alpha of zero on every target would make the kernel arm the uniform arm and this
+  whole comparison a restatement of increment 14, which is why that clause is here.
+
+====================================================================================================
+A. ChEMBL-40, 40 targets, BOTH SCALES
+====================================================================================================
+  difference                                                  skill                  absolute RMSE
+  kernel - cv                            -0.0394 [-0.0501, -0.0289]     -0.0449 [-0.0564, -0.0339]   5/40
+  kernel - floor                         +0.0361 [+0.0305, +0.0415]     +0.0402 [+0.0340, +0.0462]   38/40
+  floor - cv                             -0.0754 [-0.0865, -0.0639]     -0.0852 [-0.0983, -0.0720]   3/40
+  m-term: uniform - floor                +0.0179 [+0.0114, +0.0242]     +0.0197 [+0.0129, +0.0263]   31/40
+  weighting: kernel - uniform            +0.0181 [+0.0146, +0.0218]     +0.0205 [+0.0163, +0.0250]   37/40
+
+====================================================================================================
+C. THE FOUR PREDICTIONS
+====================================================================================================
+  1  mean(kernel - cv) = -0.0394 against increment 14's committed -0.0754
+     PREDICTION 1: HOLDS   DERIVABLE IN ADVANCE, no evidential weight
+
+  2  the interval is [-0.0501, -0.0289]
+     PREDICTION 2: HOLDS   THE PIVOT, not derivable from means
+     per target: -0.025 -0.016 -0.007 -0.019 -0.019 -0.072 -0.103 -0.081 +0.020 -0.043 -0.046 -0.076 -0.055 -0.091 -0.045 -0.047 -0.015 -0.033 +0.044 -0.046 +0.009 -0.036 -0.052 -0.115 -0.014 -0.046 -0.013 -0.056 -0.067 -0.019 -0.020 +0.007 -0.020 -0.047 +0.018 -0.067 -0.085 -0.031 -0.092 -0.053
+     the reweighted floor is ahead on 5/40 targets
+
+  3  choosing m   +0.0179 [+0.0114, +0.0242]
+     weighting    +0.0181 [+0.0146, +0.0218]
+     total        +0.0361   decomposition residual 0.0e+00
+     PREDICTION 3: HOLDS (|difference| 0.0002 < 0.01)   DERIVABLE IN ADVANCE, no evidential weight
+
+  4  the reweighted floor is ahead on 5 of 40, needs < 8
+     PREDICTION 4: HOLDS
+     increment 14 reported the uniform floor ahead on 3 of 40; section 4a's
+     unregistered sensitivity on 1 of 31
+
+====================================================================================================
+D. THE OUTCOME RULE
+====================================================================================================
+  the paired interval is [-0.0501, -0.0289] around -0.0394
+
+  CLAIM 4 SURVIVES, WITH ITS MAGNITUDE REVISED. The gap narrows but does not
+  close: from increment 14's -0.0754 to -0.0394, of which choosing m
+  recovers +0.0179 and weighting +0.0181. The paper drops any implication
+  that the whole gap is information outside the neighbourhood, and section 4a's
+  unregistered sensitivity is replaced by this registered measurement.
+
+====================================================================================================
+E. WHAT THE FLOOR ARM SELECTED
+====================================================================================================
+  m:     {5: 7, 10: 23, 20: 2, 40: 8}
+  alpha: {0.5: 1, 0.75: 5, 1.0: 26, 1.5: 8}
+  increment 16's committed floor-arm selection regret on this collection: 0.0040
+  Selection is symmetric in FORM -- both arms choose on the training split alone --
+  but not in SEARCH COST: 40 cross-validation cells against 3. That residual
+  asymmetry points AGAINST the floor arm, the direction that keeps claim 4 alive.
+
+====================================================================================================
+B. MoleculeACE-30, 30 targets, BOTH SCALES
+====================================================================================================
+  difference                                                  skill                  absolute RMSE
+  kernel - cv                            -0.0474 [-0.0586, -0.0360]     -0.0596 [-0.0741, -0.0453]   3/30
+  kernel - floor                         +0.0474 [+0.0412, +0.0536]     +0.0575 [+0.0494, +0.0661]   30/30
+  floor - cv                             -0.0949 [-0.1084, -0.0806]     -0.1171 [-0.1356, -0.0986]   1/30
+  m-term: uniform - floor                +0.0263 [+0.0182, +0.0342]     +0.0325 [+0.0227, +0.0425]   26/30
+  weighting: kernel - uniform            +0.0211 [+0.0171, +0.0257]     +0.0250 [+0.0205, +0.0297]   30/30
