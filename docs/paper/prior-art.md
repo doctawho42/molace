@@ -355,7 +355,7 @@ roles of their two 2023 papers are reversed in increment 14's pre-registration.
 | 1 | Assortativity predicts attainable accuracy | **Known.** MODI_q2 vs QSAR_R2, Golbraikh 2014. Reported as replication at larger scale with a frozen plan. Increment 11 adds the comparison: MODI over assortativity is +0.305 [+0.026, +0.539] on ChEMBL-40 and covers zero on the other two collections, so MODI is the slightly richer of the two statistics |
 | 2 | It beats ROGI incrementally | **Survives**, and MODI is now measured (increment 11). Assortativity over MODI covers zero on all three collections, so the honest statement is that the two are near-interchangeable rankers, not that ours wins. SARI still missing |
 | 3 | Not an artefact of one fingerprint | **Survives.** No collision found |
-| 4 | It also says which model class wins | **Survives and is strengthened**, because the field's own rankings put kNN near the bottom on average and this is the conditional exception |
+| 4 | It also says which model class wins | **Survives at half its magnitude** (increment 20). The floor-against-learner gap is −0.0394 [−0.0501, −0.0289] on ChEMBL-40 and −0.0474 [−0.0586, −0.0360] on MoleculeACE-30 once BOTH arms select on the training split, against the −0.0754 and −0.0949 increment 14 reported with the floor fixed at m = 10. Half the original gap was the floor's own unexercised freedom, split evenly between choosing m (+0.0179) and choosing the weighting shape (+0.0181). The claim keeps its direction and loses the implication that the whole gap is information outside the neighbourhood. Still strengthened by the field's own rankings putting kNN near the bottom on average, this being the conditional exception |
 | 5 | Exact identity, equals a Dirichlet energy | **Object known, accounting new, and the fifth pass cleared it — see section 8.** MODI's own paper was read in full and contains no closed form, no graph or spectral language and no error formula, so the single collision that would have cost this claim does not exist. 0.0083 to 0.0123 mean absolute error reproducing MODI_q2 on 80 targets. Four framing corrections stand: `m1` is **Moran's I** (Arthur 2025) and coincides with Newman's assortativity only under row normalisation; the Dirichlet energy is the **first-moment term**, not the whole right-hand side; the graph-average-as-harmonic-energy-minimiser is Zhu, Ghahramani & Lafferty 2003; and the index enumeration must add Cui et al.'s **Label Incoherence Index**. The second moment's own ranking contribution covers zero on all three collections, so it is necessary for the identity and empirically quiet here |
 | 6 | Equal weights are near-optimal locally | **Refuted by increment 12, corrected by its own audit, and measured to the end by increment 16.** Under exchangeability the statement is a theorem about calibration and says nothing about weighting. Without the assumption, reweighting by neighbour rank is worth **+0.0155 [+0.0118, +0.0192]** once each arm gets its better `m` — not the +0.038 to +0.050 first reported, 62 % of which was the effect of fixing `m` — and increment 16 showed the whole effect is bought by **one parameter**, `w_j ∝ j^-α` with α = 1 selected on 39 of 40 targets, non-inferior to the fitted `C^-1 c` optimum at a pre-registered margin. The claim becomes "the neighbourhood mean is calibrated in total and wrong in shape, and the shape has one degree of freedom". The weighting passes it asked for are **done**: sections 7 and 8. Prior art on the weighting axis is heavy — Itskowitz & Tropsha 2005 own both arms, Nigsch 2006 owns the uniform-against-kernel comparison in QSAR, Cleveland & Devlin 1988 own the direction, Anava & Levy 2016 own one-parameter optimal local weights — and what survives is the measurement on molecular neighbourhoods and the comparison against the fitted optimum |
 | 7 | The noise floor fails out of sample, with a diagnosis | **Replication.** Must cite Atkinson, Kim, Zimmerman and claim the graph transport, not the estimator |
@@ -393,10 +393,16 @@ needs a new baseline run before anything is written.
    half ran as increment 17 and found seven collisions, none refuted, including the one that corrects
    section 7's own text: Nigsch 2006 compared a uniform arm against three weighting schemes in this
    paper's target journal.
-6. **Re-examine claim 4 under the reshaped floor**, with its own frozen plan. Claim 4 attributes the
-   floor-against-fitted-model gap to information outside the neighbourhood; **+0.0155** of that gap is
-   now known to be weighting, and known to be reachable with one parameter (increment 16). Note the
-   figure: this entry originally said +0.04, from the pre-correction reading of increment 12.
+6. ~~Re-examine claim 4 under the reshaped floor~~ **DONE, increment 20.**
+   `prereg/increment20_claim4_reweighted.yaml`, blob `4e60cc1e95f3d3777311ba47317dc2c84933f847`;
+   `results/results_increment20.md`. **Claim 4 survives at half its magnitude.** A reanalysis of two
+   committed tables, which share a split to 3.331e-16: with both arms selecting on the training split,
+   the gap is −0.0394 [−0.0501, −0.0289] on ChEMBL-40 against increment 14's −0.0754, and the recovered
+   half splits evenly between choosing `m` (+0.0179) and choosing the weighting (+0.0181). Note the
+   figures this entry has carried: it originally said +0.04 from the pre-correction reading of
+   increment 12, then +0.0155 from increment 16's corrected reshaping gain; the measured weighting term
+   against **fixed-m** uniform is +0.0181, and the earlier +0.0155 was measured against **best-m**
+   uniform. Two baselines, and the entry had conflated them.
 7. **Run Janela & Bajorath's protocol on their public data**, which section 8 has now specified: their
    metric is MAE, their 2022 control is unweighted kNN over at most five **Euclidean**-nearest
    neighbours on 2048-bit Morgan vectors, and their model arm is a CV-tuned **Tanimoto-kernel** SVR.

@@ -229,10 +229,33 @@ with the worst and left out the one that wins.
 moment's ranking contribution +0.0156, the MODI reproduction error 0.0103. The choice of baseline
 dominated the science, and nothing in the repository recorded that a choice had been made.
 
-**And the same error, pointed at us.** The audit fixed the model arm and left the floor at a fixed
-`m = 10`. Giving the floor its better `m` narrows the gap from −0.0824 to −0.0596 [−0.0708, −0.0482],
-still excluding zero, floor ahead on 1 of 31. Reported as a sensitivity because it was not
-pre-registered; a symmetric pre-registered version is owed.
+**And the same error, pointed at us — now measured under a frozen plan** (increment 20;
+`prereg/increment20_claim4_reweighted.yaml`, blob `4e60cc1e95f3d3777311ba47317dc2c84933f847`;
+`results/results_increment20.md`). The audit fixed the model arm and left the floor at a fixed
+`m = 10`. Giving the floor **its own symmetric selection** — the one-parameter rank kernel of section
+5.2, with `m` and α chosen by cross-validation on the training split, exactly as the model arm chooses
+its learner — recovers half the gap and does not close it:
+
+| | skill | absolute RMSE | floor ahead |
+|---|---|---|---|
+| uniform floor at `m = 10`, as the audit reported it | −0.0754 [−0.0865, −0.0639] | −0.0852 | 3 / 40 |
+| **reweighted floor, both arms selecting on train** | **−0.0394** [−0.0501, −0.0289] | −0.0449 | **5 / 40** |
+| recovered, of which choosing `m` | +0.0179 [+0.0114, +0.0242] | +0.0197 | 31 / 40 |
+| recovered, of which choosing the weighting | +0.0181 [+0.0146, +0.0218] | +0.0205 | 37 / 40 |
+
+On MoleculeACE-30 the same thing: −0.0949 becomes **−0.0474** [−0.0586, −0.0360], floor ahead on 3 of
+30. **48 % and 50 % of the gap recovered**, on two collections of different size and framing, and the
+recovery splits almost exactly evenly between the two freedoms — a difference of 0.0002 between them,
+with a decomposition residual of exactly zero. The weighting term reproduces section 5.2's committed
++0.0181 to four decimals, which independently confirms the two measurements sit on one split.
+
+So **half of the gap this section reported was the floor's own unexercised freedom**, and the paper no
+longer implies that the whole of it is information outside the neighbourhood. What remains excludes
+zero on both collections. Two caveats belong with it: every point estimate above was derivable from
+committed columns before the plan was frozen, so the registered content is the paired intervals and the
+sign counts; and selection is symmetric in form but not in search cost, the floor arm searching 40
+cross-validation cells against the model arm's 3 with a committed regret of 0.0040, which points
+**against** the floor arm and so cannot explain what survives.
 
 **The open question is closed: it was a disagreement about scale** (increment 18;
 `prereg/increment18_jb_reanalysis.yaml`, blob `07c64acc2d48b320b1366b3e5a6251b1b4993a9f`;
