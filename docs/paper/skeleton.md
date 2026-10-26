@@ -43,6 +43,24 @@ representation dependence. RMODI (Luque Ruiz & Gómez-Nieto, *JCIM* 2018, 58(10)
 analogue. Kernel target alignment serves the same role in closed form (Marcou, Horvath & Varnek,
 *JCIM* 2016, 56(1):6).
 
+**Measured against each other on this project's 80 targets** (increment 19;
+`prereg/increment19_sari.yaml`, blob `b62cb36b3eb92b6b960040e54c1fd1bb78aaa194`), two of the four rank
+attainable accuracy and two do not:
+
+| index | Spearman with attainable accuracy, ChEMBL-40 | incrementally over the other three |
+|---|---|---|
+| **target assortativity** | **+0.8956** [+0.7428, +0.9711] | +0.1749 [−0.1172, +0.4379] covers 0 |
+| **MODI_q2** | **+0.9233** [+0.8070, +0.9756] | +0.2161 [−0.0836, +0.4657] covers 0 |
+| ROGI | −0.3071 [−0.6140, +0.0440] covers 0 | +0.0407 [−0.2738, +0.3523] covers 0 |
+| SARI | −0.2224 [−0.5367, +0.1313] covers 0 | −0.0265 [−0.3190, +0.2754] covers 0 |
+
+Assortativity and MODI_q2 are at 0.9448 mutual Spearman — nearly the same statistic — and **no index
+adds anything over the other three on either potency collection**. SARI is not redundant with them
+(0.1467 against MODI_q2), so it measures something else, which on these targets does not predict
+attainable accuracy. Its sign is negative and its discontinuity component positively associated with
+accuracy, which this paper reports and does not resolve. `rogi` 0.1's SARI combination is a product
+where three independent restatements give a mean, and is used here only as a reported defect.
+
 Every one of these is published as a **bare point estimate per dataset**. The ROGI authors say so in
 print: *"While we do not provide a statistical estimator of ROGI uncertainty..."*, and report that
 their bootstrap *"generally correlates with, but also underestimates, the ROGI error"*. No index in the

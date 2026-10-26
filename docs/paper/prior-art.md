@@ -353,7 +353,7 @@ roles of their two 2023 papers are reversed in increment 14's pre-registration.
 | # | Claim | Verdict after the pass |
 |---|---|---|
 | 1 | Assortativity predicts attainable accuracy | **Known.** MODI_q2 vs QSAR_R2, Golbraikh 2014. Reported as replication at larger scale with a frozen plan. Increment 11 adds the comparison: MODI over assortativity is +0.305 [+0.026, +0.539] on ChEMBL-40 and covers zero on the other two collections, so MODI is the slightly richer of the two statistics |
-| 2 | It beats ROGI incrementally | **Survives**, and MODI is now measured (increment 11). Assortativity over MODI covers zero on all three collections, so the honest statement is that the two are near-interchangeable rankers, not that ours wins. SARI still missing |
+| 2 | It beats ROGI incrementally | **Does not beat it, and the baseline line splits in two** (increment 19, all three indices now measured). Of the four, TWO rank attainable accuracy and two do not: rank_assortativity +0.8956 [+0.7428, +0.9711] and MODI_q2 +0.9233 [+0.8070, +0.9756] on ChEMBL-40, against ROGI −0.3071 and SARI −0.2224, both covering zero. No index adds anything incrementally over the other three on either potency collection — assortativity's increment over {ROGI, MODI_q2, SARI} is +0.1749 [−0.1172, +0.4379], and removing SARI from the covariate set moves it by 0.005. And the four are NOT mutually redundant: MODI_q2 against SARI is 0.1467. So the honest statement is that **assortativity and MODI_q2 are interchangeable with each other** at 0.9448 mutual, not that ours wins and not that all four are one thing |
 | 3 | Not an artefact of one fingerprint | **Survives.** No collision found |
 | 4 | It also says which model class wins | **Survives at half its magnitude** (increment 20). The floor-against-learner gap is −0.0394 [−0.0501, −0.0289] on ChEMBL-40 and −0.0474 [−0.0586, −0.0360] on MoleculeACE-30 once BOTH arms select on the training split, against the −0.0754 and −0.0949 increment 14 reported with the floor fixed at m = 10. Half the original gap was the floor's own unexercised freedom, split evenly between choosing m (+0.0179) and choosing the weighting shape (+0.0181). The claim keeps its direction and loses the implication that the whole gap is information outside the neighbourhood. Still strengthened by the field's own rankings putting kNN near the bottom on average, this being the conditional exception |
 | 5 | Exact identity, equals a Dirichlet energy | **Object known, accounting new, and the fifth pass cleared it — see section 8.** MODI's own paper was read in full and contains no closed form, no graph or spectral language and no error formula, so the single collision that would have cost this claim does not exist. 0.0083 to 0.0123 mean absolute error reproducing MODI_q2 on 80 targets. Four framing corrections stand: `m1` is **Moran's I** (Arthur 2025) and coincides with Newman's assortativity only under row normalisation; the Dirichlet energy is the **first-moment term**, not the whole right-hand side; the graph-average-as-harmonic-energy-minimiser is Zhu, Ghahramani & Lafferty 2003; and the index enumeration must add Cui et al.'s **Label Incoherence Index**. The second moment's own ranking contribution covers zero on all three collections, so it is necessary for the identity and empirically quiet here |
@@ -386,7 +386,18 @@ needs a new baseline run before anything is written.
    increment 17, section 8.** MODI's own paper read in full: no closed form, no graph or spectral
    language, no error formula, no size analysis. **Claim 5 survives.** Four framing corrections, none
    of them a refutation.
-4. **SARI** as a third baseline, nice to have rather than required.
+4. ~~SARI as a third baseline~~ **DONE, increment 19.** `prereg/increment19_sari.yaml`, blob
+   `b62cb36b3eb92b6b960040e54c1fd1bb78aaa194`; `results/results_increment19.md`. It turned out to
+   matter more than "nice to have": it is what showed that **two of the four indices do not rank** on
+   this data. Three findings travel with it. SARI's association with attainable accuracy is NEGATIVE on
+   both potency collections and its `raw_disc` component correlates POSITIVELY at +0.2422, the opposite
+   of the naive reading; complementing the continuity term does not rescue it, so the orientation is
+   reported and explicitly not resolved, the 2007 primary source being paywalled and unread. The `rogi`
+   package version 0.1 computes the combination as a PRODUCT where three independent restatements give
+   the MEAN, and the product is bounded above by 0.5 while published SARI values exceed it — a defect
+   in that package, measured here at Spearman 0.9464 against the published form. And SARI presumes
+   positive log-potency: 8 of the 10 DeepDelta targets carry non-positive labels down to −25.470, where
+   its weight goes negative, so that collection is outside the index's domain and enters no conclusion.
 5. ~~A fifth pass on weighted kNN in QSAR~~ **DONE in two halves: sections 7 and 8.** The
    distance- and rank-weighted half ran with increment 16 and found that three of this project's own
    citations were wrong about what they cite. The similarity-weighted and locally-weighted-regression
