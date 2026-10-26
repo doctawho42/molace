@@ -1,0 +1,252 @@
+# Increment 19: SARI as the third baseline index
+#
+# SECOND DRAFT. The first went through an adversarial pre-freeze review which, across this draft and
+# increment 20's, raised 47 findings; 32 survived verification and 8 were fatal, of which FIVE were
+# this draft's. Every constant below was re-derived here rather than copied.
+#
+# WHY. Item 4 of prior-art.md's "Required before drafting", and the only unfinished part of claim 2's
+# verdict row: "Assortativity over MODI covers zero on all three collections ... SARI still missing."
+#
+# WHAT SARI IS. The raw scores come from the originating group's own restatement, Balfer & Bajorath,
+# PLoS One 2015, eqs (1)-(2), which the `rogi` package's implementation matches exactly:
+#
+#   w_ij      = y_i * y_j / (1 + |y_i - y_j|)                       over pairs i > j
+#   raw_cont  = 1 - sum_ij w_ij * sim_ij / sum_ij w_ij
+#   raw_disc  = sum over pairs with sim_ij > t of |y_i - y_j| * sim_ij , divided by their count
+#   SARI      = 0.5 * ( Phi(z_cont) + (1 - Phi(z_disc)) )
+#
+# FIVE THINGS THE FIRST DRAFT GOT WRONG, each corrected and each measured.
+#
+#  (1) THE COMBINATION. The first draft made 0.5 * score_cont * (1 - score_disc) primary, on the
+#      grounds that it is the field's own code. THE PRODUCT IS A BUG IN rogi 0.1, not a rival
+#      convention. The arithmetic settles it: a product of two quantities in (0,1) times 0.5 is hard
+#      bounded by 0.5, while published SARI values above 0.5 exist -- SPARFlow (J Cheminform 2026)
+#      Table 1 reports 0.958, 0.897, 0.577 and 0.534, and Sanches et al. 2024 reports 0.7, 0.88 and
+#      0.87. Three independent sources give the MEAN: SPARFlow eq. 13, Guha WIREs Comput Mol Sci 2012
+#      eq. 3, and Guha Methods Mol Biol 2011 eq. 2, the last adding "the SARI values will range from 0
+#      to 1". And the discrepancy is isolated to the one line the originating group's own paper does
+#      not restate: Balfer & Bajorath 2015 gives cont_raw, disc_raw and w_ij exactly as the code
+#      computes them, and stops before the combination. So "the code is right" is unavailable.
+#      THE SUM IS PRIMARY. The product is reported beside it as a NAMED DEFECT of rogi 0.1, not as a
+#      second convention, and the generic rule the first draft wrote -- "if the paper's equations
+#      differ from its own field's reference code, this increment inherits the code's reading" -- IS
+#      STRUCK, because here the code is right everywhere the group's paper can check it and wrong
+#      exactly where it cannot.
+#      MEASURED AND DISCLOSED: the two forms rank these 80 targets at Spearman 0.9343 at t = 0.6 and
+#      0.9283 at t = 0.56, so the defect changes the ranking materially. The first draft registered a
+#      prediction that the two agree at 0.95 or better; that prediction WOULD HAVE FAILED, and it is
+#      not carried forward as a prediction since its value is now known.
+#
+#  (2) THE TARGET VARIABLE. The first draft named `skill` from results/rogi_chembl.csv and
+#      `skill_absolute` from results/rogi_showdown.csv. A script following it joins ZERO of 80 rows:
+#      rogi_chembl.csv has no `collection` column, and rogi_showdown.csv holds MoleculeACE-30 and
+#      TDC-9 -- not DeepDelta-10, with which TDC shares no dataset name. Worse, increment 11's result,
+#      the one claim 2's row rests on, was measured on `best_skill`, and best_skill differs from
+#      rogi_chembl's `skill` by up to 0.1786 on ChEMBL-40 (Pearson 0.971), so the first draft's
+#      promise to continue increment 11 was false on its own target.
+#      THE TARGET IS `best_skill` FROM results/modi_baseline.csv: 80 rows, zero NaN, `dataset` unique
+#      across all three collections, and the only frame that also carries modi_q2 -- so it removes a
+#      join rather than adding one.
+#
+#  (3) THE DISCLOSURE ABOUT NORMALISATION WAS FALSE ARITHMETIC. The first draft said SARI "collapses to
+#      about 0 on every dataset" without a reference set. Measured on these 80 with the defaults
+#      mu = 0 and sd = 1: the SUM form spans 0.4748 to 0.6332. It does not collapse; IT COMPRESSES,
+#      into a range of 0.16 where the normalised form spans 0.046 to 0.943. The reference set is needed
+#      to recover spread, and since the registered statistic is rank-based it would survive the
+#      compression anyway -- so the honest reason to declare one is to follow published practice and to
+#      make the values legible, not to avoid a collapse.
+#
+#  (4) THE THRESHOLD. The first draft kept rogi 0.1's hardcoded 0.6 as primary. 0.6 is a MACCS-era
+#      constant; the applied literature uses 0.56 for ECFP4, which is this project's representation.
+#      0.56 IS PRIMARY and 0.6 is the sensitivity. Measured: every one of the 80 targets has at least
+#      one pair above each threshold, so the reference implementation's 1e8 sentinel never fires.
+#
+#  (5) THE POTENCY VECTOR WAS NEVER DECLARED, and declaring it exposes a domain violation.
+#      SARI's weight w_ij = y_i*y_j/(1+|y_i-y_j|) presumes POSITIVE log-potency. Measured: 8 of the 10
+#      DeepDelta targets carry non-positive labels, and the label range over all 80 targets runs from
+#      -25.470 to 11.000. On those targets w_ij goes NEGATIVE and the weighted mean in raw_cont is not
+#      a weighted mean. DeepDelta-10 is therefore OUTSIDE SARI's DOMAIN, which is a fact about the
+#      index and is handled as follows rather than hidden: the reference set pools the 70 POTENCY
+#      targets only, DeepDelta-10's SARI is computed against that same reference set and reported
+#      FLAGGED AS OUT OF DOMAIN, and no outcome branch depends on it.
+#
+# AND ONE SIMPLIFICATION THE REVIEW MADE POSSIBLE. The first draft used a vectorised fast path with a
+# gate tying it to the reference implementation. Measured: the reference path costs 0.06 to 0.32 s on
+# targets up to n = 700, so about 44 s on the largest at n = 8205 and roughly ten minutes over all 80,
+# while the vectorised path would hold five upper-triangle arrays, about 1.3 GB at that size. THE
+# REFERENCE IMPLEMENTATION IS USED DIRECTLY ON ALL 80 TARGETS. No fast path, no substitution, and the
+# gate that would have licensed one is gone.
+
+provenance:
+  claim_under_test: claim 2's verdict row in docs/paper/prior-art.md, and item 4 of its required list
+  what_is_new_here: >
+    nothing about SARI. The index is published; this computes it on this project's targets and puts it
+    into the comparison ROGI and MODI are already in.
+  raw_score_source: >
+    Balfer, J.; Bajorath, J. PLoS One 2015 (PMC4350943), eqs (1)-(2), the originating group's own
+    restatement, which the `rogi` package version 0.1 implements exactly
+  combination_source: >
+    Guha, Methods Mol Biol 2011 (PMC3159128) eq. 2; Guha, WIREs Comput Mol Sci 2012 (PMC3807878) eq. 3;
+    SPARFlow, J Cheminform 2026 (PMC13112764) eq. 13. All three give the mean.
+  primary_source_not_read: >
+    Peltason & Bajorath, J. Med. Chem. 2007, 50(23):5571-5578 is paywalled and was not obtained. The
+    equations above are from the originating group's later restatement and from three independent
+    restatements of the combination, which agree with each other.
+  known_defect_in_the_implementation: >
+    rogi 0.1 computes the combination as a product. This increment uses the published mean and reports
+    the product beside it as that package's defect.
+  measured_before_freezing_and_disclosed: >
+    the two combination forms rank these 80 targets at Spearman 0.9343 (t = 0.6) and 0.9283
+    (t = 0.56). That value is known to the author and is therefore not registered as a prediction.
+
+shared:
+  the_index_is_computed_with: >
+    the `rogi` package version 0.1 SARI class, called with this project's own ECFP4 Tanimoto matrix
+    through its sim_matrix argument, using compute_raw_scores() only; the combination is applied by
+    this increment's own script from the published mean
+  potency_vector:
+    chembl_40: the `y` column of data/raw/chembl_targets/<dataset>.csv
+    moleculeace_30: the `y` column returned by molace.data.moleculeace.load_target
+    deepdelta_10: the `Y` column of the DeepDelta benchmark CSVs
+    scale: >
+      as stored, pKi/pEC50-like log units for the 70 potency targets, with NO centring, standardisation
+      or rescaling, because SARI's weight is a product of two potency values and any shift changes it
+  similarity: the project's own ECFP4 Tanimoto matrix, so SARI is computed on the SAME representation
+    as assortativity, ROGI and MODI and the comparison is not a comparison of fingerprints
+  threshold: 0.56 primary (ECFP4), 0.6 as a sensitivity
+  combination: the published mean, 0.5 * (Phi(z_cont) + (1 - Phi(z_disc)))
+  reference_set_for_the_z_scores: >
+    the 70 POTENCY targets, ChEMBL-40 and MoleculeACE-30 pooled, one mean and one standard deviation
+    for each raw score. DeepDelta-10 is scored against that same reference set and flagged out of
+    domain; it does not enter the reference set.
+  target_variable: >
+    `best_skill` from results/modi_baseline.csv, which is what increment 11 measured and the only
+    definition that exists for all 80 targets
+  covariates: >
+    rogi, modi_q2, mean_degree and n_molecules, the COVARS set of scripts/rogi_chembl.py with modi_q2
+    added, as increment 11 used
+  statistic: >
+    molace.analysis.correlate.incremental_contribution, 10000 draws, seed 0, each target its own
+    cluster
+  seed: 0
+
+design_gates:
+  evaluated_before_any_outcome_is_read: true
+  gate_1_the_join_is_complete:
+    passes_iff: >
+      all 80 targets of results/modi_baseline.csv join by `dataset` to a SARI value and to every
+      covariate, with no missing target variable and no missing covariate, and the three collection
+      labels partition the 80 as 40 / 30 / 10
+    why_a_hard_stop_and_not_a_bookkeeping_note: >
+      the first draft declared this check unable to fail, and it is the ONLY thing standing between a
+      wrong frame name and a silent 70-target run that would have been reported as 80. A declared-weak
+      gate is the defect that has cost this project a fatal finding in each of the last four
+      increments.
+    checked_before_freezing: >
+      `dataset` is unique over all 80 rows of modi_baseline.csv; best_skill and modi_q2 have zero NaN.
+      The covariates rogi and mean_degree must be joined from the index frames and THAT join is what
+      this gate exists to check, since DeepDelta-10's rogi lives in a different file from ChEMBL-40's.
+    if_it_fails: the increment stops and the discrepancy is the report
+  gate_2_the_threshold_leaves_pairs:
+    passes_iff: every target has at least one pair above the threshold in use
+    checked_before_freezing: >
+      0 of 80 targets have zero qualifying pairs at either 0.56 or 0.6, so the reference
+      implementation's 1e8 sentinel never fires on this data. This gate is therefore KNOWN TO PASS and
+      is kept as a precondition record rather than offered as a live test; it is not called weak, it
+      is called already-measured.
+  gate_3_the_domain_violation_is_confined:
+    passes_iff: >
+      every target in the reference set has strictly positive labels, and every target with a
+      non-positive label is flagged out of domain and is absent from the reference set
+    checked_before_freezing: >
+      8 of the 10 DeepDelta targets carry non-positive labels, label range over all 80 is -25.470 to
+      11.000, and 0 of the 70 potency targets do. This gate CAN fail -- it fails if a potency target
+      turns out to carry a non-positive label -- and it stops the increment if it does.
+    if_it_fails: the increment stops and the discrepancy is the report
+
+predictions_registered_in_advance:
+  prediction_1:
+    text: SARI ranks attainable accuracy on its own
+    holds_iff: >
+      the cluster-bootstrap Spearman of SARI against best_skill excludes zero on ChEMBL-40, the
+      primary collection
+    status: >
+      expected but not certain. SARI is built from potency differences over similar pairs, the same raw
+      material as the other indices, and this project's ROGI and MODI both rank. A failure would be a
+      finding about SARI, not about this project.
+  prediction_2:
+    text: assortativity adds nothing over the three published indices together
+    holds_iff: >
+      the incremental contribution of rank_assortativity over {rogi, modi_q2, SARI} plus mean_degree
+      and n_molecules covers zero on BOTH potency collections, ChEMBL-40 and MoleculeACE-30
+    status: >
+      THE PRIMARY, and registered in the direction that COSTS this project its claim-2 story.
+      Increment 11 already found assortativity's increment over MODI covering zero on all three
+      collections, and this adds a third correlated competitor, which can only make exclusion harder.
+      So the honest expectation is that it still covers zero and the claim stays "near-interchangeable
+      rankers". A failure would be in this project's favour, which is why it is registered this way
+      round -- and why a failure must be reported with the suspicion that a degraded competitor index
+      caused it, which is exactly what the rogi 0.1 product form would have done had it been used.
+    restricted_to_the_potency_collections: >
+      DeepDelta-10 is excluded from this prediction because SARI is out of its domain, and because
+      five covariates on ten targets would not support the statistic in any case. Its values are
+      reported descriptively.
+  prediction_3:
+    text: the four indices are mutually redundant as rankers
+    holds_iff: >
+      every pairwise Spearman among {rank_assortativity, rogi, modi_q2, SARI} on ChEMBL-40 has absolute
+      value at least 0.3
+    status: >
+      a descriptive floor on the claim that these are "near-interchangeable rankers", registered so
+      that the phrase has a measured basis rather than resting on the incremental contributions alone.
+      Not known in advance: the committed frames carry three of the four indices but their mutual
+      correlations have not been computed here.
+
+outcome_rule:
+  primary_statistic: >
+    the incremental contribution of rank_assortativity over {rogi, modi_q2, SARI, mean_degree,
+    n_molecules} against best_skill, on ChEMBL-40 and on MoleculeACE-30
+  branch_interchangeable:
+    iff: prediction 2 holds
+    then: >
+      claim 2's row is completed as "near-interchangeable rankers" with all three published indices
+      named, and the paper stops claiming an incremental win over the baseline line. The row's
+      "SARI still missing" clause is removed.
+  branch_assortativity_adds:
+    iff: the increment excludes zero on at least one potency collection
+    then: >
+      stated per collection with the interval, and explicitly NOT generalised: increment 11 found the
+      MODI comparison collection-dependent already. The report must also state that a weakened SARI
+      would produce this result spuriously, give the measured Spearman between the index and
+      best_skill so a reader can judge whether SARI is doing work, and repeat the comparison with SARI
+      removed from the covariate set so the reader sees whether SARI's presence changed anything.
+  whatever_happens: >
+    the 80 SARI values on both combination forms and both thresholds with the out-of-domain flag; the
+    pooled z-score inputs; every pairwise Spearman among the four indices per collection; each index's
+    standalone correlation with best_skill; and the incremental contribution of every index over the
+    other three
+
+limits_stated_in_advance:
+  - SARI's absolute value here is self-referential, the reference set being the 70 potency targets of
+    this project. Only its ranking is used and only its ranking is reported as meaningful; no value is
+    comparable to a published SARI number or threshold.
+  - The primary source was not read. The equations are the originating group's own later restatement
+    plus three independent restatements of the combination.
+  - rogi 0.1's combination is a defect and is not used; its raw scores are used and are correct.
+  - DeepDelta-10 is outside SARI's domain because 8 of its 10 targets carry non-positive labels. Its
+    values are reported and flagged and enter no conclusion.
+  - The target variable is increment 11's `best_skill`, a maximum over model families, so this
+    increment inherits whatever that arm is. It is not increment 14's CV-selected arm, which does not
+    exist for DeepDelta-10.
+
+forbidden:
+  - Using the product combination as SARI. It is rogi 0.1's defect and is reported as such.
+  - Writing any rule that defers to an implementation over a published equation.
+  - Changing the reference set, the threshold, the combination, the target variable or the covariate
+    set after seeing a value.
+  - Including a non-positive-label target in the reference set, or in any conclusion.
+  - Declaring any gate unable to fail.
+  - Registering a prediction whose value is already known, which is why the sum-against-product
+    agreement is a disclosure and not a prediction.
+  - Reporting SARI's absolute value as comparable to a published one.
+  - Claiming anything new about SARI itself.
